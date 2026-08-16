@@ -1,0 +1,75 @@
+{
+  "blocking_findings": [],
+  "claim_assessments": [
+    {
+      "claim_id": "D1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "D2",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "A1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "P1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "P2",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "L1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "T1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "C1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "N1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "I1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "E1",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "A2",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    },
+    {
+      "claim_id": "C2",
+      "explanation": "Claim aligns with explicit Epistemic rules.",
+      "status": "supported"
+    }
+  ],
+  "confidence": 1,
+  "continue": false,
+  "counterexamples": [],
+  "required_changes": [],
+  "verdict": "ACCEPT"
+}

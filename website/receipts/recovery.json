@@ -1,0 +1,19 @@
+{
+  "schema": "principia.pilot.recovery.v1",
+  "status": "ok",
+  "task_id": "complete_publication",
+  "review_fix_passes": 1,
+  "paper_review": {
+    "topic_series_verdict": "ACCEPT",
+    "synthesis_findings_applied": ["S-P1", "S-N3"],
+    "latex_exit_status": 0,
+    "page_counts": [6, 6, 6, 6]
+  },
+  "formal_verification": {
+    "lean_exit_status": 0,
+    "lean_placeholders_found": 0,
+    "haskell_exit_status": 0,
+    "strict_warning_policy": "-Wall -Wextra -Werror"
+  },
+  "unresolved_errors": []
+}

@@ -1,0 +1,66 @@
+{
+  "verdict": "MAJOR",
+  "confidence": 0.98,
+  "continue": true,
+  "blocking_findings": [
+    "The footer does not preserve the required epistemic taxonomy. It collapses lemma, proposition, theorem, corollary, and new result into “proved result,” while omitting axiom and the explicit new-result category. Its universal statement that “Every claim is labeled” is also broader than the evidence presented on the page.",
+    "The page advertises “machine-checked representative formal artifacts” but provides no links to Proofs.lean, Core.hs, formal.json, or an explanation of their deliberately limited scope. Visitors therefore cannot inspect the evidence supporting the claim.",
+    "The website provides no source-grounding or receipt interface: the paper cards expose only PDFs, with no links to LaTeX sources, review records, build receipts, hashes, or claim identifiers. The existing website receipt verifies file hashes only; it does not record link, responsive-layout, accessibility, security, or rendered-page checks."
+  ],
+  "required_changes": [
+    "Replace the footer with wording that enumerates the exact categories: definition, axiom, assumption, conjecture, lemma, proposition, theorem, corollary, interpretation, empirical statement, established physical result, and new result. Avoid claiming universal compliance unless backed by an auditable claim ledger.",
+    "Add inspectable links for formal/lean/Proofs.lean, formal/haskell/Core.hs, and receipts/formal.json. State that these artifacts check finite algebraic and bookkeeping shadows and do not formalize the differential geometry or physical realization.",
+    "Add a provenance or verification section linking the LaTeX sources, relevant reviews, and build receipts, including the corrected synthesis and its S-P1 and S-N3 claims.",
+    "Run and record deployment-layout link checks for all four PDF URLs. The local targets exist and their hashes match latex.json, but the ../papers/... URLs require the deployed web root to include the sibling papers directory.",
+    "Make repeated “Read PDF” links uniquely named for assistive technology, for example “Read Compositional Systems PDF.”",
+    "Use an absolute deployed URL for og:image and add basic Open Graph description metadata before deployment.",
+    "Extend receipts/website.json, or add a separate receipt, to record the deployed URL, HTTP status of each link, responsive viewport checks, accessibility checks, and security-header checks."
+  ],
+  "counterexamples": [
+    "A visitor following the claim about machine-checked artifacts cannot reach either formal artifact from the website; only the four PDFs are linked.",
+    "If only the website directory is published as the hosting root, every ../papers/pdf/... link resolves outside that root and returns 404.",
+    "The synthesis distinguishes S-N3 specifically as a “New result claimed by this work,” whereas the website footer erases that distinction under the generic phrase “proved result.”"
+  ],
+  "claim_assessments": [
+    {
+      "claim_id": "WEB-PAPERS",
+      "status": "supported",
+      "explanation": "All four local PDF targets exist, are valid six-page PDF 1.7 files, and their SHA-256 hashes match receipts/latex.json. Deployment reachability remains unverified."
+    },
+    {
+      "claim_id": "WEB-FORMAL",
+      "status": "unsupported",
+      "explanation": "receipts/formal.json reports verified=true and its hashes match the final Lean and Haskell files, but the website neither links those files nor states the limited scope of their checks."
+    },
+    {
+      "claim_id": "WEB-INDEPENDENCE",
+      "status": "uncertain",
+      "explanation": "topic-workers.json records separate topic tasks, but the public phrase “independently researched” is undefined and has no visible provenance link."
+    },
+    {
+      "claim_id": "WEB-EPISTEMIC",
+      "status": "contradicted",
+      "explanation": "The footer collapses and omits categories that the governing epistemic contract requires to remain distinct."
+    },
+    {
+      "claim_id": "WEB-MATH",
+      "status": "not_applicable",
+      "explanation": "The HTML contains no mathematical notation or math-rendering library. Mathematical content is delegated to the linked PDFs, whose text extraction confirms the corrected S-P1 and S-N3 statements."
+    },
+    {
+      "claim_id": "WEB-RESPONSIVE",
+      "status": "supported",
+      "explanation": "The stylesheet uses a fluid maximum-width layout, clamp-based heading size, auto-fit cards, and a narrow-screen media rule. No obvious static overflow defect was found, although no browser-based viewport receipt was supplied."
+    },
+    {
+      "claim_id": "WEB-SECURITY",
+      "status": "supported",
+      "explanation": "The page contains no scripts, forms, inline event handlers, or remote dependencies. Deployment security headers cannot be assessed from the supplied static files."
+    },
+    {
+      "claim_id": "WEB-RECEIPT",
+      "status": "uncertain",
+      "explanation": "receipts/website.json hashes match all three website files, but status=ok is not accompanied by evidence for link checking, accessibility, responsive rendering, or deployed HTTP behavior."
+    }
+  ]
+}

@@ -1,0 +1,454 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,hyperref}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{axiom}[definition]{Axiom}
+\newtheorem{assumption}[definition]{Assumption}
+\newtheorem{conjecture}[definition]{Conjecture}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{interpretation}[definition]{Interpretation}
+\newtheorem{empirical}[definition]{Empirical statement}
+\newtheorem{established}[definition]{Established physical result}
+\newtheorem{newresult}[definition]{New result claimed by this work}
+\newtheorem{counterexample}[definition]{Counterexample}
+\newtheorem{example}[definition]{Example}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Lie}{\mathcal{L}}
+
+\title{Layered Composition, Reciprocity, and Protocol-Relative Realization}
+\author{PRINCIPIA PHYSICA Synthesis}
+\date{15 August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This synthesis separates mathematical admissibility from physical realization.
+It defines a layered realized theory object, proves a reciprocity trichotomy for
+a linear interconnection, and proves that closed-system isomorphism need not
+preserve a fixed empirical protocol. It also corrects an earlier claim about
+limits and composition: for the oscillator family, the zero-frequency limit
+commutes with composition when the interaction parameter is retained. A
+different trajectory arises only when that interface datum is discarded.
+Lean and Haskell companions formalize finite logical and computational shadows
+of these claims; neither artifact formalizes the differential geometry in full.
+\end{abstract}
+
+\section{Epistemic discipline}
+
+\begin{assumption}[Finite-dimensional scope, S-A1]
+All state spaces considered below are finite-dimensional smooth manifolds.
+Claims about field theory, general relativity, and quantum theory are outside
+the proved scope.
+\end{assumption}
+
+\begin{axiom}[Synthesis discipline, S-A2]
+A synthesis may translate inherited claims and prove consequences from jointly
+satisfiable hypotheses. It may not promote an inherited epistemic label, treat
+agreement as evidence, or identify mathematical admissibility with empirical
+realization.
+\end{axiom}
+
+\begin{interpretation}[Founding thesis, S-I1]
+The thesis that physics studies empirically realized compositional mathematical
+structures is treated as a methodological proposal. The mathematical results
+below test distinctions required by that proposal; they do not establish its
+exhaustiveness or empirical truth.
+\end{interpretation}
+
+\section{Layered realized systems}
+
+\begin{definition}[Realized theory object, S-D1]
+A realized theory object is a tuple
+\[
+  \mathcal R=(K,D,I,E,P,A),
+\]
+where $K$ contains states, observables, and declared geometry; $D$ contains a
+generator and its flow domain; $I$ contains ports and interaction data; $E$
+contains preparations, measurement kernels, calibration, and uncertainty;
+$P$ is a protocol; and $A$ is a predeclared adequacy rule. Mathematical
+admissibility concerns the appropriate mathematical components. Physical
+realization additionally requires empirical input in $E$, $P$, and $A$.
+\end{definition}
+
+\begin{proposition}[Vocabulary translation is not top-level injective, S-P1]
+The assignment in Table~\ref{tab:translation} is a function on the listed
+source notions, but it is not injective into the set
+$\{K,D,I,E,P,A\}$. In particular, kinematical product and observable embedding
+both map to $K$, while preparation distributions and measurement kernels both
+map to $E$.
+\end{proposition}
+
+\begin{proof}
+Every row in Table~\ref{tab:translation} has one source and one target, so the
+displayed assignment is a function. The first two rows have the same target
+$K$, and the last two rows have the same target $E$. Hence the assignment is
+not injective into the six top-level components. The parenthetical qualifiers
+identify distinct substructures within those components; they do not create
+additional top-level tuple entries.
+\end{proof}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+Source notion & Target & Internal field \\
+\midrule
+Kinematical product & $K$ & state space \\
+Observable embedding & $K$ & observable algebra \\
+Dynamical factorization & $D$ & generator and flow \\
+Port observable & $I$ & distinguished observable \\
+Preparation distribution & $E$ & preparation field \\
+Measurement kernel & $E$ & measurement field \\
+Adequacy rule & $A$ & acceptance region \\
+\bottomrule
+\end{tabular}
+\caption{A non-injective translation into the layered carrier.}
+\label{tab:translation}
+\end{table}
+
+\section{Reciprocity and factorization}
+
+Let $X=\R^{2n_1}\times\R^{2n_2}$ have canonical product symplectic form
+$\omega_\oplus$. For matrices $C_{12}$ and $C_{21}$, define
+\[
+ Y=(0,-C_{12}q_2,0,-C_{21}q_1).
+\]
+
+\begin{lemma}[Contraction calculation, S-L1]
+For the stated field,
+\[
+ \iota_Y\omega_\oplus
+ =-(C_{12}q_2)\cdot dq_1-(C_{21}q_1)\cdot dq_2,
+\]
+and
+\[
+ d(\iota_Y\omega_\oplus)
+ =\sum_{a,b}\bigl((C_{21})_{ba}-(C_{12})_{ab}\bigr)
+   dq_{1a}\wedge dq_{2b}.
+\]
+\end{lemma}
+
+\begin{proof}
+For a canonical pair, contraction of $(\dot q,\dot p)$ with
+$dq\wedge dp$ is $\dot q\,dp-\dot p\,dq$. Substitution of the two momentum
+components of $Y$ gives the first display. Differentiating each coefficient and
+reordering $dq_{2b}\wedge dq_{1a}=-dq_{1a}\wedge dq_{2b}$ gives the second.
+\end{proof}
+
+\begin{newresult}[Linear composition trichotomy, S-N1]
+Relative to $\omega_\oplus$, the stated family has three disjoint classes:
+(i) $C_{12}=C_{21}=0$, for which the dynamics factorize; (ii)
+$C_{21}=C_{12}^{T}\ne0$, for which the interconnection is Hamiltonian but does
+not factorize; and (iii) $C_{21}\ne C_{12}^{T}$, for which the interconnection
+does not preserve $\omega_\oplus$.
+\end{newresult}
+
+\begin{proof}
+By Cartan's formula and $d\omega_\oplus=0$,
+$\Lie_Y\omega_\oplus=d(\iota_Y\omega_\oplus)$. Lemma S-L1 makes this zero
+exactly when $C_{21}=C_{12}^{T}$. If both matrices vanish, $Y=0$ and an
+additive factor generator remains. If the reciprocal matrices are nonzero,
+$Y$ has a component depending on the other factor, so the vector field is not
+a product field. If reciprocity fails, the displayed Lie derivative is
+nonzero. These conditions are mutually exclusive and exhaustive.
+\end{proof}
+
+\begin{corollary}[Hamiltonian does not imply factorized, S-C1]
+The decoupled class is a proper subset of the Hamiltonian class whenever a
+nonzero matrix $C$ is available: take $C_{12}=C$ and $C_{21}=C^T$.
+\end{corollary}
+
+\begin{example}[Normal modes expose the middle class]
+For one degree of freedom in each factor, take
+$C_{12}=C_{21}=c\ne0$ and add identical oscillator Hamiltonians.  The equations
+for $q_\pm=(q_1\pm q_2)/\sqrt2$ decouple into normal modes with squared
+frequencies $\omega^2\pm c/m$.  Thus the total system has a Hamiltonian flow,
+yet neither original factor evolves without reference to the other.  The
+example witnesses class (ii) of S-N1 without relying only on the abstract
+matrix criterion.
+\end{example}
+
+\begin{counterexample}[Volume preservation is not reciprocity]
+The divergence of $Y$ is zero for every pair $C_{12},C_{21}$ because its
+Jacobian has zero diagonal.  Taking $C_{12}=0$ and $C_{21}\ne0$ therefore
+gives a volume-preserving interconnection in class (iii).  Preservation of
+phase volume alone cannot replace preservation of $\omega_\oplus$.
+\end{counterexample}
+
+\section{Closed isomorphism and empirical protocol}
+
+\begin{newresult}[Protocol distinction survives closed isomorphism, S-N2]
+Let
+\[
+ H_m(q,p)=\frac{p^2}{2m}+\frac{m\omega_0^2q^2}{2}.
+\]
+For positive $m,m'$, the map
+$F(q,p)=(\alpha q,p/\alpha)$ with $\alpha=\sqrt{m/m'}$ is symplectic and
+satisfies $H_{m'}\circ F=H_m$. Nevertheless, a fixed protocol preparing
+$(q,p)=(0,1)$ and reading the unscaled coordinate $q(t)$ distinguishes the
+masses whenever the two predicted readings differ.
+\end{newresult}
+
+\begin{proof}
+The pullback of $dq\wedge dp$ under $F$ is
+$d(\alpha q)\wedge d(p/\alpha)=dq\wedge dp$. Direct substitution gives
+$H_{m'}(F(q,p))=H_m(q,p)$. The prepared solution is
+$q_m(t)=\sin(\omega_0t)/(m\omega_0)$. Thus, for example, $m=1$, $m'=4$,
+$\omega_0=1$, and $t=1$ give readings $\sin 1$ and $\sin 1/4$, which are
+unequal. The mathematical isomorphism does not transport the fixed calibration
+used by the protocol.
+\end{proof}
+
+\begin{interpretation}[Calibration transport, S-I2]
+Transporting the port calibration with $F$ removes this particular protocol
+difference. Keeping the calibration fixed does not. This is an interpretation
+of S-N2, not an empirical assertion that either oscillator is physically
+realized.
+\end{interpretation}
+
+\begin{proposition}[Transported protocol restores equivalence, S-P2]
+Let a protocol for $H_m$ have preparation measure $\pi$, evolution $\phi_t$,
+and measurement kernel $K$.  Define the protocol for $H_{m'}$ by
+$\pi'=F_*\pi$, $\phi'_t=F\phi_tF^{-1}$, and
+$K'(x,B)=K(F^{-1}x,B)$.  Then the two predicted outcome measures agree for
+every admitted time and event $B$.
+\end{proposition}
+\begin{proof}
+The primed prediction is
+\[
+ \int K'(\phi'_t(x),B)\,d\pi'(x)
+ =\int K(F^{-1}F\phi_t(y),B)\,d\pi(y)
+ =\int K(\phi_t(y),B)\,d\pi(y),
+\]
+where the first equality uses the pushforward change of variables.  This is
+the unprimed prediction.  S-N2 differs because it intentionally fixes rather
+than transports the preparation and coordinate calibration.
+\end{proof}
+
+\begin{counterexample}[Partial transport is insufficient]
+Transport the Hamiltonian and preparation by $F$ but retain the original
+coordinate-reading kernel.  The evolved mathematical states correspond, but
+the unscaled readout again returns $q_m(t)$ versus $q_{m'}(t)$.  Dynamical
+intertwining alone does not establish protocol equivalence.
+\end{counterexample}
+
+\section{Limits and interface retention}
+
+\begin{newresult}[Fixed-interface commutation, S-N3]
+Let $\Sigma^{(i)}_\omega$ be identical oscillators of mass $m$ and frequency
+$\omega$, and let $\otimes_\kappa$ add the interaction $\kappa q_1q_2$. Then
+\[
+ \lim_{\omega\to0}
+ (\Sigma^{(1)}_\omega\otimes_\kappa\Sigma^{(2)}_\omega)
+ =
+ (\lim_{\omega\to0}\Sigma^{(1)}_\omega)
+ \otimes_\kappa
+ (\lim_{\omega\to0}\Sigma^{(2)}_\omega).
+\]
+If $\otimes_0$ is used on the right instead, its Hamiltonian differs from the
+fixed-interface limit by $\kappa q_1q_2$.
+\end{newresult}
+
+\begin{proof}
+Before taking the limit, the composite Hamiltonian is
+\[
+ H_{\omega,\kappa}
+ =\frac{p_1^2+p_2^2}{2m}
+  +\frac{m\omega^2(q_1^2+q_2^2)}2+\kappa q_1q_2.
+\]
+Taking $\omega\to0$ gives
+$H_{0,\kappa}=(p_1^2+p_2^2)/(2m)+\kappa q_1q_2$. Taking the isolated limits
+first gives $p_i^2/(2m)$, and applying the same $\otimes_\kappa$ adds the same
+interaction term. Both orders therefore yield $H_{0,\kappa}$. Applying
+$\otimes_0$ after the factor limits instead yields $H_{0,0}$, whose difference
+from $H_{0,\kappa}$ is $\kappa q_1q_2$.
+\end{proof}
+
+\begin{counterexample}[Counterexample to the rejected non-commutation claim]
+Retain $\kappa$ in both composition operations. The two Hamiltonians are then
+identical. Thus a comparison using $\otimes_\kappa$ before the limit and
+$\otimes_0$ afterward does not establish non-commutation of a fixed operation;
+it establishes that changing the interface data changes the system.
+\end{counterexample}
+
+\begin{proposition}[Vector-field form of fixed-interface commutation, S-P3]
+For the Hamiltonians in S-N3, the Hamiltonian vector fields converge
+coefficientwise, uniformly on compact subsets of phase space, to the vector
+field of $H_{0,\kappa}$.  Taking isolated limits and then applying the same
+$\otimes_\kappa$ produces that identical limiting field.
+\end{proposition}
+\begin{proof}
+Hamilton's equations are
+\[
+ \dot q_i=p_i/m,\qquad
+ \dot p_1=-m\omega^2q_1-\kappa q_2,\qquad
+ \dot p_2=-m\omega^2q_2-\kappa q_1.
+\]
+On a compact set with $|q_i|\le R$, the difference from the $\omega=0$ field
+has norm at most $\sqrt2m\omega^2R$.  This tends uniformly to zero.  Applying
+the retained interface after the isolated limits writes down the same last
+two terms, so it gives exactly the same vector field.
+\end{proof}
+
+\begin{interpretation}[What the estimate does not prove]
+Uniform convergence of vector fields on compact phase-space sets supports
+finite-time trajectory comparison only together with an ODE stability
+argument and a common compact region containing the trajectories.  It does
+not establish uniform agreement for all initial data or all times.  The
+bounded-domain warning inherited from EL therefore remains relevant even
+though the algebraic commutation statement is exact.
+\end{interpretation}
+
+\begin{proposition}[Finite-time trajectory estimate, S-P5]
+Fix a compact convex phase-space region $B$ and $T>0$.  Suppose the
+$\omega$ and zero-frequency solutions with common initial data remain in $B$
+for $0\le t\le T$.  Then, for a constant $L$ bounding the Lipschitz constant
+of the limiting linear vector field on $B$,
+\[
+ \|z_\omega(t)-z_0(t)\|
+ \le \frac{\sqrt2m\omega^2R}{L}(e^{Lt}-1)
+\]
+when $L>0$, with the quotient replaced by $t$ when $L=0$.
+\end{proposition}
+\begin{proof}
+Write the vector fields as $f_\omega$ and $f_0$.  The calculation in S-P3
+gives $\|f_\omega(z)-f_0(z)\|\le\varepsilon_\omega:=\sqrt2m\omega^2R$ on
+$B$.  The integral equations imply
+\[
+ \|z_\omega(t)-z_0(t)\|
+ \le\int_0^t\bigl(\varepsilon_\omega
+       +L\|z_\omega(s)-z_0(s)\|\bigr)\,ds.
+\]
+Gr\"onwall's inequality yields the displayed estimate.  The explicit
+compact-region hypothesis prevents the finite-time statement from being
+mistaken for a global uniform limit.
+\end{proof}
+
+\begin{counterexample}[Long times evade the estimate]
+Even for a single uncoupled oscillator,
+$q_\omega(t)=q_0\cos(\omega t)+(v_0/\omega)\sin(\omega t)$ approaches the free
+trajectory on bounded time intervals but not uniformly for all time.  Taking
+$t=2\pi/\omega$ with $v_0\ne0$ produces a discrepancy
+$2\pi|v_0|/\omega$.  Exact commutation of the Hamiltonian formula in S-N3
+therefore does not erase the domain qualifications attached to convergence of
+solutions.
+\end{counterexample}
+
+\subsection{Protocol quotient and composition}
+
+For a fixed protocol, observational equivalence identifies realized models
+having identical families of predicted outcome measures.  Composition can
+descend to this quotient only if replacing either factor by an equivalent
+representative leaves every composite prediction unchanged.  This is a
+congruence requirement, stronger than equivalence of isolated predictions.
+
+\begin{definition}[Protocol congruence, S-D3]
+An observational equivalence $\sim_P$ is a congruence for an
+interface-indexed operation $\otimes_\kappa$ when
+$M\sim_PM'$ and $N\sim_PN'$ imply
+$M\otimes_\kappa N\sim_{P_\kappa}M'\otimes_\kappa N'$ for the declared
+composite protocol $P_\kappa$.
+\end{definition}
+
+\begin{counterexample}[Isolated equivalence need not be a congruence]
+Let an isolated protocol read only positions at time zero.  Two oscillator
+models with identical prepared position distributions but different momenta
+are equivalent under that impoverished protocol.  Couple each to a second
+system and later read position.  Hamiltonian evolution can convert the hidden
+momentum difference into a position difference, so the composites are
+distinguishable.  Equivalence under the isolated protocol is therefore not
+automatically substitutive under richer composite interventions.
+\end{counterexample}
+
+\begin{interpretation}[Required interface information]
+The counterexample does not show that quotient composition is impossible.  It
+shows that a protocol must expose enough port behavior, or equivalence must be
+defined against a sufficiently rich family of interventions, before
+congruence can be expected.  This motivates the interface datum in S-D1 and
+the qualification ``suitable'' in S-C3.
+\end{interpretation}
+
+\begin{empirical}[Computational cross-check, S-E2]
+For $m=\kappa=1$ and initial data $(0,0,1,0)$, the retained-interface system
+has $q_1(t)=\tfrac12(\cos t-\cosh t)$, while the discarded-interface system
+has $q_1(t)=0$. The accompanying Haskell program evaluates both at $t=1$ by
+fourth-order Runge--Kutta integration. This finite-precision calculation is a
+software-process record, not a proof and not an observation of a physical
+system.
+\end{empirical}
+
+\section{Formal scope and dependencies}
+
+\begin{definition}[Dependency ledger, S-D2]
+A dependency ledger records, for each inherited claim used by the synthesis,
+its source identifier, epistemic type, hypotheses, and the exact conclusion
+imported.  Recording a dependency does not re-prove it; it makes the boundary
+between inherited and newly proved content inspectable.
+\end{definition}
+
+\begin{proposition}[No empirical promotion by conjunction, S-P4]
+Conjoining finitely many mathematical theorems and interpretations cannot by
+itself entail an empirical realization statement under S-A2 unless an
+empirical premise connecting the model to a procedure or observation is also
+supplied.
+\end{proposition}
+\begin{proof}
+S-A2 forbids identifying mathematical admissibility with realization.  The
+conclusions of the mathematical results constrain $K,D,$ and $I$, while a
+realization assertion additionally concerns $E,P,$ and $A$ by S-D1.  Without
+a premise about those components, the required connection is absent.  This is
+a typed consequence of the stipulated synthesis discipline, not a theorem of
+untyped propositional logic.
+\end{proof}
+
+\begin{counterexample}[Agreement of artifacts is not independent evidence]
+If a Lean registry and a Haskell test are both transcribed from the same false
+paper premise, they may agree with one another while inheriting the same
+error.  Their agreement checks consistency of selected encodings, not the
+truth of an empirical premise or the correctness of omitted differential
+geometry.  S-E3 therefore records their limited scope explicitly.
+\end{counterexample}
+
+\begin{empirical}[Tool artifact record, S-E3]
+The accompanying \texttt{Proofs.lean} uses Lean core to check a finite claim
+registry and algebraic witnesses. The accompanying \texttt{Core.hs} provides
+finite numerical checks. These files do not formalize smooth manifolds,
+differential forms, ODE existence, or physical realization.
+\end{empirical}
+
+\begin{conjecture}[Interface-indexed composition, S-C3]
+There may exist a category of realized theory objects in which composition is
+indexed by explicit interface data and is compatible with protocol quotients
+and suitable limits. No such category, coherence theorem, or general
+continuity theorem is constructed here.
+\end{conjecture}
+
+\section{Bibliographic notes}
+
+The dependency identifiers CS, HR, and EL refer respectively to the supplied
+papers \emph{Compositional Systems in Finite-Dimensional Classical Mechanics},
+\emph{Hamiltonian Reconstruction, Reciprocity, and Typed Physical Structure},
+and \emph{Empirical Realization, Equivalence, Limits, and Falsification}.
+CS-P4 is used only for the statement that isolated factors do not determine an
+interaction. EL-P3 and EL-P4 are cited only for their bounded-domain limit
+warnings. The 15 August 2026 synthesis review supplied the counterexample that
+forced the corrected formulation of S-N3 and identified the non-injectivity
+error in the former S-P1.
+
+\section{Conclusion}
+
+The synthesis establishes three scoped mathematical points. Reciprocal
+coupling can be Hamiltonian without being factorized. Closed Hamiltonian
+isomorphism does not determine equivalence under a fixed empirical protocol.
+For the oscillator family, a limit commutes with a fixed interaction-indexed
+composition, whereas discarding the interaction produces a different system.
+None of these mathematical results supplies evidence that a modeled structure
+is empirically realized.
+
+\end{document}

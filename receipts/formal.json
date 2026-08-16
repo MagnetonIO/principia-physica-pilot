@@ -1,0 +1,23 @@
+{
+  "schema": "principia.pilot.formal.v1",
+  "status": "ok",
+  "verified": true,
+  "review_fix_passes": 1,
+  "lean": {
+    "tool": "Lean 4.33.0",
+    "command": "lean formal/lean/Proofs.lean",
+    "exit_status": 0,
+    "placeholder_scan": "rg -n \\\"\\\\b(sorry|admit)\\\\b\\\" formal/lean/Proofs.lean",
+    "placeholder_scan_exit_status": 1,
+    "placeholders_found": 0,
+    "sha256": "971ff409f14086952ac48cf9ca43241e0a5ee0e175b39f1679aafa190508336f"
+  },
+  "haskell": {
+    "tool": "GHC 9.14.1",
+    "command": "ghc -Wall -Wextra -Werror -fforce-recomp -fno-code formal/haskell/Core.hs",
+    "exit_status": 0,
+    "runtime_command": "runghc -Wall -Wextra -Werror formal/haskell/Core.hs",
+    "runtime_exit_status": 0,
+    "sha256": "164be0564fe3960fe2478f3780c119a928cfb724e8327c695befa96c49fcb499"
+  }
+}

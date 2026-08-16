@@ -1,0 +1,442 @@
+\documentclass[10pt]{article}
+\usepackage[margin=.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\usepackage{multicol}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{axiom}[definition]{Axiom}
+\newtheorem{assumption}[definition]{Assumption}
+\newtheorem{conjecture}[definition]{Conjecture}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{interpretation}[definition]{Interpretation}
+\newtheorem{empirical}[definition]{Empirical statement}
+\newtheorem{established}[definition]{Established physical result}
+\newtheorem{newresult}[definition]{New result claimed by this work}
+\newtheorem{counterexample}[definition]{Counterexample}
+\newtheorem{example}[definition]{Example}
+
+\newcommand{\R}{\mathbb R}
+\newcommand{\dd}{\mathrm d}
+
+\title{Hamiltonian Reconstruction, Reciprocity, and Typed Physical Structure}
+\author{PRINCIPIA PHYSICA Research Worker}
+\date{15 August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We reconstruct Hamiltonian dynamics from an autonomous symplectic flow and identify the cohomological obstruction to a global Hamiltonian. We then study composition through linear interconnections. Preservation of the product symplectic form is equivalent to reciprocity of the coupling matrices. In one degree of freedom per factor, unidirectional coupling admits no invariant symplectic form compatible with the declared split. Examples involving non-Jacobi brackets, torus translations, damped oscillators, and empirically interpreted oscillators delimit the results. Mathematical, interface, and empirical structure remain separately typed throughout.
+\end{abstract}
+
+\section{Typed presentation}
+
+\begin{definition}[Typed theory object, D1]
+A theory object is a tuple $T=(K,D,I,E)$. The kinematic layer $K$ contains states, geometric structure, and an observable algebra. The dynamical layer $D$ contains admissible evolution. The interface $I$ lists port observables through which composition or intervention occurs. The empirical layer $E$ contains preparation procedures, measurement assignments, dimensions, and uncertainties.
+\end{definition}
+
+\begin{axiom}[Layer separation, A1]
+The empirical layer is not inferred from $(K,D,I)$. In particular, no purely mathematical derivation establishes that a symbol represents a laboratory quantity.
+\end{axiom}
+
+\begin{assumption}[Scope, A2]
+Manifolds are finite-dimensional, Hausdorff, second-countable, and smooth. Maps are smooth. Completeness is stated whenever global flows are used. Field theory, general relativity, quantum theory, and infinite-dimensional geometry are outside the proved scope.
+\end{assumption}
+
+\begin{interpretation}[Founding thesis, I1]
+The founding thesis is read as a methodological proposal: physics studies mathematical structures only together with empirically warranted realization data. Axiom A1 enforces the non-conflation part of that proposal but does not prove the proposal exhaustive or unique.
+\end{interpretation}
+
+\section{Symplectic reconstruction}
+
+\begin{definition}[Symplectic system, D2]
+A symplectic manifold is a pair $(M,\omega)$ with $d\omega=0$ and with $\omega^\flat:TM\to T^*M$, $v\mapsto\omega(v,\cdot)$, a bundle isomorphism. For $H\in C^\infty(M)$, define $X_H$ by $\iota_{X_H}\omega=dH$ and define $\{f,g\}=\omega(X_f,X_g)$.
+\end{definition}
+
+\begin{lemma}[Existence and uniqueness, L1]
+For every smooth $H$, there is exactly one smooth vector field $X_H$ satisfying $\iota_{X_H}\omega=dH$.
+\end{lemma}
+\begin{proof}
+Set $X_H=(\omega^\flat)^{-1}(dH)$. Smoothness follows because the inverse of a smooth vector-bundle isomorphism is smooth. Injectivity of $\omega^\flat$ gives uniqueness.
+\end{proof}
+
+\begin{lemma}[Pointwise generation, L2]
+For every $x\in M$ and $v\in T_xM$, there is $f\in C^\infty(M)$ such that $X_f(x)=v$.
+\end{lemma}
+\begin{proof}
+The covector $\omega_x(v,\cdot)$ is the differential at $x$ of a local linear coordinate function. Multiply that function by a bump function equal to one near $x$ and extend it by zero. The resulting $f$ satisfies $df_x=\omega_x(v,\cdot)$, so L1 gives $X_f(x)=v$.
+\end{proof}
+
+\begin{proposition}[Closedness and Jacobi, P1]
+With the convention of D2,
+\[
+ d\omega(X_f,X_g,X_h)=2\operatorname{Jac}(f,g,h).
+\]
+Consequently, a nondegenerate two-form is closed if and only if its induced bracket satisfies Jacobi.
+\end{proposition}
+\begin{proof}
+Insert $X_f,X_g,X_h$ into the intrinsic formula for $d\omega$, replace each derivative of $\omega(X_a,X_b)$ by a derivative of $\{a,b\}$, and use $X_{\{a,b\}}=-[X_a,X_b]$. Antisymmetry collects the six terms into twice the cyclic Jacobiator. If $d\omega=0$, Jacobi follows. Conversely, L2 lets any three tangent vectors at a point be written as values of Hamiltonian vector fields, so vanishing Jacobi implies $d\omega=0$ pointwise.
+\end{proof}
+
+\begin{counterexample}[Leibniz does not imply Jacobi]
+On $\R^3$, prescribe $\{x_1,x_2\}=x_1$, $\{x_2,x_3\}=x_3$, and $\{x_3,x_1\}=x_1$, extending by a bivector and the Leibniz rule. Its Jacobiator on $(x_1,x_2,x_3)$ equals $x_1$. Bilinearity, antisymmetry, and Leibniz therefore do not imply Jacobi.
+\end{counterexample}
+
+\begin{established}[Darboux theorem, E1]
+Every symplectic manifold has local coordinates in which $\omega=\sum_i dq^i\wedge dp_i$~\cite{AbrahamMarsden,McDuffSalamon}. This established theorem shows that local symplectic kinematics has no invariant beyond dimension; it does not identify local coordinates with measured quantities.
+\end{established}
+
+\begin{assumption}[Dynamical hypotheses, A3]
+The dynamics is an autonomous smooth $\R$-action $\phi_t$ and each $\phi_t$ preserves $\omega$.
+\end{assumption}
+
+\begin{theorem}[Hamiltonian reconstruction, T1]
+Let $X$ generate a flow satisfying A3. Then $\iota_X\omega$ is closed; $X$ is locally Hamiltonian; and if $H^1_{\mathrm{dR}}(M)=0$, then $X=X_H$ globally for a smooth $H$, unique up to an additive constant on each connected component.
+\end{theorem}
+\begin{proof}
+Differentiate $\phi_t^*\omega=\omega$ at $t=0$ to obtain $\mathcal L_X\omega=0$. Cartan's formula and $d\omega=0$ give $d(\iota_X\omega)=0$. The Poincaré lemma makes this one-form locally exact. If $H^1_{\mathrm{dR}}(M)=0$, it is globally exact, so $\iota_X\omega=dH$ and L1 gives $X=X_H$. If $dH=dH'$, then $H-H'$ is locally constant and hence constant on each connected component.
+\end{proof}
+
+\begin{counterexample}[Global obstruction]
+On $T^2$ with $\omega=d\theta_1\wedge d\theta_2$, the complete field $X=\partial_{\theta_1}$ generates symplectic translations, but $\iota_X\omega=d\theta_2$ has nonzero integral around a generating loop. It is closed but not exact, so no global real-valued Hamiltonian exists.
+\end{counterexample}
+
+\begin{corollary}[Liouville volume, C1]
+A flow satisfying A3 preserves $\omega^n/n!$.
+\end{corollary}
+\begin{proof}
+Pullback preserves wedge products, so $\phi_t^*(\omega^n)=(\phi_t^*\omega)^n=\omega^n$.
+\end{proof}
+
+The cohomology hypothesis in T1 is sufficient but stronger than necessary for
+a particular flow.  The exact obstruction is the class
+$[\iota_X\omega]\in H^1_{\mathrm{dR}}(M)$.  It vanishes precisely when that
+flow has a global real-valued Hamiltonian.  This distinction matters on
+multiply connected spaces: nonzero first cohomology permits non-Hamiltonian
+symplectic fields, but it does not force every symplectic field to be
+non-Hamiltonian.
+
+\begin{proposition}[Period criterion, P4]
+For a symplectic vector field $X$ on a connected manifold, the following are
+equivalent: (i) $X=X_H$ for a global smooth real-valued $H$; (ii) every
+piecewise smooth closed curve $\gamma$ satisfies
+$\int_\gamma\iota_X\omega=0$.
+\end{proposition}
+\begin{proof}
+If $\iota_X\omega=dH$, every period vanishes by the fundamental theorem for
+line integrals.  Conversely, fix $x_0$ and define
+$H(x)=\int_{\gamma_x}\iota_X\omega$ along any path from $x_0$ to $x$.
+Connected manifolds are path connected, and the vanishing-period hypothesis
+makes this definition independent of the chosen path.  On a coordinate ball,
+comparison with a fixed incoming path shows that $H$ differs by a constant
+from a local primitive of the closed one-form.  Therefore $H$ is smooth and
+$dH=\iota_X\omega$.
+\end{proof}
+
+\begin{example}[Reading the torus obstruction]
+For the translation counterexample, integrate $d\theta_2$ around the
+$\theta_2$ circle.  The period is $2\pi$ under the usual angular
+normalization, so P4 forbids a real-valued Hamiltonian.  On the universal
+cover $\R^2$, however, the lifted form is $d\theta_2$ with primitive
+$H=\theta_2$.  The obstruction is global topology, not a failure of the local
+Hamiltonian equation.
+\end{example}
+
+\section{Composition and reciprocity}
+
+\begin{proposition}[Free composite, P2]
+For symplectic manifolds $(M_i,\omega_i)$, the form $\omega_\oplus=\pi_1^*\omega_1+\pi_2^*\omega_2$ is symplectic on $M_1\times M_2$. Pullbacks of observables from different factors Poisson-commute.
+\end{proposition}
+\begin{proof}
+Closedness follows from $d\omega_i=0$. If $(u,v)$ lies in the kernel, pairing with $(u',0)$ and then $(0,v')$ gives $u=v=0$. For $f\in C^\infty(M_1)$ and $g\in C^\infty(M_2)$, their Hamiltonian vector fields occupy complementary tangent factors, so their product-form pairing vanishes.
+\end{proof}
+
+Consider canonical coordinates $(q_i,p_i)$ and an interconnection field
+\[
+ Y=(0,-C_{12}q_2,0,-C_{21}q_1).
+\]
+The uncoupled Hamiltonian fields may be added without changing the following criterion.
+
+\begin{newresult}[Reciprocity criterion, N1]
+The coupled flow preserves $\omega_\oplus$ if and only if $C_{21}=C_{12}^{T}$. In that case it is Hamiltonian with interaction $H_{\rm int}=q_1^TC_{12}q_2$.
+\end{newresult}
+\begin{proof}
+A direct contraction gives a one-form whose exterior derivative is
+\[
+ d(\iota_Y\omega_\oplus)=\sum_{a,b}\big((C_{21})_{ba}-(C_{12})_{ab}\big)dq_{1a}\wedge dq_{2b}.
+\]
+The coordinate two-forms are linearly independent, so this vanishes exactly when $C_{21}=C_{12}^T$. Under that condition the contraction equals $dH_{\rm int}$ with the declared sign convention.
+\end{proof}
+
+\begin{proposition}[Volume preservation is weaker, P3]
+The linear field $Y$ has zero divergence for arbitrary $C_{12},C_{21}$. Hence it preserves Lebesgue volume even when it fails to preserve $\omega_\oplus$.
+\end{proposition}
+\begin{proof}
+Every diagonal entry of the Jacobian of $Y$ is zero, so its trace and divergence vanish. N1 supplies non-reciprocal choices that fail symplectic preservation.
+\end{proof}
+
+\begin{newresult}[Split obstruction, N2]
+For one degree of freedom per factor, with scalar couplings $c_{12},c_{21}$ and a fixed point at the origin, an invariant symplectic form respecting the tangent-space split can exist near the origin only if $c_{12}=0$ exactly when $c_{21}=0$. If both are nonzero, the constant form $c_{21}\omega_1+c_{12}\omega_2$ is invariant.
+\end{newresult}
+\begin{proof}
+At the fixed point a split-respecting skew form has matrix $\Omega_0=\operatorname{diag}(a_1J,a_2J)$ with $a_1a_2\ne0$. Infinitesimal invariance is $A^T\Omega_0+\Omega_0A=0$, which reduces to $a_1c_{12}=a_2c_{21}$. If exactly one coupling vanishes this contradicts $a_1a_2\ne0$. If both are nonzero, choosing $(a_1,a_2)=(c_{21},c_{12})$ satisfies the equation and gives the displayed invariant constant form.
+\end{proof}
+
+\begin{corollary}[Unidirectional obstruction, C2]
+A unidirectional coupling of two one-degree-of-freedom Hamiltonian factors is not Hamiltonian relative to any symplectic form compatible with the declared split.
+\end{corollary}
+\begin{proof}
+Unidirectional means exactly one of $c_{12},c_{21}$ vanishes, which N2 excludes.
+\end{proof}
+
+\subsection{Matrix form and a worked reciprocal pair}
+
+For canonical coordinates ordered as $(q_1,p_1,q_2,p_2)$, infinitesimal
+symplectic preservation of a linear field $\dot z=Az$ is the matrix identity
+$A^TJ_\oplus+J_\oplus A=0$.  The off-diagonal blocks of this identity are
+exactly the transpose relation in N1.  This is a statement about preservation
+of the declared product form; changing the form changes the compatibility
+question and must be recorded in $K$.
+
+\begin{example}[Two reciprocal oscillators]
+Take scalar coupling $c$ and
+\[
+ H=\frac{p_1^2+p_2^2}{2m}
+   +\frac{m\omega^2}{2}(q_1^2+q_2^2)+cq_1q_2.
+\]
+Hamilton's equations give
+$\dot p_1=-m\omega^2q_1-cq_2$ and
+$\dot p_2=-m\omega^2q_2-cq_1$.  With normal coordinates
+$q_\pm=(q_1\pm q_2)/\sqrt2$ and similarly for momenta, the Hamiltonian splits
+into modes with squared frequencies $\omega^2\pm c/m$.  Reciprocity therefore
+does not mean absence of interaction: it permits a symplectic coupled system
+whose collective modes differ from the original subsystem modes.  Stability
+additionally requires the relevant quadratic form to be positive, for example
+$|c|<m\omega^2$ in this symmetric case.
+\end{example}
+
+\begin{counterexample}[Reciprocity does not imply stability]
+Choose $c>m\omega^2$ in the preceding reciprocal system.  The minus-mode
+squared frequency is negative, so generic solutions grow exponentially even
+though the flow is Hamiltonian and preserves symplectic volume.  Geometric
+admissibility, energetic stability, and empirical adequacy are distinct
+conditions.
+\end{counterexample}
+
+\begin{empirical}[Non-reciprocal devices, E2]
+Servo feedback, optical isolators, circulators, and engineered mechanical media instantiate non-reciprocal response in laboratory practice. This is an empirical statement about existing devices, not a consequence of N1 or a new measurement reported here.
+\end{empirical}
+
+\section{Non-conflation and boundary cases}
+
+\begin{newresult}[Port-sensitive non-conflation, N3]
+For $H_m=p^2/(2m)+m\omega_0^2q^2/2$, all positive masses give isomorphic closed symplectic dynamical systems after rescaling $(q,p)$, but they are not isomorphic as objects whose fixed port is $q$ unless the masses agree.
+\end{newresult}
+\begin{proof}
+The map $(q,p)\mapsto(\alpha q,\alpha^{-1}p)$ with $\alpha=\sqrt{m/m'}$ is symplectic and transports $H_m$ to $H_{m'}$. If a symplectomorphism preserves the port $q$, it has the form $(q,p)\mapsto(q,p+h(q))$. Comparing the coefficients of $p^2$ after Hamiltonian transport forces $m=m'$.
+\end{proof}
+
+\begin{interpretation}[Empirical distinction]
+A calibrated periodic force produces an off-resonance response proportional to $1/m$. Thus the port and its calibration can distinguish masses that the closed-system isomorphism forgets. The mathematical calculation does not itself establish a particular experimental calibration.
+\end{interpretation}
+
+\begin{proposition}[Damped oscillator obstruction, P4]
+For $\gamma>0$, the field $\dot q=p/m$, $\dot p=-m\omega^2q-2\gamma p$ on $\R^2$ admits no invariant symplectic form.
+\end{proposition}
+\begin{proof}
+At the fixed point, the derivative of the flow has determinant $e^{-2\gamma t}$. An invariant nondegenerate two-form would have a nonzero density $\rho(0)$ satisfying $\rho(0)e^{-2\gamma t}=\rho(0)$ for every $t$, a contradiction.
+\end{proof}
+
+\begin{proposition}[Energy conservation, P5]
+For an autonomous Hamiltonian system, $H$ is constant along every integral
+curve of $X_H$ on its interval of existence.
+\end{proposition}
+\begin{proof}
+If $\gamma$ is such a curve, then
+\[
+ \frac{d}{dt}H(\gamma(t))=dH(X_H)
+ =\omega(X_H,X_H)=0
+\]
+by antisymmetry.  The statement is local in time and does not assert
+completeness of $X_H$.
+\end{proof}
+
+\begin{counterexample}[Conservation does not imply completeness]
+On $(\R^2,dq\wedge dp)$ take $H=q^2p$.  Hamilton's equations include
+$\dot q=q^2$, so for $q(0)=q_0>0$ one has
+$q(t)=q_0/(1-q_0t)$ and the solution leaves every compact set at
+$t=1/q_0$.  P5 still holds on the maximal interval.  A conserved Hamiltonian
+need not be proper, and conservation alone does not provide global flow.
+\end{counterexample}
+
+\begin{proposition}[Proper energy gives a completeness criterion, P6]
+If $M$ is connected, $H:M\to\R$ is proper, and $X_H$ is smooth, then $X_H$
+is complete.
+\end{proposition}
+\begin{proof}
+An integral curve starting at $x$ remains in the level set $H^{-1}(H(x))$ by
+P5.  Properness makes that level set compact.  A maximal integral curve of a
+smooth vector field that remains in a compact subset cannot terminate at a
+finite endpoint: cover the compact set by finitely many coordinate
+neighborhoods on which the usual local existence theorem supplies a common
+positive extension time.  Repeating at either endpoint extends the curve for
+all real time.
+\end{proof}
+
+The hypotheses of P6 are sufficient, not necessary.  Free-particle motion on
+$T^*\R$ is complete although its standard Hamiltonian $p^2/(2m)$ is not proper
+because every energy level contains an unbounded position direction.  This
+contrast is another reason to state completeness separately in A2 and A3.
+
+\begin{counterexample}[Kinematic exclusions]
+Odd-dimensional manifolds admit no nondegenerate two-form because odd-dimensional skew matrices are singular. Moreover, $S^6$ admits nondegenerate two-forms but no symplectic form: $H^2_{\mathrm{dR}}(S^6)=0$, whereas a closed symplectic form on a compact $2n$-manifold has nonzero cohomology class because $\int_M\omega^n\ne0$.
+\end{counterexample}
+
+\subsection{Relation to port-Hamiltonian descriptions}
+
+The interface layer in D1 is deliberately less specific than a complete
+port-Hamiltonian formalism.  In that literature, power-conjugate effort and
+flow variables, interconnection structure, storage, and dissipation are typed
+explicitly~\cite{PortHamiltonian}.  N1 isolates only the closed conservative
+linear coupling represented on a product symplectic manifold.  It neither
+classifies open systems nor turns a dissipative device into a closed
+Hamiltonian system by terminology.
+
+\begin{interpretation}[Reciprocity and physical response]
+Onsager reciprocity concerns phenomenological response coefficients under
+specific near-equilibrium and microscopic-reversibility hypotheses
+\cite{Onsager}.  The transpose equality in N1 is an algebraic criterion for
+one declared interconnection field.  Their formal resemblance does not make
+N1 a derivation of Onsager's empirical result, nor does a violation of the N1
+criterion by a controlled device contradict Onsager's scoped hypotheses.
+\end{interpretation}
+
+\begin{conjecture}[Nonlinear local reciprocity]
+For a fixed decomposition into port pairs, suitable reciprocity of the full linear response at a nondegenerate equilibrium may imply a local invariant split-respecting symplectic form. N2 proves only the stated two-factor linear family; the general claim remains open.
+\end{conjecture}
+
+\subsection{What reconstruction determines}
+
+When T1 produces a Hamiltonian, it determines it only up to an additive
+constant on each connected component.  This ambiguity leaves $dH$, the vector
+field, and the classical trajectories unchanged.  It does not license an
+arbitrary monotone reparameterization: replacing $H$ by $f(H)$ gives
+$X_{f(H)}=f'(H)X_H$, which generally changes the speed along trajectories and
+can change it differently on distinct energy levels.
+
+\begin{proposition}[Generator fixes energy differences, P7]
+On a connected symplectic manifold, if $X_H=X_G$, then $H-G$ is constant.
+Consequently the common autonomous generator fixes every difference
+$H(x)-H(y)$, although assigning measured energy units remains empirical
+structure in $E$.
+\end{proposition}
+\begin{proof}
+Equality of vector fields gives
+$dH=\iota_{X_H}\omega=\iota_{X_G}\omega=dG$.  Hence $d(H-G)=0$, and a smooth
+function with zero differential on a connected manifold is constant.
+\end{proof}
+
+\begin{interpretation}[Time and energy calibration]
+Reconstructing $X$ presupposes a parameterized flow $\phi_t$, not merely its
+unparameterized orbits.  Rescaling the laboratory time unit rescales the
+generator and the reconstructed Hamiltonian.  Thus T1 is a theorem about the
+mathematical data in A3; identifying its parameter with calibrated seconds and
+$H$ with energy in joules belongs to the empirical layer of D1.
+\end{interpretation}
+
+\subsection{Local primitives and transition constants}
+
+The local conclusion of T1 can be made explicit on a good coordinate cover.
+Choose contractible open sets $U_i$ and primitives $H_i$ satisfying
+$dH_i=\iota_X\omega$ on $U_i$.  On every connected component of an overlap
+$U_i\cap U_j$, the difference $H_i-H_j$ is constant.  These constants encode
+the obstruction to selecting the primitives so that they agree globally.
+Changing $H_i$ by a constant changes the overlap constants by a coboundary but
+does not change the vector field.  This is the elementary local form of the
+de Rham class used in T1.
+
+\begin{proposition}[Simply connected criterion, P8]
+If $M$ is connected and simply connected, every symplectic vector field is
+globally Hamiltonian.
+\end{proposition}
+\begin{proof}
+For a symplectic vector field, Cartan's formula gives that
+$\alpha=\iota_X\omega$ is closed.  The integral of a closed one-form is
+invariant under endpoint-preserving homotopy of paths.  Every closed curve on
+a simply connected manifold is homotopic to a constant curve, whose integral
+is zero.  The period criterion P4 now supplies a global primitive $H$ and
+hence $X=X_H$.
+\end{proof}
+
+\begin{counterexample}[Connectedness matters for one constant]
+Let $M$ be the disjoint union of two symplectic planes and take $X=0$.
+Both $H=0$ and the function $G$ equal to zero on the first component and one
+on the second generate $X$.  Their difference is locally constant but not a
+single constant on all of $M$.  This is why T1 states uniqueness component by
+component.
+\end{counterexample}
+
+\begin{example}[Exact symplectic translation on the plane]
+On $\R^2$ with $\omega=dq\wedge dp$, the constant field
+$X=a\partial_q+b\partial_p$ satisfies
+$\iota_X\omega=a\,dp-b\,dq=d(ap-bq)$.  Its translation flow is therefore
+Hamiltonian with $H=ap-bq$.  Passing to a torus can destroy single-valuedness
+of this primitive even though the same local calculation survives in every
+chart.  The plane and torus examples separate local differential structure
+from global topology without changing the infinitesimal formula.
+\end{example}
+
+\subsection{Empirical typing of reconstructed quantities}
+
+The reconstruction theorem begins with an exact smooth action and an exact
+invariant two-form.  Experimental data instead arrive as finite records with
+uncertainty.  Inferring $X$, testing $\phi_t^*\omega=\omega$, and selecting a
+topology for the state space are inverse problems that lie in layer $E$ until
+a particular statistical and calibration procedure is declared.  T1 says
+what follows if those mathematical hypotheses hold; it supplies no test that
+they hold for a device.
+
+\begin{empirical}[Finite reconstruction data, E3]
+A finite collection of sampled trajectories cannot by itself verify equality
+$\phi_t^*\omega=\omega$ at every state and time, nor can it determine a unique
+smooth generator without model restrictions.  Any laboratory reconstruction
+therefore depends on specified interpolation, uncertainty, and model-class
+assumptions.  This is an epistemic limitation statement, not a report of a new
+experiment.
+\end{empirical}
+
+\begin{counterexample}[A preserved sample is not a preserved form]
+The map $F(q,p)=(2q,p)$ preserves the $p$-axis and fixes the origin, so data
+sampled only at the origin or only through the proposition ``$q=0$'' may show
+no change.  Nevertheless
+$F^*(dq\wedge dp)=2dq\wedge dp$.  Agreement on an impoverished set of
+preparations and readouts does not establish symplectic preservation.
+\end{counterexample}
+
+\begin{interpretation}[Role of the interface]
+Ports make some observables available for intervention while leaving others
+internal.  Two closed presentations may be symplectically isomorphic yet
+differ once a port observable and its dimensions are held fixed, as N3 shows.
+Conversely, transporting the full interface and empirical calibration can
+turn a coordinate change into a representational equivalence.  The choice
+between these readings is not settled by the existence of the diffeomorphism
+alone.
+\end{interpretation}
+
+\section{Conclusion}
+
+T1 reconstructs Hamiltonian dynamics only from explicit dynamical and topological hypotheses. N1 and N2 show that composability is typed by the selected subsystem forms and ports: strict product-form composition requires reciprocity, while unidirectional coupling is obstructed even after split-respecting rescaling in the stated dimension. Axiom A1 prevents these mathematical results from being redescribed as empirical realization claims.
+
+\begin{thebibliography}{9}
+\bibitem{AbrahamMarsden} R. Abraham and J. E. Marsden, \emph{Foundations of Mechanics}, 2nd ed., 1978.
+\bibitem{MarsdenRatiu} J. E. Marsden and T. S. Ratiu, \emph{Introduction to Mechanics and Symmetry}, 2nd ed., Springer, 1999.
+\bibitem{McDuffSalamon} D. McDuff and D. Salamon, \emph{Introduction to Symplectic Topology}, 3rd ed., Oxford University Press, 2017.
+\bibitem{Onsager} L. Onsager, ``Reciprocal Relations in Irreversible Processes I,'' \emph{Physical Review} 37 (1931), 405--426.
+\bibitem{PortHamiltonian} A. van der Schaft and D. Jeltsema, ``Port-Hamiltonian Systems Theory,'' \emph{Foundations and Trends in Systems and Control} 1 (2014), 173--378.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,28 @@
+{
+  "schema": "principia.pilot.website-self-review.v1",
+  "review_round": 2,
+  "verdict": "ACCEPT",
+  "fix_passes": 1,
+  "findings": [
+    {
+      "id": "WEB-LAYOUT-001",
+      "severity": "medium",
+      "category": "responsive_layout",
+      "location": "website/styles.css -- .label-grid li and .label-grid b",
+      "finding": "The exact twelfth epistemic label was substantially longer than the other labels and cramped at intermediate three-column widths.",
+      "required_fix": "Increase label-card block space and give multiline label names an explicit compact line height.",
+      "status": "fixed",
+      "resolution": "Label cards now reserve 170px and label names use a 1.25 line height; narrow breakpoints retain two- and one-column layouts."
+    }
+  ],
+  "checks": {
+    "content_scope": "pass",
+    "all_twelve_epistemic_labels": "pass",
+    "formal_companion_scope_statement": "pass",
+    "review_transparency": "pass",
+    "responsive_layout": "pass",
+    "accessibility": "pass",
+    "local_artifact_population": "pass",
+    "og_design_and_dimensions": "pass"
+  }
+}

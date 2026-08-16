@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A four-paper pilot on composition, reconstruction, and empirical discipline in finite-dimensional classical mechanics.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Principia Physica — Pilot Series">
+  <meta property="og:description" content="Four papers, representative formal companions, and an inspectable evidence trail.">
+  <meta property="og:image" content="og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Principia Physica — Pilot Series</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="masthead">
+    <a class="wordmark" href="#top" aria-label="Principia Physica home"><span>PP</span> Principia Physica</a>
+    <nav aria-label="Primary navigation">
+      <a href="#papers">Papers</a><a href="#formal">Formal</a><a href="#evidence">Evidence</a><a href="#labels">Labels</a>
+    </nav>
+  </header>
+  <main id="content">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="kicker">Research pilot · finite-dimensional classical mechanics</p>
+        <h1 id="hero-title">Structure first.<br><em>Realization earned.</em></h1>
+        <p class="lede">A four-paper investigation of how systems compose, when dynamics can be reconstructed, and where mathematical admissibility stops short of physical realization.</p>
+        <div class="hero-actions"><a class="button primary" href="papers/pdf/synthesis.pdf">Read the synthesis <span aria-hidden="true">↗</span></a><a class="button" href="#papers">Explore the series</a></div>
+      </div>
+      <div class="orbit" aria-hidden="true"><div class="ring ring-one"></div><div class="ring ring-two"></div><div class="axis"></div><div class="mass mass-a"></div><div class="mass mass-b"></div><span>𝓡</span></div>
+    </section>
+
+    <section class="thesis band" aria-labelledby="thesis-title">
+      <p class="section-number">01 / Thesis</p>
+      <div><h2 id="thesis-title">Mathematics supplies admissible structures. Physics additionally requires calibrated interfaces, protocols, and empirical warrant.</h2><p>The pilot keeps these layers explicit. It does not identify mathematical isomorphism with operational equivalence, or mathematical admissibility with physical realization.</p></div>
+    </section>
+
+    <section class="papers" id="papers" aria-labelledby="papers-title">
+      <div class="section-head"><div><p class="section-number">02 / Papers</p><h2 id="papers-title">The research series</h2></div><p>Three focused studies feed a cross-paper synthesis. Every paper is available as the rendered PDF and its LaTeX source.</p></div>
+      <div class="paper-grid">
+        <article class="paper featured"><p class="paper-index">I</p><div><p class="tag">Composition</p><h3>Compositional Systems</h3><p>Separates kinematical product, observable embedding, dynamical factorization, and empirical compositionality.</p><div class="links"><a href="papers/pdf/compositional-systems.pdf">PDF <span aria-hidden="true">↗</span></a><a href="papers/latex/compositional-systems.tex">LaTeX <span aria-hidden="true">↓</span></a></div></div></article>
+        <article class="paper"><p class="paper-index">II</p><div><p class="tag">Reconstruction</p><h3>Hamiltonian Reconstruction</h3><p>States the hypotheses under which dynamics can be reconstructed and tests composition through subsystem forms and ports.</p><div class="links"><a href="papers/pdf/hamiltonian-reconstruction.pdf">PDF <span aria-hidden="true">↗</span></a><a href="papers/latex/hamiltonian-reconstruction.tex">LaTeX <span aria-hidden="true">↓</span></a></div></div></article>
+        <article class="paper"><p class="paper-index">III</p><div><p class="tag">Empirics</p><h3>Empirical Limits</h3><p>Formalizes protocols, observational equivalence, limiting regimes, calibration, and falsification boundaries.</p><div class="links"><a href="papers/pdf/empirical-limits.pdf">PDF <span aria-hidden="true">↗</span></a><a href="papers/latex/empirical-limits.tex">LaTeX <span aria-hidden="true">↓</span></a></div></div></article>
+        <article class="paper synthesis"><p class="paper-index">IV</p><div><p class="tag">Synthesis</p><h3>Principia Physica Pilot Synthesis</h3><p>Brings the three layers into one typed framework and preserves the review record—including rejected claims and required corrections.</p><div class="links"><a href="papers/pdf/synthesis.pdf">PDF <span aria-hidden="true">↗</span></a><a href="papers/latex/synthesis.tex">LaTeX <span aria-hidden="true">↓</span></a></div></div></article>
+      </div>
+    </section>
+
+    <section class="formal band" id="formal" aria-labelledby="formal-title">
+      <p class="section-number">03 / Formal companions</p>
+      <div><h2 id="formal-title">Executable witnesses,<br>carefully scoped.</h2><p class="formal-note"><strong>The Lean and Haskell artifacts are representative formal companions, not proofs of the complete thesis.</strong> They check selected finite algebraic and bookkeeping shadows. They do not formalize the papers’ differential geometry, certify the empirical program, prove the full thesis, or establish physical realization.</p><div class="artifact-list"><a href="formal/lean/Proofs.lean"><span><b>Lean</b><small>Selected machine-checked propositions</small></span><code>Proofs.lean</code></a><a href="formal/haskell/Core.hs"><span><b>Haskell</b><small>Executable core model and properties</small></span><code>Core.hs</code></a></div></div>
+    </section>
+
+    <section class="labels" id="labels" aria-labelledby="labels-title">
+      <div class="section-head"><div><p class="section-number">04 / Epistemic contract</p><h2 id="labels-title">Twelve labels,<br>twelve obligations.</h2></div><p>Substantial assertions must be proved, cited, supplied as explicit empirical input, or marked conjectural. The label is part of the claim.</p></div>
+      <ol class="label-grid">
+        <li><span>01</span><b>Definition</b><small>Fixes terminology</small></li><li><span>02</span><b>Axiom</b><small>Stipulates formal closure</small></li><li><span>03</span><b>Assumption</b><small>Restricts the model class</small></li><li><span>04</span><b>Conjecture</b><small>Remains unproved</small></li><li><span>05</span><b>Lemma</b><small>Proved auxiliary result</small></li><li><span>06</span><b>Proposition</b><small>Proved result</small></li><li><span>07</span><b>Theorem</b><small>Proved principal result</small></li><li><span>08</span><b>Corollary</b><small>Proved consequence</small></li><li><span>09</span><b>Interpretation</b><small>Proposed physical reading</small></li><li><span>10</span><b>Empirical statement</b><small>Requires observation or calibration</small></li><li><span>11</span><b>Established physical result</b><small>Cited accepted formalism</small></li><li><span>12</span><b>New result claimed by this work</b><small>Synthesis isolated in this work</small></li>
+      </ol>
+    </section>
+
+    <section class="evidence band" id="evidence" aria-labelledby="evidence-title">
+      <p class="section-number">05 / Evidence trail</p>
+      <div><h2 id="evidence-title">Inspect the work,<br>including its friction.</h2><p>The topic-series review accepted its assessed claims. The synthesis review rejected claims S-P1 and S-N3, records the counterexample and required changes, and the corrected synthesis preserves their narrowed conclusions. Both records are published intact; review evidence is not a decorative badge.</p><div class="evidence-grid"><div><h3>Peer review</h3><a href="reviews/topic-series-review.json">Topic-series review</a><a href="reviews/synthesis-review.json">Synthesis review</a><a href="reviews/website-review.json">Website review</a></div><div><h3>Verification receipts</h3><a href="receipts/latex.json">LaTeX build receipt</a><a href="receipts/formal.json">Formal checks receipt</a><a href="receipts/recovery.json">Recovery receipt</a><a href="receipts/website.json">Website validation receipt</a></div></div></div>
+    </section>
+  </main>
+  <footer><div><span class="footer-mark">PP</span><p>PRINCIPIA PHYSICA<br><small>Pilot research series · 2026</small></p></div><p>Finite scope. Explicit assumptions.<br>Inspectable evidence.</p></footer>
+</body>
+</html>

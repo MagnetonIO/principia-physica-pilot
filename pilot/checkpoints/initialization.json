@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "checkpoint_kind": "pilot_workspace_initialized",
+  "pilot_id": "principia-miniature-research-agent-v1",
+  "namespace": "principia-pilot/principia-miniature-research-agent-v1/runs/4c15c009-34a3-4459-99d2-a15c508880b7",
+  "app_run_id": "4c15c009-34a3-4459-99d2-a15c508880b7",
+  "manifest_hash": "sha256:3d152459e128aeffbce5e26a909f7e2b1368ba55583f2f447082a19d2fbdfc0f",
+  "policy_hash": "sha256:5563a8a4552af7ca7650d1ac4a07d164a7f00867e044f97a371bf9eb834497c5",
+  "charter_hash": "sha256:dce664ddb5b81a622501a0b504d54d76331ba3845b38899024e23d1bd3ec9b6e",
+  "output_root": "/Users/mlong/Documents/Development/principia-mathematica/pilot-runs/principia-pilot-20260815-live-r10",
+  "full_campaign_promotion_allowed": false
+}

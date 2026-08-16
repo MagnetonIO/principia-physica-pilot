@@ -1,0 +1,22 @@
+{
+  "schema": "principia.pilot.latex.v1",
+  "status": "ok",
+  "review_fix_passes": 1,
+  "tool": {
+    "command": "latexmk -pdf -g -interaction=nonstopmode -halt-on-error -file-line-error -outdir=papers/pdf",
+    "latexmk_version": "4.88",
+    "engine": "pdfTeX 3.141592653-2.6-1.40.29 (TeX Live 2026)",
+    "exit_status": 0
+  },
+  "diagnostics": {
+    "log_warning_scan": "clean",
+    "page_count_tool": "pdfinfo",
+    "page_range_required": [6, 10]
+  },
+  "artifacts": {
+    "compositional-systems": {"pages": 6, "source_sha256": "87c8ce6fda2b325092ff2bc1ae30b91e25702594530274dff739f7f853922778", "pdf_sha256": "41422a88f260863a9f1802ef9eb0e79c38d5392c683031c5ba25af4ab89f0c64"},
+    "hamiltonian-reconstruction": {"pages": 6, "source_sha256": "224e2c85e17288312350c8c6da740677f6aacaec240aa03b3d99accdebc10232", "pdf_sha256": "699a0e927ec3540c532668aa31c8d68fa58ed7344f39d163dbc5e274bc5e018e"},
+    "empirical-limits": {"pages": 6, "source_sha256": "aa0053af5f27252fe4dfbf3b45f0711303ad5e4da00329c9419a1af3b516203d", "pdf_sha256": "97d2dc0974fad0f8329fab4b720756b39aa986132337fecd54c8474f4e410b45"},
+    "synthesis": {"pages": 6, "source_sha256": "fa6cd119b28d58d8eb163a83d0746e08ff5092928da9c57604206a44c543e0e2", "pdf_sha256": "45592f64134c65b73e1bb1cae548d7fc434f594c732354a3073b83a08b99f7ab"}
+  }
+}

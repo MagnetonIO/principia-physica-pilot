@@ -1,0 +1,9 @@
+{
+  "files": {
+    "reviews/website-draft/index.html": "89429c5fcad9a3831d697c58c95e411ce5052ac0a431e536be6f5dac6cde2185",
+    "reviews/website-draft/og.png": "d06d93e2e063c9fea008d1df9b296c09352d930ee96b5caba465af3d1e83d881",
+    "reviews/website-draft/styles.css": "85be7c8f17761f12a705dbc8a941da6d8b0ecb99f8882eb7e89189bccfdcd22b"
+  },
+  "schema": "principia.pilot.website-draft.v1",
+  "status": "ok"
+}

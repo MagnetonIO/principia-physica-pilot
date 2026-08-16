@@ -1,0 +1,32 @@
+{
+  "schema": "principia.pilot.website-validation.v1",
+  "status": "ok",
+  "review_fix_passes": 1,
+  "tools": [
+    {"name": "Python html.parser", "purpose": "HTML structure, fragment, and relative-target validation"},
+    {"name": "HTML Tidy", "purpose": "UTF-8 markup error scan with HTML5 structural tags declared"},
+    {"name": "Node.js", "purpose": "CSS delimiter, responsive-rule, focus-rule, and contrast checks"},
+    {"name": "ImageMagick", "purpose": "Original 1200x630 Open Graph design rendering and PNG inspection"},
+    {"name": "pdfinfo", "purpose": "PDF readability and page-count validation"},
+    {"name": "Lean 4.33.0", "purpose": "Published Lean companion verification"},
+    {"name": "GHC 9.14.1 and runghc", "purpose": "Strict Haskell compile and runtime property checks"},
+    {"name": "jq", "purpose": "JSON syntax and accepted-review assertions"},
+    {"name": "cmp", "purpose": "Published artifact byte-equivalence checks"},
+    {"name": "shasum", "purpose": "Final declared-output SHA-256 calculation"}
+  ],
+  "checks": [
+    {"name": "html_structure", "status": "pass", "detail": "UTF-8 document parsed with lang, one H1, 26 references, and 12 IDs; Tidy error scan found no markup errors. The installed legacy Tidy emits non-failing HTML5/ARIA approval warnings."},
+    {"name": "relative_links_and_fragments", "status": "pass", "detail": "Every local href and fragment resolves inside website/."},
+    {"name": "css_and_responsiveness", "status": "pass", "detail": "Balanced delimiters; 800px, 480px, reduced-motion, and focus-visible rules present; long epistemic labels have reserved multiline space."},
+    {"name": "accessibility", "status": "pass", "detail": "Skip link, landmarks, heading structure, keyboard focus, retained mobile navigation, reduced motion, and 5.46:1 white-on-orange contrast checked."},
+    {"name": "open_graph_image", "status": "pass", "detail": "Locally designed RGBA PNG is exactly 1200x630 and is not a PDF thumbnail."},
+    {"name": "pdf_readability", "status": "pass", "detail": "All four PDFs are readable and contain 6 pages each."},
+    {"name": "formal_verification", "status": "pass", "detail": "Lean verification, strict GHC compilation, and Haskell runtime checks all exited successfully."},
+    {"name": "json_syntax", "status": "pass", "detail": "All published reviews and receipts parse with jq; final website review verdict is ACCEPT."},
+    {"name": "source_equivalence", "status": "pass", "detail": "Four LaTeX papers, four PDFs, two formal companions, two evidence reviews, and three upstream receipts byte-match accepted workspace sources."},
+    {"name": "required_content", "status": "pass", "detail": "All four PDF and LaTeX pairs, both formal artifacts, review evidence, and verification receipts are linked; all twelve exact epistemic labels and the formal-companion limitation are explicit."},
+    {"name": "review_loop", "status": "pass", "detail": "Round 1 found one responsive-label issue; one fix pass resolved it; round 2 accepted."}
+  ],
+  "external_actions": {"published": false, "slack_messages_sent": false},
+  "remaining_issues": []
+}

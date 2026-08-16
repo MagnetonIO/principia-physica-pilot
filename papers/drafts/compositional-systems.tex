@@ -1,0 +1,403 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{axiom}[definition]{Axiom}
+\newtheorem{assumption}[definition]{Assumption}
+\newtheorem{conjecture}[definition]{Conjecture}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{interpretation}[definition]{Interpretation}
+\newtheorem{empirical}[definition]{Empirical statement}
+\newtheorem{established}[definition]{Established physical result}
+\newtheorem{newresult}[definition]{New result claimed by this work}
+\newtheorem{counterexample}[definition]{Counterexample}
+\newtheorem{example}[definition]{Example}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\Obs}{\mathcal{O}}
+\newcommand{\Ham}{\mathsf{Ham}}
+\newcommand{\Smooth}{\mathsf{SmoothSys}}
+
+\title{Compositional Systems in Finite-Dimensional Classical Mechanics}
+\author{PRINCIPIA PHYSICA Research Worker}
+\date{15 August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We give a typed formulation of finite-dimensional classical mechanics in which systems, states, observables, processes, and composition are distinct data. Smooth systems and smooth processes form a category, and Cartesian product supplies a symmetric monoidal operation. For symplectic systems we prove that the product two-form is symplectic and that additive Hamiltonians generate factorized dynamics. Interaction terms preserve kinematical product structure while generally destroying dynamical factorization. Counterexamples show that a product state space does not imply independence, that arbitrary smooth maps are not Hamiltonian processes, that reduced spaces need not be smooth manifolds, and that mathematical isomorphism does not establish physical equivalence. Empirical realization is therefore represented as additional, fallible structure rather than as a consequence of the mathematics. Every substantive assertion is assigned an epistemic type.
+\end{abstract}
+
+\section{Scope and epistemic discipline}
+
+The subject is finite-dimensional smooth classical mechanics. Field theories, continuum mechanics, general relativity, quantum mechanics, and infinite-dimensional phase spaces enter only as boundary cases. Standard symplectic mechanics is documented in Abraham and Marsden~\cite{AbrahamMarsden1978} and Marsden and Ratiu~\cite{MarsdenRatiu1999}. Category-theoretic terminology follows Mac Lane~\cite{MacLane1998}; the use of symmetric monoidal categories as a language of processes is discussed by Baez and Stay~\cite{BaezStay2011}. These references support established mathematics and physical formalism, not the empirical adequacy of any particular model.
+
+\begin{assumption}[Finite-dimensional regularity, A1]
+Every state space considered in the main construction is a finite-dimensional, Hausdorff, second-countable smooth manifold, and every displayed observable or process has the differentiability stated for it.
+\end{assumption}
+
+\begin{interpretation}[Founding thesis under investigation, I1]
+The sentence ``physics studies empirically realized compositional mathematical structures'' is treated as a methodological proposal. It is neither an axiom of mathematics nor an established physical result. The construction below tests whether its terms can be separated precisely in classical mechanics.
+\end{interpretation}
+
+A claim labelled Definition fixes terminology. An Axiom stipulates formal closure. An Assumption restricts the model class. Propositions, Lemmas, Theorems, and Corollaries are proved. An Interpretation connects mathematics to possible physical meaning without asserting experimental fact. An Empirical statement identifies input that must be tested. An Established physical result records accepted physical formalism supported by the cited literature. A New result records a synthesis specific to this work. A Conjecture remains unproved.
+
+\section{Systems, states, and observables}
+
+\begin{definition}[Kinematical system, D1]
+A \emph{kinematical classical system} is a pair
+\[
+ S=(X,\Obs_S),
+\]
+where $X$ is a manifold and $\Obs_S\subseteq C^\infty(X,\R)$ is a unital real subalgebra that separates the states the model intends to distinguish. A \emph{state} is a point $x\in X$, and an \emph{observable} is an element $f\in\Obs_S$.
+\end{definition}
+
+The separation clause is relative to the mathematical model: if $x\ne y$, the intended strong form requires some $f\in\Obs_S$ with $f(x)\ne f(y)$. It says nothing about whether an experiment resolves that difference.
+
+\begin{definition}[Hamiltonian system, D2]
+A \emph{Hamiltonian system} is a quadruple
+\[
+ H_S=(X,\omega,\Obs_S,h),
+\]
+where $(X,\omega)$ is symplectic, $\Obs_S\subseteq C^\infty(X,\R)$ is as in Definition~\ref{def:label-placeholder}, and $h\in C^\infty(X,\R)$ is the Hamiltonian. Here symplectic means that $\omega\in\Omega^2(X)$ is closed and that $v\mapsto\omega_x(v,\cdot)$ is injective at every $x$.
+\end{definition}
+
+For self-containment, the backward reference in the preceding definition means Definition 2.1; no result depends on the generated label.
+
+Nondegeneracy gives a unique vector field $X_h$ satisfying
+\begin{equation}\label{eq:hamvf}
+ \iota_{X_h}\omega=dh.
+\end{equation}
+We use this sign convention throughout. The Poisson bracket is
+\begin{equation}\label{eq:poisson}
+ \{f,g\}=\omega(X_f,X_g)=df(X_g).
+\end{equation}
+Along an integral curve $\gamma$ of $X_h$,
+\begin{equation}\label{eq:evolution}
+ \frac{d}{dt}f(\gamma(t))=df_{\gamma(t)}(X_h)=\{f,h\}(\gamma(t)).
+\end{equation}
+Equation~\eqref{eq:evolution} is a calculation from the definitions, conditional on existence of the integral curve.
+
+\begin{established}[Hamiltonian representation, E1]
+Finite-dimensional conservative classical models are standardly represented by symplectic state spaces, Hamiltonian functions, and the flows of their Hamiltonian vector fields~\cite[Chs.~3,6]{MarsdenRatiu1999}. This is an established physical formalism. It does not assert that every physical system is finite-dimensional, conservative, or Hamiltonian.
+\end{established}
+
+\begin{example}[Particle on a configuration manifold]
+For a smooth configuration manifold $Q$, the cotangent bundle $T^*Q$ has canonical one-form $\theta$ and symplectic form $\omega=-d\theta$. In canonical coordinates $(q^i,p_i)$,
+\[
+ \omega=dq^i\wedge dp_i,
+ \qquad
+ X_h=\frac{\partial h}{\partial p_i}\frac{\partial}{\partial q^i}
+      -\frac{\partial h}{\partial q^i}\frac{\partial}{\partial p_i}.
+\]
+For $Q=\R$ and $h(q,p)=p^2/(2m)+V(q)$, Equation~\eqref{eq:hamvf} yields $\dot q=p/m$ and $\dot p=-V'(q)$.
+\end{example}
+
+\begin{counterexample}[Observables need not separate states]
+Let $X=\R$ and let $\Obs$ contain only constant functions. Then $x$ and $y$ give identical values for every $f\in\Obs$, even when $x\ne y$. Thus a manifold by itself does not determine an adequate observable algebra. The example motivates, but does not empirically validate, the separation condition in Definition 2.1.
+\end{counterexample}
+
+\section{Processes and their category}
+
+\begin{definition}[Typed process, D3]
+Given $S=(X,\Obs_S)$ and $T=(Y,\Obs_T)$, a \emph{kinematical process} $F:S\to T$ is a smooth map $F:X\to Y$ satisfying
+\[
+ F^*(\Obs_T)\subseteq\Obs_S,
+ \qquad F^*g=g\circ F.
+\]
+The source and target are part of the type of $F$. A \emph{reversible kinematical process} is a process whose underlying map is a diffeomorphism and whose inverse is also a process.
+\end{definition}
+
+\begin{axiom}[Process closure, A2]
+For every system $S$, $\id_S$ is admissible. If $F:S\to T$ and $G:T\to U$ are admissible, then $G\circ F:S\to U$ is admissible.
+\end{axiom}
+
+\begin{proposition}[Category of smooth systems, P1]
+Kinematical systems and their typed processes form a category $\Smooth$.
+\end{proposition}
+
+\begin{proof}
+Axiom A2 supplies identities and closure. For composable processes $F,G,K$, equality
+$K\circ(G\circ F)=(K\circ G)\circ F$ holds pointwise because function composition is associative. The equations $F\circ\id_S=F$ and $\id_T\circ F=F$ also hold pointwise. Pullbacks preserve the observable condition: if $u\in\Obs_U$, then
+\[
+ (G\circ F)^*u=F^*(G^*u)\in F^*(\Obs_T)\subseteq\Obs_S.
+\]
+Hence all category axioms are satisfied.
+\end{proof}
+
+Different physical questions require narrower process classes.
+
+\begin{definition}[Symplectic and Hamiltonian processes, D4]
+A map $F:(X,\omega_X)\to(Y,\omega_Y)$ between equal-dimensional symplectic manifolds is \emph{symplectic} when $F^*\omega_Y=\omega_X$. A symplectic diffeomorphism between Hamiltonian systems is \emph{Hamiltonian-preserving} when $h_Y\circ F=h_X$.
+\end{definition}
+
+\begin{proposition}[Intertwining dynamics, P2]
+If $F:(X,\omega_X,h_X)\to(Y,\omega_Y,h_Y)$ is a Hamiltonian-preserving symplectic diffeomorphism, then
+\[
+ TF\circ X_{h_X}=X_{h_Y}\circ F.
+\]
+Consequently, $F\circ\phi_t^X=\phi_t^Y\circ F$ wherever both flows are defined.
+\end{proposition}
+
+\begin{proof}
+For $x\in X$ and $v\in T_xX$,
+\begin{align*}
+ \omega_Y\bigl(T_xF(X_{h_X}(x)),T_xF(v)\bigr)
+ &=\omega_X(X_{h_X}(x),v)\\
+ &=dh_X(v)=d(h_Y\circ F)(v)\\
+ &=dh_Y(T_xF(v)).
+\end{align*}
+Surjectivity of $T_xF$ and nondegeneracy of $\omega_Y$ identify $T_xF(X_{h_X}(x))$ with $X_{h_Y}(F(x))$. Both curves $F(\phi_t^X(x))$ and $\phi_t^Y(F(x))$ therefore solve the same initial-value problem. Local uniqueness for smooth vector fields gives the flow identity.
+\end{proof}
+
+\begin{counterexample}[Smooth does not imply symplectic]
+On $(\R^2,dq\wedge dp)$, let $F(q,p)=(2q,2p)$. Then
+$F^*(dq\wedge dp)=4\,dq\wedge dp$, so $F$ is a smooth diffeomorphism but not a symplectic process. Process type cannot be omitted without changing the theory.
+\end{counterexample}
+
+\section{Parallel composition}
+
+\begin{definition}[Kinematical parallel composite, D5]
+For $S=(X,\Obs_S)$ and $T=(Y,\Obs_T)$ define
+\[
+ S\otimes T=(X\times Y,\Obs_{S\otimes T}),
+\]
+where $\Obs_{S\otimes T}$ is the unital subalgebra of $C^\infty(X\times Y)$ generated by $\pi_X^*\Obs_S$ and $\pi_Y^*\Obs_T$. For processes $F:S\to S'$ and $G:T\to T'$, set
+\[
+ F\otimes G=F\times G,\qquad (x,y)\mapsto(F(x),G(y)).
+\]
+The unit system is $I=(\{*\},\R)$.
+\end{definition}
+
+This minimal observable algebra contains finite algebraic combinations of local observables. It may be enlarged to all of $C^\infty(X\times Y)$ when joint observables are intended. The choice is part of the model.
+
+\begin{proposition}[Symmetric monoidal kinematics, P3]
+With Definition 4.1, $\Smooth$ is symmetric monoidal up to the canonical product diffeomorphisms.
+\end{proposition}
+
+\begin{proof}
+Functoriality holds pointwise:
+\[
+ (F'\circ F)\times(G'\circ G)
+ =(F'\times G')\circ(F\times G),
+ \qquad \id_X\times\id_Y=\id_{X\times Y}.
+\]
+The canonical maps
+\begin{align*}
+ \alpha_{X,Y,Z}:((x,y),z)&\mapsto(x,(y,z)),\\
+ \lambda_X:(*,x)&\mapsto x,\qquad
+ \rho_X:(x,*)&\mapsto x,\\
+ \sigma_{X,Y}:(x,y)&\mapsto(y,x)
+\end{align*}
+are diffeomorphisms and preserve the generated observable algebras by pullback. The pentagon, triangle, and hexagon equations hold because both sides send every tuple to the same rebracketed or permuted tuple. Naturality is verified by substituting the component maps. These data satisfy the symmetric monoidal axioms described in~\cite[Ch.~XI]{MacLane1998}.
+\end{proof}
+
+\begin{lemma}[Product symplectic form, L1]
+If $(X,\omega_X)$ and $(Y,\omega_Y)$ are symplectic, then
+\[
+ \omega_{X\otimes Y}=\pi_X^*\omega_X+\pi_Y^*\omega_Y
+\]
+is symplectic on $X\times Y$.
+\end{lemma}
+
+\begin{proof}
+Closedness is
+$d\omega_{X\otimes Y}=\pi_X^*(d\omega_X)+\pi_Y^*(d\omega_Y)=0$.
+At $(x,y)$ identify $T_{(x,y)}(X\times Y)$ with $T_xX\oplus T_yY$. If $(u,v)$ lies in the kernel, pairing it first with $(u',0)$ gives $\omega_X(u,u')=0$ for every $u'$, hence $u=0$. Pairing with $(0,v')$ then gives $v=0$. Thus the form is nondegenerate.
+\end{proof}
+
+\begin{definition}[Noninteracting Hamiltonian composite, D6]
+The noninteracting composite of $(X,\omega_X,h_X)$ and $(Y,\omega_Y,h_Y)$ has the product form of Lemma 4.3 and Hamiltonian
+\[
+ h_0=\pi_X^*h_X+\pi_Y^*h_Y.
+\]
+An interacting composite has $h=h_0+V$, where $V\in C^\infty(X\times Y)$ is an interaction term.
+\end{definition}
+
+\begin{theorem}[Factorization criterion for additive dynamics, T1]
+For the noninteracting composite,
+\[
+ X_{h_0}(x,y)=\bigl(X_{h_X}(x),X_{h_Y}(y)\bigr).
+\]
+\end{theorem}
+
+\begin{proof}
+For $(u,v)\in T_xX\oplus T_yY$,
+\begin{align*}
+ \omega_{X\otimes Y}\bigl((X_{h_X},X_{h_Y}),(u,v)\bigr)
+ &=\omega_X(X_{h_X},u)+\omega_Y(X_{h_Y},v)\\
+ &=dh_X(u)+dh_Y(v)=dh_0(u,v).
+\end{align*}
+Uniqueness in Equation~\eqref{eq:hamvf} identifies the displayed product vector field with $X_{h_0}$.
+\end{proof}
+
+\begin{corollary}[Factorized flow, C1]
+Where the component flows exist,
+\[
+ \phi_t^{h_0}(x,y)=\bigl(\phi_t^{h_X}(x),\phi_t^{h_Y}(y)\bigr).
+\]
+If both component vector fields are complete, the composite vector field is complete.
+\end{corollary}
+
+\begin{proof}
+The product curve has derivative $(X_{h_X},X_{h_Y})$, so Theorem 4.5 makes it an integral curve of $X_{h_0}$ with initial point $(x,y)$. Uniqueness supplies the equality. Completeness means both component curves exist for every $t\in\R$, which makes their product exist for every $t$.
+\end{proof}
+
+\begin{example}[Coupled particles]
+Let $X_i=T^*\R$ with coordinates $(q_i,p_i)$ and
+\[
+ h=\frac{p_1^2}{2m_1}+\frac{p_2^2}{2m_2}
+   +U_1(q_1)+U_2(q_2)+V(q_1,q_2).
+\]
+Then
+\[
+ \dot q_i=\frac{p_i}{m_i},\qquad
+ \dot p_1=-U_1'(q_1)-\partial_{q_1}V,
+ \qquad
+ \dot p_2=-U_2'(q_2)-\partial_{q_2}V.
+\]
+The state space remains a Cartesian product. Unless the derivatives of $V$ separate appropriately, the vector field is not the product of autonomous component vector fields. Thus kinematical composition survives interaction while dynamical factorization does not.
+\end{example}
+
+\begin{counterexample}[Product state space does not imply independence]
+Take two harmonic degrees of freedom and $V(q_1,q_2)=kq_1q_2$ with $k\ne0$. The equation $\dot p_1=-m_1\omega_1^2q_1-kq_2$ depends on the second subsystem's state. Therefore $X_h$ cannot equal $(A(q_1,p_1),B(q_2,p_2))$. A product manifold alone neither states statistical independence nor entails dynamically independent evolution.
+\end{counterexample}
+
+\begin{counterexample}[Completeness is not automatic]
+On $(\R^2,dq\wedge dp)$ take $h(q,p)=q^2p$. Hamilton's equations give $\dot q=q^2$ and $\dot p=-2qp$. Starting at $q(0)=q_0>0$, the solution $q(t)=q_0/(1-q_0t)$ diverges at $t=1/q_0$. Smooth finite-dimensional Hamiltonian data therefore need not generate a global process for every time.
+\end{counterexample}
+
+\section{Interconnection, constraints, and loss of closure}
+
+Parallel product is not the only composition operation. Identification of ports, imposition of constraints, or symmetry reduction can replace a product by a subspace or quotient. Such constructions require regularity hypotheses.
+
+\begin{assumption}[Regular constraint, A3]
+For a constraint map $C:X\to\R^k$, the value $0$ is regular. Hence $C^{-1}(0)$ is an embedded submanifold by the regular-value theorem.
+\end{assumption}
+
+Assumption A3 is not derivable from the existence of $C$. Moreover, the pullback of a symplectic form to $C^{-1}(0)$ can be degenerate; obtaining a symplectic reduced space can require quotienting a characteristic distribution and proving that the quotient is a manifold~\cite[Chs.~8,10]{AbrahamMarsden1978}.
+
+\begin{counterexample}[Singular reduction can leave the declared category]
+Let $S^1$ act on $\mathbb{C}^2$ by $e^{i\theta}(z_1,z_2)=(e^{i\theta}z_1,e^{-i\theta}z_2)$. The origin has the full group as stabilizer, whereas generic points have smaller stabilizer. Quotients containing orbits of different stabilizer type generally have strata of different local form. Without freeness and properness hypotheses, the quotient need not be a smooth manifold. Hence finite-dimensional smooth systems are not closed under arbitrary reduction.
+\end{counterexample}
+
+\begin{proposition}[Interaction is extra structure, P4]
+Fix symplectic systems $(X,\omega_X,h_X)$ and $(Y,\omega_Y,h_Y)$. Their kinematical product and canonical observable embeddings do not determine an interaction Hamiltonian $V$.
+\end{proposition}
+
+\begin{proof}
+Both $V_0=0$ and $V_1=f\circ\pi_X\,g\circ\pi_Y$, for arbitrary nonconstant smooth $f$ and $g$, are smooth functions on the same product and leave the projections and product symplectic form unchanged. Their Hamiltonian vector fields differ wherever $dV_1\ne0$, by nondegeneracy of the symplectic form. Thus identical kinematical data admit distinct interactions and distinct dynamics.
+\end{proof}
+
+\section{Empirical realization and equivalence}
+
+\begin{definition}[Empirical realization scheme, D7]
+For a mathematical system $S=(X,\Obs_S)$, an \emph{empirical realization scheme} is typed data
+\[
+ \mathcal{R}_S=(\mathcal{P}_S,\mathcal{M}_S,r_S,\{e_m\}_{m\in\mathcal{M}_S},\varepsilon),
+\]
+where $\mathcal{P}_S$ is a set of preparation procedures, $\mathcal{M}_S$ is a set of measurement procedures, $r_S:\mathcal{P}_S\dashrightarrow X$ is a possibly partial representation map, each $e_m$ maps represented states to predicted outcome distributions or values, and $\varepsilon$ records resolution and accepted error. The scheme is mathematical data until linked to actual laboratory procedures and observations.
+\end{definition}
+
+\begin{empirical}[Calibration input, E2]
+The assertion that a particular preparation $p$ is represented by $r_S(p)=x$, or that a meter implements an observable $f$, is empirical input. It requires calibration, uncertainty assessment, and comparison with observations. No property of $X$, $\omega$, or $h$ proves that correspondence.
+\end{empirical}
+
+\begin{definition}[Mathematical and empirical equivalence, D8]
+Two Hamiltonian systems are \emph{mathematically isomorphic} when a Hamiltonian-preserving symplectic diffeomorphism relates them. Relative to realization schemes, they are \emph{observationally equivalent at resolution $\varepsilon$} when specified translations of preparations and measurements make all compared predicted outcome distributions agree within $\varepsilon$. They are \emph{physically equivalent} only if the intended physical content is preserved, including the relevant interventions, units, causal roles, and measurement assignments.
+\end{definition}
+
+Mathematical isomorphism can support an empirical equivalence argument after the realization maps are transported, but it is not itself that argument.
+
+\begin{counterexample}[A canonical transformation can change empirical meaning]
+Let $F(q,p)=(p,-q)$ on $(\R^2,dq\wedge dp)$. It is symplectic because $d p\wedge d(-q)=dq\wedge dp$. If an apparatus is calibrated so that its first readout is physical position in metres, replacing $(q,p)$ by $(p,-q)$ while retaining that calibration changes the predicted meaning and dimensions of the readout. The mathematical coordinate systems are symplectically isomorphic; physical equivalence requires a corresponding translation of the measurement assignment.
+\end{counterexample}
+
+\begin{counterexample}[Finite observations underdetermine the Hamiltonian]
+Suppose experiments probe only a compact region $K\subset X$ during a finite interval. Choose a smooth function $b$ supported outside an open neighbourhood of $K$. Hamiltonians $h$ and $h+b$ have identical differentials on that neighbourhood and hence identical Hamiltonian vector fields there. Data confined to the probed region cannot distinguish them. Agreement on finite observations therefore does not establish global equality of mathematical models.
+\end{counterexample}
+
+\begin{newresult}[Four-layer compositionality, N1]
+For the framework above, compositional closure separates into four layers:
+\begin{enumerate}[label=(\roman*)]
+\item kinematical composition: formation of $X\times Y$;
+\item observable composition: embeddings $f\mapsto f\circ\pi_X$ and $g\mapsto g\circ\pi_Y$;
+\item dynamical composition: selection of $h_X+h_Y+V$ and, only when $V=0$, factorization proved in Theorem 4.5;
+\item empirical composition: justification that joint preparations and measurements are represented by the proposed composite.
+\end{enumerate}
+No implication from any of (i)--(iii) to (iv) is valid from the definitions alone.
+\end{newresult}
+
+\begin{proof}
+Definitions 4.1 and 4.4 independently specify (i)--(iii). Proposition 5.2 proves that (i) and (ii) do not determine the dynamical interaction. Counterexample 4.8 proves that (i) does not imply dynamical independence. Definition 6.1 adds preparations, measurements, representation maps, and tolerances absent from (i)--(iii). Two realization schemes can therefore share all mathematical data while assigning different apparatus procedures or no procedures at all. Consequently the empirical layer is not entailed by the preceding mathematical layers.
+\end{proof}
+
+\begin{conjecture}[Functorial empirical realization, C2]
+A broad theory of experimentally realized composition can be organized by a lax symmetric-monoidal mapping from a category of mathematical systems and processes to a category of operational preparations, interventions, and measurements. Laxity would encode that not every mathematical composite is physically available and that composition may introduce noise or constraints.
+\end{conjecture}
+
+No proof is claimed: neither a universal operational category nor empirically adequate comparison maps have been specified. The conjecture is a research direction suggested by the categorical process viewpoint~\cite{BaezStay2011}.
+
+\section{Boundary tests and falsification}
+
+The framework has explicit failure conditions.
+
+\begin{enumerate}[label=\textbf{F\arabic*.},leftmargin=*]
+\item If experimentally necessary states cannot be represented by any finite-dimensional manifold at the intended accuracy, Assumption A1 fails for that domain.
+\item If observed evolution is dissipative, stochastic, history-dependent, or non-Markovian in the chosen state variables, a Hamiltonian flow on the proposed symplectic space is inadequate unless additional variables or a different process class are justified.
+\item If subsystem identification changes under interaction so that no empirically stable preparation or measurement translation supports $X\times Y$, empirical product realization fails even though the Cartesian product exists mathematically.
+\item If constraints or quotient operations yield singular spaces, closure in the category of smooth manifolds fails; stratified, differential, or other generalized spaces are required.
+\item If two mathematically isomorphic models assign observably different interventions or units, the isomorphism does not establish physical equivalence.
+\end{enumerate}
+
+\begin{empirical}[Model testing, E3]
+For a proposed realization, measured trajectories or outcome distributions must be compared with the predictions generated by $h$ and the measurement maps, including uncertainty and alternative models. Persistent discrepancies exceeding the declared tolerance falsify that realization scheme, not the mathematical consistency of symplectic geometry.
+\end{empirical}
+
+\begin{interpretation}[Limited verdict, I2]
+Finite-dimensional Hamiltonian mechanics supports a precise compositional mathematical core: typed processes compose categorically, systems compose kinematically by products, and noninteracting dynamics factorize. The core becomes physics only through additional empirical representation. This result is compatible with the founding thesis but does not establish the thesis for all physical theories.
+\end{interpretation}
+
+\section{Conclusion}
+
+Systems, states, observables, processes, and composition have been assigned separate types. The resulting smooth category is symmetric monoidal under Cartesian product. Product symplectic forms are nondegenerate, additive Hamiltonians yield product vector fields, and their flows factorize on their common domains. Interaction terms, constraints, and reduction demonstrate why composition cannot be reduced to Cartesian multiplication. Empirical realization data are logically additional, and physical equivalence is stronger than mathematical isomorphism. The proposed framework is therefore a controlled finite-dimensional test of compositional foundations, with stated counterexamples and failure modes rather than a claim of universal applicability.
+
+\begin{thebibliography}{9}
+
+\bibitem{AbrahamMarsden1978}
+R.~Abraham and J.~E. Marsden,
+\emph{Foundations of Mechanics}, 2nd ed.,
+Benjamin/Cummings, 1978; AMS Chelsea reprint, 2008.
+Verified bibliographic record: \url{https://bookstore.ams.org/view?ProductCode=CHEL%2F364.H}.
+
+\bibitem{MarsdenRatiu1999}
+J.~E. Marsden and T.~S. Ratiu,
+\emph{Introduction to Mechanics and Symmetry: A Basic Exposition of Classical Mechanical Systems}, 2nd ed.,
+Texts in Applied Mathematics 17, Springer, 1999.
+\doi{10.1007/978-0-387-21792-5}.
+
+\bibitem{MacLane1998}
+S.~Mac Lane,
+\emph{Categories for the Working Mathematician}, 2nd ed.,
+Graduate Texts in Mathematics 5, Springer, 1998.
+\doi{10.1007/978-1-4757-4721-8}.
+
+\bibitem{BaezStay2011}
+J.~C. Baez and M.~Stay,
+``Physics, topology, logic and computation: a Rosetta Stone,''
+in \emph{New Structures for Physics}, Lecture Notes in Physics 813,
+Springer, 2011, pp.~95--172.
+Preprint: \url{https://arxiv.org/abs/0903.0340}.
+
+\end{thebibliography}
+\end{document}

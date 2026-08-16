@@ -1,0 +1,1 @@
+{"status": "failed", "error": "missing_scope", "needed": "chat:write:bot", "provided": "incoming-webhook", "token_type": "xoxb"}

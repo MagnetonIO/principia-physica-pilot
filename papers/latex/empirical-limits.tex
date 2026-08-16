@@ -1,0 +1,247 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{axiom}[definition]{Axiom}
+\newtheorem{assumption}[definition]{Assumption}
+\newtheorem{conjecture}[definition]{Conjecture}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{interpretation}[definition]{Interpretation}
+\newtheorem{empirical}[definition]{Empirical statement}
+\newtheorem{established}[definition]{Established physical result}
+\newtheorem{newresult}[definition]{New result claimed by this work}
+\newtheorem{counterexample}[definition]{Counterexample}
+\newtheorem{failuremode}[definition]{Failure mode}
+
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prob}{\mathsf{Prob}}
+\newcommand{\TV}{d_{\mathrm{TV}}}
+
+\title{Empirical Realization, Equivalence, Limits, and Falsification}
+\author{PRINCIPIA PHYSICA Research Worker}
+\date{15 August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A bare mathematical model is not an empirical realization. We define realization relative to preparations, interventions, measurements, calibrations, uncertainties, and an adequacy rule. Exact observational equivalence is proved to be an equivalence relation, and its quotient is shown to encode exactly the distinctions available to a fixed protocol. A mathematical isomorphism yields observational equivalence only when it transports the empirical interpretation. Finite sampling underdetermines unrestricted smooth trajectories. Newtonian and free-particle limits are proved only on bounded domains, with counterexamples to global uniform convergence. Finally, observationally equivalent models are shown to have identical falsification status only under a common full protocol and assessment rule.
+\end{abstract}
+
+\section{Scope and epistemic types}
+
+\begin{assumption}[Finite protocol models, A1]
+State spaces are finite-dimensional smooth manifolds. Preparations, interventions, measurement kernels, and comparison domains are explicitly specified. This assumption does not assert that every physical system admits such a representation.
+\end{assumption}
+
+Definitions stipulate terminology. Assumptions restrict the paper's domain. Propositions and theorems are proved. Established physical results are cited. Interpretations state proposed physical readings. Empirical statements require observation or calibration. New results are mathematical claims first isolated in this work. Conjectures remain open.
+
+\begin{interpretation}[Founding thesis, I1]
+The thesis that physics studies empirically realized compositional mathematical structures is treated as a methodological interpretation. The formal results below articulate ``empirically realized'' relative to a protocol; they do not prove that every physical practice fits this scheme.
+\end{interpretation}
+
+\section{Realized models and predictions}
+
+\begin{definition}[Empirical protocol, D1]\label{def:protocol}
+A protocol $P$ consists of a target domain, preparation labels $a$, intervention labels $i$, measurement labels $j$, admitted times $t$, outcome spaces $Y_j$, calibration conventions, and an error model. A realized-model candidate supplies:
+\begin{enumerate}[label=(\roman*)]
+\item a state space $X$ and evolutions $\Phi^{i}_{t,s}$;
+\item a preparation distribution $\pi_a\in\Prob(X)$ for each $a$;
+\item a measurement kernel $K_j:X\times\mathcal B(Y_j)\to[0,1]$;
+\item a predeclared adequacy rule using the error model.
+\end{enumerate}
+Its predicted outcome law is
+\[
+ p_{aijt}(B)=\int_X K_j(\Phi^i_{t,0}(x),B)\,d\pi_a(x).
+\]
+\end{definition}
+
+\begin{empirical}[Calibration, E1]
+Claims associating a preparation with $\pi_a$, an apparatus with $K_j$, or a recorded numeral with a dimensioned quantity are empirical inputs. They require calibration and uncertainty assessment and are not consequences of the state-space geometry.
+\end{empirical}
+
+\begin{counterexample}[Mathematical admissibility is not adequacy]
+Both $\ddot q=0$ and $\ddot q+\omega^2q=0$ are mathematically consistent smooth models. A calibrated trajectory whose residuals exceed the oscillator's declared tolerance rejects the oscillator candidate relative to that protocol. Consistency does not protect a model from empirical rejection.
+\end{counterexample}
+
+\section{Observational and mathematical equivalence}
+
+\begin{definition}[Protocol-relative equivalence, D2]\label{def:obseq}
+For models with common protocol $P$, write $M\sim_PN$ when $p^M_{aijt}=p^N_{aijt}$ for every admitted index. Write $M\sim_{P,\varepsilon}N$ when the supremum of $\TV(p^M_{aijt},p^N_{aijt})$ over the protocol is at most $\varepsilon$.
+\end{definition}
+
+\begin{proposition}[Exact equivalence relation, P1]
+The relation $\sim_P$ is an equivalence relation.
+\end{proposition}
+\begin{proof}
+Equality of probability measures is reflexive, symmetric, and transitive. Applying these properties at every admitted prediction index proves the three corresponding properties of $\sim_P$.
+\end{proof}
+
+\begin{counterexample}[Approximate equivalence need not be transitive]
+For deterministic scalar predictions $0$, $0.75\varepsilon$, and $1.5\varepsilon$ with absolute-error distance, the first is within $\varepsilon$ of the second and the second of the third, while the first is not within $\varepsilon$ of the third. Approximate equivalence is therefore a tolerance relation unless additional structure is imposed.
+\end{counterexample}
+
+\begin{newresult}[Protocol quotient, N1]\label{res:quotient}
+Let $\mathfrak M$ be a set of models with protocol $P$. The prediction map
+\[
+ \operatorname{Pred}_P:\mathfrak M\longrightarrow\prod_{a,i,j,t}\Prob(Y_j)
+\]
+factors uniquely through $q:\mathfrak M\to\mathfrak M/{\sim_P}$ as an injective map. The quotient is therefore the maximal distinction among models available to $P$.
+\end{newresult}
+\begin{proof}
+By D2, $q(M)=q(N)$ exactly when $\operatorname{Pred}_P(M)=\operatorname{Pred}_P(N)$. Define the induced map by $[M]\mapsto\operatorname{Pred}_P(M)$. The biconditional makes it well-defined and injective. Surjectivity of $q$ makes the factorization unique.
+\end{proof}
+
+Calling this quotient ``empirical content'' is an interpretation restricted to $P$. Enlarging the protocol can refine its classes.
+
+\begin{definition}[Transported interpretation, D3]
+An isomorphism $F:X_M\to X_N$ transports the interpretation when it intertwines all declared dynamics, satisfies $F_*\pi_a^M=\pi_a^N$, and satisfies $K_j^M(x,B)=K_j^N(Fx,B)$ for every admitted label and event.
+\end{definition}
+
+\begin{proposition}[Conditional bridge, P2]
+An isomorphism transporting the interpretation yields $M\sim_PN$.
+\end{proposition}
+\begin{proof}
+Substitute $F_*\pi_a^M=\pi_a^N$ into the integral defining $p^N$. Intertwining transports the evolved state, and kernel compatibility replaces the $N$ kernel by the $M$ kernel. The resulting integral is $p^M$ for every index and measurable event.
+\end{proof}
+
+\begin{counterexample}[Bare isomorphism is insufficient]
+The symplectomorphism $F(q,p)=(\lambda q,p/\lambda)$ can relate two free-particle presentations after parameters are transported. If both empirical interpretations nevertheless associate their numerical $q$ with the same calibrated metre reading, $q=1$ and $F(q,p)$ predict different readings when $\lambda\ne1$. The calibration must be transported before observational equivalence is inferred.
+\end{counterexample}
+
+The literature distinguishes formal, categorical, empirical, and interpretative notions of theoretical equivalence~\cite{Weatherall1,Weatherall2,Coffey}. P2 is a conditional preservation result, not a universal identification of mathematical and physical equivalence.
+
+\section{Finite-data underdetermination}
+
+\begin{newresult}[Finite sampling, N2]
+Let $t_1,\ldots,t_n$ be distinct times in an open interval $I$, and let $q:I\to\R$ be smooth. Infinitely many distinct smooth trajectories agree with $q$ at every $t_k$.
+\end{newresult}
+\begin{proof}
+Choose a nonzero smooth $g:I\to\R$, set $h(t)=g(t)\prod_{k=1}^n(t-t_k)$, and define $q_\lambda=q+\lambda h$. Every $h(t_k)$ vanishes. If $\lambda\ne\mu$, then $q_\lambda-q_\mu=(\lambda-\mu)h$ is not identically zero.
+\end{proof}
+
+\begin{corollary}[Structural non-identifiability, C1]
+Finite noiseless position samples do not identify an unrestricted smooth trajectory or law of motion.
+\end{corollary}
+\begin{proof}
+N2 constructs infinitely many inputs to the sampling map with the same output, so that map is not injective.
+\end{proof}
+
+This result does not state that scientific inference is impossible. Identification may be recovered relative to a restricted model class, interventions, derivative observations, or regularization. Those restrictions are assumptions rather than consequences of the samples.
+
+\begin{failuremode}[Auxiliary dependence]
+A failed prediction may implicate dynamics, preparation, measurement, calibration, timing, or the error model. A test rejects the conjunction used to derive the prediction; attribution to a particular component requires further evidence.
+\end{failuremode}
+
+\begin{failuremode}[Protocol impoverishment]
+If every measurement kernel is constant in the state, all models are observationally equivalent under the protocol. N1 remains true, but its quotient has one class and carries no state-discriminating information.
+\end{failuremode}
+
+\section{Limiting relations}
+
+\begin{definition}[Protocol-compatible limit, D4]
+After comparison maps and a domain $D$ are specified, write $M_\epsilon\to_PM_0$ on $D$ when
+\[
+ \sup_{r\in D}\TV(p_r^{M_\epsilon},p_r^{M_0})\longrightarrow0.
+\]
+The domain, topology or metric, parameter, observable matching, and order of limits are part of the statement.
+\end{definition}
+
+\begin{established}[Relativistic kinetic energy, E2]
+Special relativity assigns a free particle
+\[
+ T_c(p)=\sqrt{m^2c^4+p^2c^2}-mc^2,
+\]
+whereas Newtonian mechanics assigns $T_N(p)=p^2/(2m)$. For fixed $p$, expansion gives $T_c=T_N-p^4/(8m^3c^2)+O(c^{-4})$.
+\end{established}
+
+\begin{proposition}[Compact Newtonian limit, P3]
+For every finite $P$, $T_c\to T_N$ uniformly on $|p|\le P$ as $c\to\infty$, but not uniformly on all of $\R$.
+\end{proposition}
+\begin{proof}
+Taylor's theorem for $\sqrt{1+z}$ with $z=p^2/(m^2c^2)$ bounds the compact-domain remainder by $C_Pc^{-2}$. For nonuniformity choose $p=mc$. Then
+\[
+ |T_c(mc)-T_N(mc)|=mc^2\left|\sqrt2-1-\frac12\right|,
+\]
+which grows with $c$.
+\end{proof}
+
+\begin{interpretation}[Domain of the Newtonian statement]
+The phrase ``Newtonian mechanics is the $c\to\infty$ limit'' is supported here only after subtracting rest energy, matching observables, and restricting momentum. The countersequence $p=mc$ leaves that regime.
+\end{interpretation}
+
+\begin{proposition}[Finite-time oscillator limit, P4]
+Let $q_\omega$ solve $\ddot q_\omega+\omega^2q_\omega=0$ with initial data $(q_0,v_0)$. On every bounded time interval it converges uniformly as $\omega\to0$ to $q_0+v_0t$. Unless both initial data vanish, convergence is not uniform on all time.
+\end{proposition}
+\begin{proof}
+The solution is $q_\omega=q_0\cos(\omega t)+(v_0/\omega)\sin(\omega t)$. For $|t|\le T$,
+\[
+ |q_\omega-q_0-v_0t|\le |q_0|\omega^2T^2/2+|v_0|\omega^2T^3/6.
+\]
+If $v_0\ne0$, evaluate at $t=2\pi/\omega$ to obtain discrepancy $2\pi|v_0|/\omega$. If $v_0=0$ and $q_0\ne0$, evaluate at $t=\pi/\omega$ to obtain $2|q_0|$.
+\end{proof}
+
+\begin{failuremode}[Noncommuting extrapolation]
+Taking $\omega\to0$ at fixed time yields the free trajectory, while choosing times proportional to $1/\omega$ retains or amplifies the discrepancy. A bounded-time estimate does not warrant unrestricted temporal equivalence.
+\end{failuremode}
+
+\section{Falsification}
+
+\begin{definition}[Acceptance region, D5]\label{def:accept}
+For candidate $(M,P,E)$ and test index $r$, let $\mathcal A_{M,P,E}(r)$ be the data records accepted by a predeclared adequacy rule. A datum falsifies the candidate relative to that test when it lies outside this set.
+\end{definition}
+
+\begin{theorem}[Equivalence and falsification, T1]
+Suppose $M\sim_PN$ and both candidates use the same error model and adequacy rule, with acceptance regions determined only by protocol predictions and those common assessment inputs. Then their acceptance regions are equal at every index. No admitted datum falsifies exactly one candidate.
+\end{theorem}
+\begin{proof}
+Observational equivalence gives equal prediction measures. Substitution of equal predictions into the same acceptance-region construction gives equal sets. Membership of every datum is therefore the same.
+\end{proof}
+
+\begin{corollary}[Protocol expansion, C2]
+Empirical discrimination between exactly equivalent candidates requires changing or extending a preparation, intervention, measurement, time, calibration, error-model, or assessment component.
+\end{corollary}
+\begin{proof}
+With every listed component fixed, T1 prohibits differential falsification. A discriminating test must violate at least one hypothesis of T1.
+\end{proof}
+
+\begin{counterexample}[Equivalence does not imply adequacy]
+Two models can assign probability $1/2$ to every binary outcome while validated repeated observations concentrate near frequency $0.9$. The models are equivalent to each other under the protocol but jointly inadequate. Equivalence is comparative, not an adequacy certificate.
+\end{counterexample}
+
+\begin{proposition}[Scalar falsification witness, P5]
+If a predeclared rule accepts exactly $|d_r-\mu_M(r)|\le\delta_r$ and the observed datum satisfies the strict reverse inequality, then the realization claim fails relative to that rule.
+\end{proposition}
+\begin{proof}
+The acceptance region is $[\mu_M(r)-\delta_r,\mu_M(r)+\delta_r]$. The strict inequality places $d_r$ outside this interval, which is falsification by D5.
+\end{proof}
+
+Post hoc enlargement of $\delta_r$ weakens this test unless independently justified and tested on new data. Setting $\delta_r=0$ for a noisy instrument instead confuses exact mathematics with achievable discrimination.
+
+\section{Composition and conclusion}
+
+\begin{assumption}[Mathematical composition, A2]
+For independently represented systems, a declared composite model and typed process composition are available. This assumption may fail for constrained, quotient, or singular constructions.
+\end{assumption}
+
+\begin{conjecture}[Empirical compositionality, C3]
+A useful compositional empirical theory should supply protocol-composition maps such that independently prepared and measured predictions factorize up to a quantified tolerance when the systems are operationally isolated to that tolerance. Interactions should be represented by additional processes rather than hidden in the tensor symbol.
+\end{conjecture}
+
+The proved conclusions are protocol-indexed. Exact observational equivalence determines a quotient; mathematical isomorphism reaches that quotient only after interpretation is transported; finite data underdetermine unrestricted smooth dynamics; familiar limits require bounded domains; and falsification status is shared only under a common full assessment procedure. Thus mathematical admissibility and physical realization remain distinct. Whether this framework captures every relevant form of empirical composition remains conjectural.
+
+\begin{thebibliography}{9}
+\bibitem{Weatherall1} J. O. Weatherall, ``Theoretical Equivalence in Physics, Part 1,'' \emph{Philosophy Compass} 14 (2019), e12592.
+\bibitem{Weatherall2} J. O. Weatherall, ``Theoretical Equivalence in Physics, Part 2,'' \emph{Philosophy Compass} 14 (2019), e12591.
+\bibitem{Coffey} K. Coffey, ``Theoretical Equivalence as Interpretative Equivalence,'' \emph{British Journal for the Philosophy of Science} 65 (2014), 821--844.
+\bibitem{Butterfield} J. Butterfield, ``Less is Different: Emergence and Reduction Reconciled,'' \emph{Foundations of Physics} 41 (2011), 1065--1135.
+\bibitem{MarsdenRatiu} J. E. Marsden and T. S. Ratiu, \emph{Introduction to Mechanics and Symmetry}, 2nd ed., Springer, 1999.
+\end{thebibliography}
+\end{document}
