@@ -1,1 +1,1 @@
-{"ok":false,"error":"missing_scope","needed":"chat:write:bot","provided":"incoming-webhook","warning":"missing_charset","response_metadata":{"warnings":["missing_charset"]}}
+{"ok":false,"error":"missing_scope","needed":"chat:write:bot","provided":"incoming-webhook"}

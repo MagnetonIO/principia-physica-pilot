@@ -1,7 +1,7 @@
 {
   "schema": "principia.pilot.latex.v1",
   "status": "ok",
-  "review_fix_passes": 1,
+  "review_fix_passes": 2,
   "tool": {
     "command": "latexmk -pdf -g -interaction=nonstopmode -halt-on-error -file-line-error -outdir=papers/pdf",
     "latexmk_version": "4.88",
@@ -11,12 +11,44 @@
   "diagnostics": {
     "log_warning_scan": "clean",
     "page_count_tool": "pdfinfo",
-    "page_range_required": [6, 10]
+    "page_range_required": [
+      6,
+      10
+    ]
   },
   "artifacts": {
-    "compositional-systems": {"pages": 6, "source_sha256": "87c8ce6fda2b325092ff2bc1ae30b91e25702594530274dff739f7f853922778", "pdf_sha256": "41422a88f260863a9f1802ef9eb0e79c38d5392c683031c5ba25af4ab89f0c64"},
-    "hamiltonian-reconstruction": {"pages": 6, "source_sha256": "224e2c85e17288312350c8c6da740677f6aacaec240aa03b3d99accdebc10232", "pdf_sha256": "699a0e927ec3540c532668aa31c8d68fa58ed7344f39d163dbc5e274bc5e018e"},
-    "empirical-limits": {"pages": 6, "source_sha256": "aa0053af5f27252fe4dfbf3b45f0711303ad5e4da00329c9419a1af3b516203d", "pdf_sha256": "97d2dc0974fad0f8329fab4b720756b39aa986132337fecd54c8474f4e410b45"},
-    "synthesis": {"pages": 6, "source_sha256": "fa6cd119b28d58d8eb163a83d0746e08ff5092928da9c57604206a44c543e0e2", "pdf_sha256": "45592f64134c65b73e1bb1cae548d7fc434f594c732354a3073b83a08b99f7ab"}
-  }
+    "compositional-systems": {
+      "pages": 6,
+      "source_sha256": "87c8ce6fda2b325092ff2bc1ae30b91e25702594530274dff739f7f853922778",
+      "pdf_sha256": "41422a88f260863a9f1802ef9eb0e79c38d5392c683031c5ba25af4ab89f0c64"
+    },
+    "hamiltonian-reconstruction": {
+      "pages": 6,
+      "source_sha256": "224e2c85e17288312350c8c6da740677f6aacaec240aa03b3d99accdebc10232",
+      "pdf_sha256": "699a0e927ec3540c532668aa31c8d68fa58ed7344f39d163dbc5e274bc5e018e"
+    },
+    "empirical-limits": {
+      "pages": 6,
+      "source_sha256": "aa0053af5f27252fe4dfbf3b45f0711303ad5e4da00329c9419a1af3b516203d",
+      "pdf_sha256": "97d2dc0974fad0f8329fab4b720756b39aa986132337fecd54c8474f4e410b45"
+    },
+    "synthesis": {
+      "pages": 6,
+      "source_sha256": "a1924f101e2263e25b4533a36cb55f8ce1af91faec80fc8662770c4b7399f747",
+      "pdf_sha256": "281cf923ede60f574d3201a168fab2032c6390f40272680cf00507bd60d483e6"
+    }
+  },
+  "repairs": [
+    {
+      "node": "final_rereview",
+      "artifact": "synthesis",
+      "defect": "Lemma S-L1 first display carried the wrong overall sign for iota_Y omega_oplus, contradicting the proof's own stated contraction rule q-dot dp - p-dot dq, the lemma's second display, and the interaction Hamiltonian q_1^T C_12 q_2 recorded in hamiltonian-reconstruction N1.",
+      "fix": "Signs corrected to +(C_12 q_2).dq_1 +(C_21 q_1).dq_2 and the substitution step made explicit.",
+      "rebuild": "latexmk -pdf -g -interaction=nonstopmode -halt-on-error -file-line-error -outdir=papers/pdf papers/latex/synthesis.tex",
+      "rebuild_exit_status": 0,
+      "pages_after": 6,
+      "previous_source_sha256": "fa6cd119b28d58d8eb163a83d0746e08ff5092928da9c57604206a44c543e0e2",
+      "previous_pdf_sha256": "45592f64134c65b73e1bb1cae548d7fc434f594c732354a3073b83a08b99f7ab"
+    }
+  ]
 }
