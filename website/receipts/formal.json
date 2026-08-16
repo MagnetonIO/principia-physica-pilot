@@ -1,20 +1,5 @@
 {
-  "schema": "principia.verification.formal.v1",
-  "lean": {
-    "tool": "Lean 4.33.0",
-    "command": "lean formal/lean/Proofs.lean",
-    "exit_status": 0,
-    "placeholder_scan": "rg sorry|admit",
-    "placeholder_count": 0,
-    "sha256": "e4c23d6b2a9f36bb61d54d1923ee5222896b3ab705318ebc82a43c8ca4424ae5"
-  },
-  "haskell": {
-    "tool": "GHC 9.14.1",
-    "command": "ghc-9.14.1 -Wall -Wextra -Werror -fforce-recomp -outputdir /tmp/principia-final/obj -o /tmp/principia-final/core formal/haskell/Core.hs",
-    "compiler_exit_status": 0,
-    "executable_exit_status": 0,
-    "checks_passed": 24,
-    "checks_failed": 0,
-    "sha256": "fe7c25b8a5cafc600698a920e5990786e2656ed1f56b8b0a177c45904d21b068"
-  }
+  "schema": "principia-publication-formal-receipt.v1",
+  "lean": {"tool":"Lean 4.33.0","command":"lean formal/lean/Proofs.lean","exit_status":0,"placeholder_scan":"rg -n '\\b(sorry|admit)\\b' formal/lean/Proofs.lean","placeholder_count":0,"sha256":"95ebe3da6883b57ec06f88473bd603f626f137e530e3afb7c2782d45c4618fce"},
+  "haskell": {"tool":"GHC 9.14.1","command":"ghc -Wall -Wextra -Werror -fforce-recomp -o build/core formal/haskell/Core.hs","compile_exit_status":0,"run_command":"build/core","run_exit_status":0,"regression_checks":"21/21 passed","sha256":"65c8034b61e7af02e27424194b3aa17ed7d886682e068053765d1ff38cc7ff9d"}
 }

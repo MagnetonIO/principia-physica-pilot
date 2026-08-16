@@ -1,277 +1,149 @@
-\documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,microtype}
-\usepackage[hidelinks]{hyperref}
+\documentclass[12pt]{article}
+\usepackage[a4paper,margin=1.65in]{geometry}
+\setlength{\parskip}{0.35em}
+\setlength{\emergencystretch}{3em}
+\linespread{1.25}
+\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,hyperref,microtype}
 \newtheorem{definition}{Definition}[section]
 \newtheorem{axiom}[definition]{Axiom}
 \newtheorem{assumption}[definition]{Assumption}
-\newtheorem{conjecture}[definition]{Conjecture}
 \newtheorem{lemma}[definition]{Lemma}
 \newtheorem{proposition}[definition]{Proposition}
 \newtheorem{theorem}[definition]{Theorem}
 \newtheorem{corollary}[definition]{Corollary}
+\newtheorem{conjecture}[definition]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{example}[definition]{Example}
+\newtheorem{counterexample}[definition]{Counterexample}
 \newtheorem{interpretation}[definition]{Interpretation}
 \newtheorem{empirical}[definition]{Empirical statement}
-\newtheorem{established}[definition]{Established physical result}
-\newtheorem{newresult}[definition]{New result claimed by this work}
-\newtheorem{counterexample}[definition]{Counterexample}
-\newcommand{\id}{\mathrm{id}}
-\newcommand{\Ham}{\mathsf{Ham}}
-\newcommand{\R}{\mathbb R}
-\title{Compositional Systems in Finite-Dimensional Classical Mechanics}
-\author{PRINCIPIA PHYSICA research note}
-\date{16 August 2026}
-
+\title{Compositional Systems: Mathematical Structure and Empirical Realization}
+\author{PRINCIPIA PHYSICA}
+\date{}
 \begin{document}
 \maketitle
-
 \begin{abstract}
-We construct a typed mathematical framework for finite-dimensional classical mechanics in which systems are symplectic manifolds, states are points, deterministic processes are smooth maps, observables are smooth real-valued functions, and parallel composition is Cartesian product.  We distinguish three claims that are often conflated: products give a symmetric monoidal mathematical structure; additively separable Hamiltonians generate factorized dynamics; and a product represents physically independent subsystems.  The first two are proved, whereas the third requires empirical assumptions.  Counterexamples show that diagonal constraints, singular constraint sets, and interactions defeat naive product or factorization claims.  The result supports compositional description as a precise mathematical organization of classical mechanics, but does not establish that every such structure is empirically realized.
+We formulate compositional physical modelling as a typed relation between experimental interfaces and mathematical systems. Symmetric monoidal categories encode sequential and parallel composition; symmetric monoidal functors encode models. We prove the resulting substitution and congruence principles, distinguish structural equivalence from physical sameness, and exhibit counterexamples to the inference from mathematical admissibility to empirical realization. Every physical assertion is isolated as an empirical statement or an explicit assumption.
 \end{abstract}
 
 \section{Scope and epistemic discipline}
+The thesis motivating this paper is that physics studies empirically realized compositional mathematical structures. The expression has two logically independent parts. Composition is a mathematical constraint. Realization is an empirical relation between a model and interventions, preparations, or observations. No categorical theorem can establish the latter without empirical premises.
 
-This paper concerns smooth, Hausdorff, second-countable, finite-dimensional manifolds without boundary.  Field theory, infinite-dimensional mechanics, relativity, and quantum theory are boundary tests rather than members of the formalism.  Standard differential-geometric mechanics is cited to Abraham and Marsden~\cite{AbrahamMarsden1978} and Marsden and Ratiu~\cite{MarsdenRatiu1999}; categorical terminology follows Mac Lane~\cite{MacLane1998}.  Baez and Stay~\cite{BaezStay2011} motivate, but do not prove for classical mechanics, the use of symmetric monoidal categories to type systems and processes.
+\begin{definition}[Interface theory]
+An \emph{interface theory} is a symmetric monoidal category $(\mathcal E,\otimes,I,\sigma)$. Objects are experimental interface types; morphisms $e:X\to Y$ are admissible experimental processes; composition represents sequential connection; and $\otimes$ represents parallel juxtaposition.
+\end{definition}
 
-\begin{conjecture}[Founding thesis under test]
-Physics is the study of empirically realized compositional mathematical structures.
-\end{conjecture}
-This statement is not used as a premise in any proof below.  The paper tests whether its terms can be made precise in a restricted domain.
+\begin{definition}[Mathematical system theory]
+A \emph{system theory} is a symmetric monoidal category $(\mathcal M,\boxtimes,\mathbf 1)$. Its objects are mathematical state or boundary types and its morphisms are mathematical processes.
+\end{definition}
 
-\begin{assumption}[Finite-dimensional regularity]
-All state spaces and maps used in the core construction are smooth and finite-dimensional; every Hamiltonian vector field under discussion has a flow on the stated time interval.
+\begin{definition}[Compositional model]
+A compositional model is a strong symmetric monoidal functor
+\[
+F:\mathcal E\longrightarrow\mathcal M,
+\]
+with coherent isomorphisms $F(X)\boxtimes F(Y)\cong F(X\otimes Y)$ and $\mathbf 1\cong F(I)$.
+\end{definition}
+
+These are definitions, not empirical claims. They specify a class of possible representations.
+
+\begin{assumption}[Typed experimental composition]
+For the domain under study, laboratory procedures admit repeatable interface types, and the connections represented by composition and tensor product are operationally implementable to stated tolerances.
 \end{assumption}
-The completeness clause is local-in-time when a global flow does not exist.
 
-\begin{axiom}[Typed equality]
-States, processes, observables, and empirical records are distinct types.  An equality is admitted only between terms of a common type; a map relating two types is part of the data.
-\end{axiom}
-
-\section{Primitive mathematical data}
-
-\begin{definition}[System and state]
-A \emph{Hamiltonian-capable system} is a pair $S=(M,\omega)$, where $M$ is a finite-dimensional smooth manifold and $\omega\in\Omega^2(M)$ is closed and nondegenerate.  A \emph{state} of $S$ is a point $x\in M$.  The unit system is $I=(\{*\},0)$.
-\end{definition}
-Nondegeneracy means that $v\mapsto\iota_v\omega$ is an isomorphism $T_xM\to T_x^*M$ at every $x$.  The zero form on the zero-dimensional tangent space of $I$ is nondegenerate.
-
-\begin{definition}[Processes]
-For systems $S=(M,\omega)$ and $T=(N,\eta)$, a \emph{kinematic process} $f:S\to T$ is a smooth map $f:M\to N$.  A \emph{canonical process} is a symplectomorphism: a diffeomorphism satisfying $f^*\eta=\omega$.  A \emph{Hamiltonian time process} on $S$ is a map $\Phi^H_t:M\to M$ in the flow of the vector field $X_H$ defined by
-\begin{equation}\label{eq:ham}
-  \iota_{X_H}\omega=dH.
-\end{equation}
-We use this sign convention throughout.
-\end{definition}
-
-Kinematic processes permit preparation maps $I\to S$ and readout maps $S\to I$, but canonical processes generally do not: positive-dimensional symplectic manifolds are not symplectomorphic to a point.  This distinction prevents a single arrow class from silently serving incompatible operational roles.
-
-\begin{definition}[Observables and evaluation]
-An \emph{observable} on $S=(M,\omega)$ is $A\in C^\infty(M,\R)$.  Its value in mathematical state $x$ is the evaluation pairing
-\[
-  \operatorname{ev}_S:C^\infty(M,\R)\times M\to\R,
-  \qquad (A,x)\mapsto A(x).
-\]
-The Poisson bracket is $\{A,B\}_S=\omega(X_A,X_B)$.
-\end{definition}
-
-\begin{lemma}[Uniqueness of Hamiltonian vector fields]
-For every $H\in C^\infty(M,\R)$ there is a unique smooth vector field $X_H$ satisfying~\eqref{eq:ham}.
-\end{lemma}
-\begin{proof}
-At each $x$, nondegeneracy makes $\omega_x^\flat:T_xM\to T_x^*M$, $v\mapsto\iota_v\omega_x$, a linear isomorphism.  Thus $X_H(x)=(\omega_x^\flat)^{-1}(dH_x)$ exists uniquely.  In local coordinates the inverse matrix of the smooth, nonsingular matrix representing $\omega$ is smooth, so $x\mapsto X_H(x)$ is smooth.
-\end{proof}
-
-\begin{established}[Hamiltonian evolution]
-In geometric classical mechanics, Hamiltonian evolution is represented by the flow of $X_H$, and this flow preserves $\omega$ wherever defined~\cite[Chs.~3--5]{AbrahamMarsden1978,MarsdenRatiu1999}.
-\end{established}
-The preservation statement also has a short mathematical proof: Cartan's formula gives $\mathcal L_{X_H}\omega=d\iota_{X_H}\omega+\iota_{X_H}d\omega=d^2H=0$, hence $\frac d{dt}(\Phi_t^H)^*\omega=(\Phi_t^H)^*\mathcal L_{X_H}\omega=0$.
-
-\section{Parallel composition}
-
-\begin{definition}[Composite system]
-For $S=(M,\omega)$ and $T=(N,\eta)$ define
-\begin{equation}\label{eq:tensor}
- S\otimes T=(M\times N,\,\pi_M^*\omega+\pi_N^*\eta).
-\end{equation}
-For kinematic processes set $(f\otimes g)(x,y)=(f(x),g(y))$.  For observables define the injections
-\[
- A\mapsto A\otimes1:=A\circ\pi_M,
- \qquad B\mapsto1\otimes B:=B\circ\pi_N.
-\]
-Here $1$ is notation for independence of the other coordinate, not multiplication by a distinguished physical observable.
-\end{definition}
-
-\begin{lemma}[The product form is symplectic]
-The two-form $\Omega=\pi_M^*\omega+\pi_N^*\eta$ in~\eqref{eq:tensor} is closed and nondegenerate.
-\end{lemma}
-\begin{proof}
-Pullback commutes with $d$, so $d\Omega=\pi_M^*d\omega+\pi_N^*d\eta=0$.  At $(x,y)$, identify $T_{(x,y)}(M\times N)$ with $T_xM\oplus T_yN$.  If $\Omega((v,w),(v',w'))=0$ for every $(v',w')$, choosing $w'=0$ yields $\omega(v,v')=0$ for every $v'$, hence $v=0$.  Choosing $v'=0$ similarly gives $w=0$.
-\end{proof}
-
-\begin{proposition}[Symmetric monoidal kinematics]
-Hamiltonian-capable systems, smooth kinematic processes, $\otimes$, and $I$ form a symmetric monoidal category, denoted $\Ham_{\rm kin}$.
-\end{proposition}
-\begin{proof}
-Smooth maps contain identities and are closed under composition, giving a category.  The Cartesian associator $((x,y),z)\mapsto(x,(y,z))$, unitors $(*,x)\mapsto x$ and $(x,*)\mapsto x$, and swap $(x,y)\mapsto(y,x)$ are smooth isomorphisms.  Pulling product forms along these maps merely reassociates or permutes summands, so the maps are also symplectomorphisms.  The pentagon, triangle, involutivity, and hexagon equations hold pointwise because both sides send each tuple to the same reordered tuple.  Bifunctoriality follows from
-$(f_2\circ f_1)\times(g_2\circ g_1)=(f_2\times g_2)\circ(f_1\times g_1)$.
-\end{proof}
-
-\begin{corollary}[Canonical subcategory]
-The same objects and only canonical processes form a symmetric monoidal subgroupoid $\Ham_{\rm can}$.
-\end{corollary}
-\begin{proof}
-Identities and composites of symplectomorphisms are symplectomorphisms.  If $f^*\omega'=\omega$ and $g^*\eta'=\eta$, then
-$(f\times g)^*(\pi_{M'}^*\omega'+\pi_{N'}^*\eta')=\pi_M^*\omega+\pi_N^*\eta$.
-The structural maps in the preceding proof are symplectomorphisms.
-\end{proof}
-
-\section{Dynamics and factorization}
-
-\begin{theorem}[Factorization criterion for additive Hamiltonians]\label{thm:factor}
-Let $H\in C^\infty(M)$ and $K\in C^\infty(N)$, and define
-$L=H\circ\pi_M+K\circ\pi_N$ on $M\times N$.  Then
-\begin{equation}\label{eq:split}
- X_L(x,y)=(X_H(x),X_K(y)).
-\end{equation}
-Where the flows exist for the same $t$,
-\begin{equation}\label{eq:flow}
- \Phi_t^L=\Phi_t^H\times\Phi_t^K.
-\end{equation}
-\end{theorem}
-\begin{proof}
-For tangent vectors $(v,w)$,
-\[
-(\iota_{(X_H,X_K)}\Omega)(v,w)
-=\omega(X_H,v)+\eta(X_K,w)
-=dH(v)+dK(w)=dL(v,w).
-\]
-Uniqueness from the lemma gives~\eqref{eq:split}.  The curve
-$t\mapsto(\Phi_t^H(x),\Phi_t^K(y))$ has derivative $(X_H,X_K)$ and initial value $(x,y)$.  Uniqueness of integral curves gives~\eqref{eq:flow}.
-\end{proof}
-
-\begin{newresult}[Separation equivalence]
-For a connected product $M\times N$, a Hamiltonian vector field has the split form
-$X_L(x,y)=(Y(x),Z(y))$ if and only if there exist $H\in C^\infty(M)$, $K\in C^\infty(N)$, and $c\in\R$ such that
-$L=H\circ\pi_M+K\circ\pi_N+c$ and $Y=X_H$, $Z=X_K$.
-\end{newresult}
-\begin{proof}
-The reverse implication is Theorem~\ref{thm:factor}.  Conversely, $dL=\iota_{(Y,Z)}\Omega$ gives
-$dL_{(x,y)}(v,w)=\omega_x(Y(x),v)+\eta_y(Z(y),w)$.  Fix $(x_0,y_0)$ and set
-$H(x)=L(x,y_0)$ and $K(y)=L(x_0,y)-L(x_0,y_0)$.  Along any smooth path in $M\times N$, the differential of $L-H\circ\pi_M-K\circ\pi_N$ is zero by the displayed formula.  Connected manifolds are path connected, so that difference is constant; its value at $(x_0,y_0)$ is zero.  Restricting $dL$ to $(v,0)$ and $(0,w)$ yields $\iota_Y\omega=dH$ and $\iota_Z\eta=dK$.
-\end{proof}
-
-\begin{proposition}[Local observables Poisson-commute]
-For $A\in C^\infty(M)$ and $B\in C^\infty(N)$,
-\[
- \{A\circ\pi_M,B\circ\pi_N\}_{S\otimes T}=0.
-\]
-\end{proposition}
-\begin{proof}
-The defining equation and block-diagonal product form give
-$X_{A\circ\pi_M}=(X_A,0)$ and $X_{B\circ\pi_N}=(0,X_B)$.  Their pairing under $\Omega$ is zero.
-\end{proof}
-
-\section{Counterexamples and failure modes}
-
-\begin{counterexample}[Interaction prevents dynamical factorization]
-Take $M=N=T^*\R$ with coordinates $(q_i,p_i)$ and $\omega_i=dq_i\wedge dp_i$.  For
-\[
- L=\frac{p_1^2}{2m_1}+\frac{p_2^2}{2m_2}+\frac{k}{2}(q_1-q_2)^2,
-\]
-Hamilton's equations include $\dot p_1=-k(q_1-q_2)$ and $\dot p_2=k(q_1-q_2)$.  When $k\ne0$, the first component depends on $q_2$ and the second on $q_1$.  Thus the state space and symplectic form are products, while the flow is not a product flow.  Composition of state spaces does not entail independent dynamics.
-\end{counterexample}
-
-\begin{counterexample}[A constraint need not be a subsystem product]
-In $T^*\R\times T^*\R$, the diagonal
-$C=\{q_1=q_2,\ p_1=p_2\}$ is diffeomorphic to $T^*\R$, not to the four-dimensional ambient product.  Pulling back
-$dq_1\wedge dp_1+dq_2\wedge dp_2$ gives $2\,dq\wedge dp$, which is symplectic but is not the canonical form under the naive diagonal identification.  Imposing a relation changes both degrees of freedom and induced geometry; it is not parallel composition.
-\end{counterexample}
-
-\begin{counterexample}[Singular constraints leave the category]
-The subset $C=\{(q,p)\in\R^2:qp=0\}$ is the union of the coordinate axes.  Removing the origin produces four connected rays, whereas removing a point from a one-dimensional manifold has locally two sides.  Hence $C$ is not a smooth one-manifold at the origin.  It is therefore not an object of $\Ham_{\rm kin}$.  Treating arbitrary constraint solution sets as systems requires stratified, derived, or other enlarged geometry not supplied here.
-\end{counterexample}
-
-\begin{counterexample}[Smooth maps do not preserve Hamiltonian structure]
-The dilation $f:\R^2\to\R^2$, $f(q,p)=(2q,p)$, is a smooth diffeomorphism but
-$f^*(dq\wedge dp)=2\,dq\wedge dp$.  It is a kinematic process and not a canonical process.  Therefore the broad process category cannot support the claim that every process preserves Poisson brackets or Hamiltonian evolution.
-\end{counterexample}
-
-\section{Empirical realization is extra structure}
-
-\begin{definition}[Empirical realization scheme]
-For a mathematical system $S=(M,\omega)$, an empirical realization scheme is a tuple
-\[
- \mathcal E=(\mathcal P,\mathcal R,\rho,\{m_A\}_{A\in\mathcal O},\epsilon),
-\]
-where $\mathcal P$ is a set of preparation procedures, $\mathcal R$ a set of records, $\rho:\mathcal P\to M$ a state-assignment map, $\mathcal O\subseteq C^\infty(M)$ a selected observable family, $m_A:\mathcal R\to\R$ readout maps, and $\epsilon$ a stated error model or tolerance.  Realization means that specified predictions $A(\Phi_t^H(\rho(P)))$ agree with corresponding readouts to the criterion encoded by $\epsilon$ on a declared domain.
-\end{definition}
-This is a definition of what evidence would have to connect the mathematics to data, not an assertion that a given tuple succeeds.
-
-\begin{empirical}[Domain-limited adequacy]
-Finite-dimensional Hamiltonian models have experimentally successful applications to many approximately isolated classical systems, but any particular adequacy claim depends on calibration, uncertainty, regime, and comparison data.  No new experimental dataset is analyzed in this paper.
+\begin{empirical}[Realization input]
+Whether a particular laboratory domain satisfies the preceding assumption, and whether a proposed $F$ predicts its observed statistics within uncertainty, must be decided from calibration and outcome data.
 \end{empirical}
 
-\begin{assumption}[Operational separability]
-To interpret $S\otimes T$ as two physically independent systems, assume that preparations can be varied independently, local readouts are insensitive within tolerance to remote preparation choices, and the observed joint evolution agrees within tolerance with an additive Hamiltonian on the tested domain.
-\end{assumption}
+\section{Consequences of functorial modelling}
+\begin{lemma}[Substitution]
+Let $F:\mathcal E\to\mathcal M$ be a functor. If $e=e':X\to Y$, then for all composable $a:W\to X$ and $b:Y\to Z$,
+\[
+F(b\circ e\circ a)=F(b\circ e'\circ a).
+\]
+\end{lemma}
+\begin{proof}
+Equality in a category is a congruence for composition, so $b\circ e\circ a=b\circ e'\circ a$. Applying the function that $F$ assigns to the hom-set $\mathcal E(W,Z)$ gives equal images. Functoriality then rewrites these images as $F(b)\circ F(e)\circ F(a)$ and $F(b)\circ F(e')\circ F(a)$.
+\end{proof}
 
-\begin{interpretation}[Mathematical versus physical composition]
-Equation~\eqref{eq:tensor} always defines a mathematical composite.  It represents a physically realized independent composite only relative to an empirical realization scheme satisfying operational separability.  Interactions may preserve the product kinematics while invalidating dynamical independence.
+\begin{theorem}[Preservation of generated process equations]
+Let $F:\mathcal E\to\mathcal M$ be a strong symmetric monoidal functor. Every equation between morphism expressions generated from identities, composition, tensor product, symmetries, and a fixed collection of equations in $\mathcal E$ is mapped to an equation in $\mathcal M$.
+\end{theorem}
+\begin{proof}
+Proceed by induction on the derivation of an equation. Reflexivity, symmetry, and transitivity are preserved because each hom-set map is a function. The composition-congruence step is preserved by functoriality. The tensor-congruence step is preserved after conjugating by the monoidal coherence isomorphisms. Equations for identities and composition are the functor axioms. Equations involving associators, unitors, and symmetries are preserved by the coherence diagrams for a strong symmetric monoidal functor. Thus every generating rule and every inference rule has an equal image.
+\end{proof}
+
+\begin{corollary}[Contextual invariance]
+If two experimental processes are equated in $\mathcal E$, no compositional context constructed from sequential or parallel connection distinguishes their images under $F$.
+\end{corollary}
+\begin{proof}
+A context is a morphism expression with one hole. Insert the two equal morphisms. The resulting equation is generated by composition and tensor congruence, so the theorem applies.
+\end{proof}
+
+\begin{interpretation}
+The corollary is a theorem about the chosen formalization. Treating its premise $e=e'$ as a claim about physical indistinguishability requires experimental evidence that the selected contexts include the interventions relevant to the intended claim.
 \end{interpretation}
 
-\begin{definition}[Observational equivalence relative to tests]
-Given realization schemes and a chosen test family $\mathcal T$ of preparations, times, and observables, two models are $\mathcal T$-equivalent when their predicted readout distributions or tolerance sets agree for every test in $\mathcal T$.
+\section{States, effects, and probabilities}
+\begin{definition}
+In a monoidal category, a \emph{state} of $X$ is a morphism $s:I\to X$, an \emph{effect} is $p:X\to I$, and the closed experiment $p\circ s:I\to I$ is a scalar.
 \end{definition}
 
-\begin{proposition}[Mathematical isomorphism is insufficient for physical equivalence]
-A symplectomorphism $f:M\to N$ does not by itself establish physical equivalence of two realized models.
+\begin{assumption}[Probabilistic interpretation]
+There is a map $\nu:\mathcal M(\mathbf 1,\mathbf 1)\to[0,1]$ such that the scalars assigned to the mutually exclusive outcomes of each specified measurement sum to one.
+\end{assumption}
+
+\begin{proposition}[Compositional prediction]
+Given a state $s:I\to X$, a process $e:X\to Y$, and an effect $p:Y\to I$, a compositional model assigns the scalar
+\[
+F(p\circ e\circ s)=F(p)\circ F(e)\circ F(s).
+\]
+Under the probabilistic-interpretation assumption, its predicted outcome probability is $\nu(F(p\circ e\circ s))$.
 \end{proposition}
 \begin{proof}
-Physical equivalence, by the preceding definition, quantifies over preparations and readouts.  The datum $f$ relates only $M,\omega$ to $N,\eta$ and contains no maps between $\mathcal P$, $\mathcal R$, calibration functions, or error models.  Choose identical mathematical systems and $f=\id$, but assign observable $q$ to length in one realization and to a dimensionally incompatible temperature record in another.  The identity is a symplectomorphism, yet it does not preserve the typed empirical interpretation.  Additional commuting relations for preparation and readout maps are necessary.
+The scalar identity is the composition axiom for $F$, applied twice. The probability statement is the content of the stated assumption, not a consequence of category theory.
 \end{proof}
 
-\begin{interpretation}[Falsification conditions]
-For a declared realization, reproducible violations beyond $\epsilon$ of predicted trajectories, local Poisson relations, or operational separability reject that realization on the tested domain.  Such a result need not reject the abstract category: it can reject the selected Hamiltonian, observable correspondence, independence assumption, or finite-dimensional approximation.
-\end{interpretation}
+\begin{example}[Finite stochastic systems]
+Let objects be finite sets and morphisms column-stochastic matrices. Matrix multiplication is sequential composition and the Kronecker product is parallel composition. A probability vector is a state and a row vector selecting an event is an effect. Normalization supplies the probabilistic interpretation. The categorical equations reduce to associativity of matrix multiplication and its compatibility with Kronecker products.
+\end{example}
 
-\section{Assessment}
+\section{Limits of structural reasoning}
+\begin{counterexample}[Admissibility is not realization]
+Let $\mathcal E$ be the free symmetric monoidal category on one process $g:X\to X$. Both assignments $F(g)=\mathrm{id}_{\mathbb R}$ and $G(g)=-\mathrm{id}_{\mathbb R}$ extend to strong symmetric monoidal functors into finite-dimensional real vector spaces. Hence both are mathematically admissible. If an experiment prepares $1$ and measures the sign after one use of $g$, the two models make different predictions. Category-theoretic admissibility alone selects neither model.
+\end{counterexample}
 
-\begin{newresult}[Layered compositional conclusion]
-Within the stated regularity assumptions, finite-dimensional Hamiltonian mechanics admits three rigorously separated layers:
-\begin{enumerate}
-\item symmetric monoidal kinematics, proved for products of symplectic state spaces and smooth maps;
-\item factorized dynamics, proved exactly for additively separable Hamiltonians and characterized by the separation equivalence;
-\item physical compositionality, which is an empirical interpretation requiring operational separability and a tolerance-bearing realization scheme.
-\end{enumerate}
-No implication from layer 1 to layer 2 or from layer 2 to layer 3 is asserted without the stated hypotheses.
-\end{newresult}
+\begin{counterexample}[Agreement on a restricted context]
+Two smooth functions $f,g:\mathbb R\to\mathbb R$ can agree on all calibrated inputs $x\in[-1,1]$ while differing outside that interval; take $f(x)=0$ and a smooth $g$ vanishing on $[-1,1]$ but nonzero for $x>1$. Agreement in the tested subcategory does not entail global physical equivalence.
+\end{counterexample}
+
+\begin{definition}[Empirical realization relative to a test family]
+Fix experiments $T$, observed estimates $\widehat q_t$, uncertainties $\epsilon_t$, and model predictions $q_t(F)$. The model $F$ is \emph{$(T,\epsilon)$-realized} when
+\[
+|q_t(F)-\widehat q_t|\leq \epsilon_t\qquad(t\in T).
+\]
+\end{definition}
+
+\begin{proposition}[Monotonicity of realization]
+If $F$ is $(T,\epsilon)$-realized, $T'\subseteq T$, and $\epsilon'_t\geq\epsilon_t$ for $t\in T'$, then $F$ is $(T',\epsilon')$-realized.
+\end{proposition}
 \begin{proof}
-Layer 1 is the symmetric monoidal proposition.  Theorem~\ref{thm:factor}, its converse in the separation equivalence, and the interacting-oscillator counterexample establish the boundary of layer 2.  The definition of realization, the operational-separability assumption, and the insufficiency proposition establish that layer 3 contains data absent from layers 1--2.
+For each $t\in T'$, realization gives $|q_t(F)-\widehat q_t|\leq\epsilon_t$. The assumed inequality yields $|q_t(F)-\widehat q_t|\leq\epsilon'_t$.
 \end{proof}
 
-The founding thesis is therefore mathematically coherent in this restricted case if ``empirically realized'' is treated as typed correspondence plus successful tests rather than as a property conferred by mathematical elegance.  The present construction does not prove the thesis as a general characterization of physics.  It also does not cover dissipation, stochasticity, singular reduction, gauge structure, or infinite-dimensional systems.  Extending the framework to those cases is future work, not a consequence of the results above.
+\begin{conjecture}[Modular identifiability]
+For experimentally important system classes, identifiability of components plus an empirically validated independence condition can be promoted to identifiability of their monoidal composite. The conjecture is false without restrictions on hidden shared causes and interface completeness.
+\end{conjecture}
+
+\section{Dependency ledger and conclusion}
+The mathematical results depend on the definitions of category, symmetric monoidal category, and strong symmetric monoidal functor, together with ordinary equality logic. Their application depends additionally on typed experimental composition, a probabilistic interpretation when probabilities are used, calibration data, and a specified test family. The theorem establishes compositional consistency; it does not establish realization.
+
+\paragraph{Bibliographic note.}
+Mac Lane supplies the coherence results underlying symmetric monoidal notation \cite{MacLane}. Categorical formulations of processes in physics are surveyed by Baez and Stay \cite{BaezStay}; operational-probabilistic frameworks are developed by Chiribella, D'Ariano, and Perinotti \cite{CDP}. These sources support established mathematical frameworks, not the empirical realization of any particular model.
 
 \begin{thebibliography}{9}
-\bibitem{AbrahamMarsden1978}
-R.~Abraham and J.~E. Marsden,
-\emph{Foundations of Mechanics}, 2nd ed., Benjamin/Cummings, 1978.
-
-\bibitem{BaezStay2011}
-J.~C. Baez and M.~Stay,
-``Physics, topology, logic and computation: a Rosetta Stone,''
-in \emph{New Structures for Physics}, Lecture Notes in Physics 813,
-Springer, 2011, pp.~95--174, arXiv:0903.0340.
-
-\bibitem{MacLane1998}
-S.~Mac Lane,
-\emph{Categories for the Working Mathematician}, 2nd ed.,
-Graduate Texts in Mathematics 5, Springer, 1998,
-doi:10.1007/978-1-4757-4721-8.
-
-\bibitem{MarsdenRatiu1999}
-J.~E. Marsden and T.~S. Ratiu,
-\emph{Introduction to Mechanics and Symmetry}, 2nd ed.,
-Texts in Applied Mathematics 17, Springer, 1999,
-doi:10.1007/978-0-387-21792-5.
+\bibitem{MacLane} S. Mac Lane, \emph{Categories for the Working Mathematician}, 2nd ed., Springer, 1998.
+\bibitem{BaezStay} J. C. Baez and M. Stay, Physics, topology, logic and computation: a Rosetta Stone, in \emph{New Structures for Physics}, Springer, 2010.
+\bibitem{CDP} G. Chiribella, G. M. D'Ariano, and P. Perinotti, Probabilistic theories with purification, \emph{Phys. Rev. A} 81, 062348 (2010).
 \end{thebibliography}
-
 \end{document}

@@ -1,381 +1,196 @@
-\documentclass[11pt]{article}
-\usepackage[a4paper,margin=1in]{geometry}
-\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,enumitem,microtype,hyperref}
-\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+\documentclass[12pt]{article}
+\usepackage[a4paper,margin=1.5in]{geometry}
+\setlength{\parskip}{0.35em}
+\setlength{\emergencystretch}{3em}
+\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,hyperref,microtype}
 \newtheorem{definition}{Definition}[section]
 \newtheorem{axiom}[definition]{Axiom}
 \newtheorem{assumption}[definition]{Assumption}
-\newtheorem{conjecture}[definition]{Conjecture}
 \newtheorem{lemma}[definition]{Lemma}
 \newtheorem{proposition}[definition]{Proposition}
 \newtheorem{theorem}[definition]{Theorem}
 \newtheorem{corollary}[definition]{Corollary}
+\newtheorem{conjecture}[definition]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{example}[definition]{Example}
+\newtheorem{counterexample}[definition]{Counterexample}
 \newtheorem{interpretation}[definition]{Interpretation}
 \newtheorem{empirical}[definition]{Empirical statement}
-\newtheorem{established}[definition]{Established physical result}
-\newtheorem{newresult}[definition]{New result claimed by this work}
-\newtheorem{counterexample}[definition]{Counterexample}
-\newcommand{\TV}{d_{\mathrm{TV}}}
-\newcommand{\R}{\mathbb R}
-
-\title{Empirical Realization, Equivalence, and Limits\\
-\large A Typed Account for Finite-Dimensional Classical Theories}
-\author{PRINCIPIA PHYSICA research draft}
-\date{16 August 2026}
-
+\title{Empirical Limits of Structural Physics: Underdetermination, Scope, and Realization}
+\author{PRINCIPIA PHYSICA}
+\date{}
 \begin{document}
 \maketitle
-
 \begin{abstract}
-We formulate the distinction between a mathematically admissible model and an empirically realized physical model.  An empirical theory is represented by a typed tuple containing models, experimental contexts, preparation and measurement kernels, probability laws, tolerances, and a domain of intended application.  Relative to this tuple we define exact and tolerance-indexed observational equivalence.  We prove that a mathematical map preserves empirical content only when it intertwines preparation, dynamics, and measurement on the tested domain.  We also prove a uniform error-transfer theorem for limiting theories and exhibit failures caused by nonuniform convergence, inaccessible preparations, unmodelled interventions, and structural mismatch.  The framework yields finite falsifiers: registered experiments whose discrepancy exceeds a prespecified error budget.  The founding thesis that physics studies empirically realized compositional mathematical structures is treated as a conjectural methodological proposal, not as an established physical result.
+Mathematical consistency constrains physical models but does not establish their realization. We formalize finite observational records, empirical equivalence, identifiability, and scope. We prove a general finite-data underdetermination theorem, derive monotonicity and quotient results for observational equivalence, and give counterexamples to extrapolation and unrestricted causal inference. The analysis identifies which conclusions are mathematical, which depend on methodological assumptions, and which remain empirical.
 \end{abstract}
 
-\section{Scope and epistemic status}
-
-The analysis concerns finite-dimensional smooth classical systems.  Field theory, general relativity, quantum theory, and infinite-dimensional analysis occur only as boundary markers.  No new experimental finding is asserted.
-
-\begin{conjecture}[Founding thesis]
-Physics is the study of empirically realized compositional mathematical structures.
-\end{conjecture}
-
-This sentence is not used as an axiom below.  The mathematical results establish conditional relations among explicitly defined objects; whether those objects adequately represent a laboratory system remains answerable to data.
-
-\begin{established}[Hamiltonian prediction]
-For a finite-dimensional symplectic manifold $(X,\omega)$ and smooth Hamiltonian $H$, a Hamiltonian trajectory satisfies
-\[
- \iota_{X_H}\omega=dH,\qquad \dot x=X_H(x),
-\]
-where existence and uniqueness hold locally because $X_H$ is a smooth vector field.  This is standard finite-dimensional Hamiltonian mechanics \cite{AbrahamMarsden1978,MarsdenRatiu1999}.
-\end{established}
-
-The displayed equations define predictions only after specifying which physical preparations correspond to points or distributions on $X$, which instruments correspond to observables, and which error model applies.  The separation is central: differential geometry supplies admissibility; experiment supplies realization.
-
-\section{Typed empirical theories}
-
-\begin{definition}[Mathematical model]
-A deterministic mathematical model is a tuple
-\[
- M=(X,U,\Phi,Y),
-\]
-where $X$ is a finite-dimensional smooth state space, $U$ is a set of admissible controls, $\Phi^u_t:X\to X$ is the evolution where defined, and $Y$ is a measurable outcome space.  The model is \emph{mathematically admissible} relative to a specification $\Sigma$ when it satisfies the regularity, composition, and dynamical conditions listed in $\Sigma$.
+\section{Data and models}
+\begin{definition}[Experimental design]
+An experimental design is a tuple $D=(X,Y,T,\delta)$, where $X$ is a set of admissible interventions or inputs, $Y$ an outcome space, $T\subseteq X$ the tested inputs, and $\delta$ records the measurement resolution or uncertainty specification.
 \end{definition}
 
-Admissibility is relative to a mathematical specification.  It neither states that a state can be prepared nor that an outcome is measured by an actual apparatus.
-
-\begin{definition}[Empirical interpretation]
-For a model $M$, an empirical interpretation on a domain $D$ is
-\[
- I=(\mathcal C,\mathcal P,\mathcal Q,K,\epsilon,D).
-\]
-Here $\mathcal C$ is a set of registered experimental contexts; $\mathcal P_c$ is a set of physical preparation procedures; $\mathcal Q_c$ is a set of measurement procedures; $K^P_c(dx)$ is a preparation kernel on $X$; $K^Q_c(dy\mid x)$ is a measurement kernel on $Y$; $\epsilon(c)>0$ is a declared total error tolerance; and $D\subseteq\mathcal C$ is the intended domain.  With control $u_c$ and duration $t_c$, the predicted outcome law is
-\begin{equation}\label{eq:prediction}
- \Pr_{M,I}(A\mid c)=\int_X K^Q_c(A\mid\Phi^{u_c}_{t_c}(x))K^P_c(dx).
-\end{equation}
+\begin{definition}[Model and prediction]
+A deterministic model is a function $m:X\to Y$. More generally, a statistical model assigns a probability measure $P_m(\cdot\mid x)$ on $Y$ to each $x\in X$.
 \end{definition}
 
-Kernels allow noisy preparation and measurement.  Deterministic readout $h:X\to Y$ is recovered by $K^Q(A\mid x)=\mathbf1_A(h(x))$.
-
-\begin{definition}[Empirical theory object]
-An empirical theory object is $T=(M,I,\mathcal E)$, where $M$ is a mathematical model, $I$ is an empirical interpretation, and $\mathcal E$ records calibration evidence, uncertainty estimates, and provenance.  A physical target $S$ \emph{realizes} $T$ on $D$ to tolerance $\epsilon$ when, for every registered $c\in D$, the target distribution $P_S^c$ exists and
-\begin{equation}\label{eq:realize}
- \TV(P_S^c,\Pr_{M,I}(\cdot\mid c))\leq\epsilon(c).
-\end{equation}
-For continuous outcomes another prespecified metric may replace total variation; changing the metric changes the claim.
+\begin{definition}[Empirical equivalence]
+Two deterministic models satisfy $m\sim_T n$ when $m(x)=n(x)$ for all $x\in T$. At finite resolution, write $m\sim_{T,\delta}n$ when their predictions differ by no more than the specified tolerance at every tested input. For statistical models, equality may be replaced by a declared distance between probability measures.
 \end{definition}
 
-\begin{empirical}[Realization input]
-Any assertion that a concrete target realizes $T$ requires observed data, calibration records, and a justified statistical procedure.  Equation \eqref{eq:realize} is a criterion, not evidence that any target satisfies it.
+\begin{definition}[Identifiability]
+A model class $\mathcal M$ is identifiable under an observation operator $O$ when $O(m)=O(n)$ implies $m=n$ for $m,n\in\mathcal M$. It is identifiable up to an equivalence relation $\approx$ when the same premise implies $m\approx n$.
+\end{definition}
+
+\begin{assumption}[Record reliability]
+Recorded inputs, outcomes, timestamps, and uncertainty estimates refer to the intended operations and have passed the stated calibration and data-integrity checks.
+\end{assumption}
+
+\begin{empirical}[Status of the record]
+Record reliability is an empirical input. Mathematics can propagate a stated uncertainty model but cannot certify that instruments, labels, or sampling procedures satisfy it.
 \end{empirical}
 
-\begin{interpretation}
-The evidence component prevents an interpretation map from functioning as an empirical certificate merely because it was written down.  Realization is indexed by domain, tolerance, intervention family, and date-sensitive calibration state.
-\end{interpretation}
-
-\begin{counterexample}[Admissibility without realization]
-Let $X=\R^2$, $\omega=dq\wedge dp$, and $H(q,p)=-(q^2+p^2)/2$.  This is a smooth Hamiltonian system with complete circular trajectories.  If the intended target is a free positive-mass particle, its measured motion is not circular and no ordinary free-particle preparation/measurement interpretation makes the model accurate.  Smooth symplectic admissibility therefore does not entail realization by that target.
-\end{counterexample}
-
-\section{Observational and physical equivalence}
-
-\begin{definition}[Indexed observational equivalence]
-Let $T_i=(M_i,I_i,\mathcal E_i)$ predict probability laws $P_i^c$ on a common registered outcome space for $c\in D$.  Define
-\[
- \Delta_D(T_1,T_2)=\sup_{c\in D}\TV(P_1^c,P_2^c).
-\]
-The theories are exactly observationally equivalent on $D$ when $\Delta_D=0$, and $\eta$-observationally equivalent when $\Delta_D\leq\eta$.
-\end{definition}
-
-This definition is deliberately indexed.  Agreement on yesterday's instruments need not survive a new intervention.  Empirical equivalence is commonly treated as necessary, but not generally sufficient, for theoretical equivalence; formal equivalences must also preserve empirical content \cite{Weatherall2019,Weatherall2016}.
-
-\begin{lemma}[Restriction monotonicity]
-If $D'\subseteq D$, then $\Delta_{D'}(T_1,T_2)\leq\Delta_D(T_1,T_2)$.
+\section{Logical structure of finite tests}
+\begin{lemma}
+For fixed $T$, empirical equivalence $\sim_T$ is an equivalence relation on the set of deterministic models $X\to Y$.
 \end{lemma}
 \begin{proof}
-The supremum over the subset $D'$ cannot exceed the supremum over $D$.
+Reflexivity holds because $m(x)=m(x)$. Symmetry follows from symmetry of equality. If $m\sim_T n$ and $n\sim_T r$, then $m(x)=n(x)=r(x)$ for every $x\in T$, so $m\sim_T r$.
 \end{proof}
 
-\begin{corollary}[Underdetermination by restricted experiments]
-Observational equivalence on $D'$ supplies no bound on $\Delta_{D\setminus D'}$.
-\end{corollary}
+\begin{proposition}[Restriction monotonicity]
+If $T'\subseteq T$ and $m\sim_T n$, then $m\sim_{T'}n$.
+\end{proposition}
 \begin{proof}
-Take two Bernoulli theories that both assign probability $1/2$ for every $c\in D'$, while for one context $c_*\in D\setminus D'$ they assign probabilities $0$ and $1$.  Then $\Delta_{D'}=0$ and $\Delta_D=1$.
+Every $x\in T'$ belongs to $T$, where the assumed equality holds.
 \end{proof}
 
-\begin{definition}[Structural equivalence]
-Two models are structurally equivalent relative to selected structure when there are inverse maps $F:X_1\to X_2$ and $G:X_2\to X_1$ preserving that selected structure.  In Hamiltonian mechanics a strong choice requires a symplectomorphism $F$ and
-\[
- F\circ\Phi_{1,t}^{u}=\Phi_{2,t}^{\bar u}\circ F.
-\]
-The phrase ``selected structure'' is indispensable: bijection, diffeomorphism, symplectomorphism, and categorical equivalence preserve different data.
-\end{definition}
+\begin{proposition}[Quotient of testable content]
+Let $R_T:\mathcal M\to Y^T$ be restriction, $R_T(m)=m|_T$. The quotient set $\mathcal M/{\sim_T}$ is in bijection with the image $R_T(\mathcal M)$.
+\end{proposition}
+\begin{proof}
+Define $\Phi([m])=R_T(m)$. If $[m]=[n]$, then $m\sim_Tn$, hence their restrictions agree, so $\Phi$ is well defined. Equal images imply $m\sim_Tn$, proving injectivity. Every element of $R_T(\mathcal M)$ is the restriction of some $m$, proving surjectivity.
+\end{proof}
 
-\begin{theorem}[Empirical preservation by intertwining]
-Suppose $F:X_1\to X_2$ is measurable and, for every $c\in D$,
-\begin{align}
- K^{P,2}_c&=F_*K^{P,1}_c,\label{eq:prep}\\
- F\circ\Phi^{u_c}_{1,t_c}&=\Phi^{\bar u_c}_{2,t_c}\circ F
- \quad K^{P,1}_c\text{-almost surely},\label{eq:dyn}\\
- K^{Q,2}_c(A\mid F(x))&=K^{Q,1}_c(A\mid x)\label{eq:meas}
-\end{align}
-for all measurable $A$.  Then $T_1$ and $T_2$ are exactly observationally equivalent on $D$.
+\begin{interpretation}
+A finite experiment directly distinguishes equivalence classes, not unrestricted global models. Selecting a representative requires additional structure such as smoothness, a parametric family, a simplicity preference, or prior information.
+\end{interpretation}
+
+\section{A general underdetermination theorem}
+\begin{assumption}[Perturbation closure]
+The deterministic model class $\mathcal M$ contains a model $m$ and, for infinitely many nonzero perturbations $h:X\to V$, also contains $m+h$, where $Y$ lies in a vector space $V$ and each $h$ vanishes on the tested set $T$.
+\end{assumption}
+
+\begin{theorem}[Finite-data underdetermination]
+Under perturbation closure, the observational record on $T$ does not identify $m$ uniquely in $\mathcal M$. If the admissible perturbations are pairwise distinct, the empirical-equivalence class of $m$ is infinite.
 \end{theorem}
 \begin{proof}
-For a measurable $A$, substitute \eqref{eq:prep} into the prediction for $T_2$ and use the pushforward integration formula:
-\[
- P_2^c(A)=\int_{X_1}K^{Q,2}_c(A\mid\Phi_{2,t_c}^{\bar u_c}(F(x)))K^{P,1}_c(dx).
-\]
-Equation \eqref{eq:dyn} replaces the evolved argument by $F(\Phi_{1,t_c}^{u_c}(x))$.  Equation \eqref{eq:meas} then makes the integrand $K^{Q,1}_c(A\mid\Phi_{1,t_c}^{u_c}(x))$.  The resulting integral is $P_1^c(A)$.  Equality for every measurable $A$ gives $P_1^c=P_2^c$ for every $c\in D$, hence $\Delta_D=0$.
+For every admissible $h$ and every $x\in T$, $(m+h)(x)=m(x)+h(x)=m(x)$. Hence $m+h\sim_Tm$. Nonzero perturbations give models distinct from $m$, and pairwise distinct perturbations give pairwise distinct models.
 \end{proof}
 
-\begin{counterexample}[Isomorphic dynamics, inequivalent measurements]
-Let both state spaces be $\R$, both evolutions the identity, and $F(x)=x$.  Prepare $x=1$.  Let $h_1(x)=x$ and $h_2(x)=2x$ with noiseless readout.  The dynamics are isomorphic, but the outcome laws are point masses at $1$ and $2$, whose total-variation distance is $1$.  Condition \eqref{eq:meas} fails.
+\begin{corollary}[Smooth finite samples]
+Let $X$ be a positive-dimensional smooth manifold, $Y=\mathbb R$, and $T\subset X$ finite. The class $C^\infty(X,\mathbb R)$ is not identifiable by restriction to $T$.
+\end{corollary}
+\begin{proof}
+Choose a coordinate ball disjoint from $T$ and a nonzero smooth bump function $h$ supported in that ball. Every scalar multiple $\lambda h$ vanishes on $T$. Apply the theorem to obtain infinitely many alternatives $m+\lambda h$.
+\end{proof}
+
+\begin{example}[Polynomial restriction restores identification]
+A real polynomial of degree at most $d$ is uniquely determined by its values at $d+1$ distinct points. If two such polynomials agree there, their difference has at least $d+1$ roots but degree at most $d$; therefore the difference is the zero polynomial. Identification here results from the degree bound, not from finiteness of data alone.
+\end{example}
+
+\begin{counterexample}[Interpolation is not unrestricted confirmation]
+Given any finite scalar dataset with distinct inputs, a polynomial interpolant exists. Infinitely many smooth functions share those values and differ elsewhere. Exact fit therefore does not establish that the polynomial, rather than another interpolant, is physically realized outside the tested inputs.
 \end{counterexample}
 
-\begin{counterexample}[Same equations, different boundaries]
-The differential equation $\ddot q+q=0$ on a time interval does not determine an empirical model until initial or boundary data and their physical control are fixed.  The families $q(0)=0,\dot q(0)=1$ and $q(0)=1,\dot q(0)=0$ predict $\sin t$ and $\cos t$.  Equality of equations of motion does not ensure observational equivalence.  Boundary structure can carry empirical content \cite{WolfRead2023}.
-\end{counterexample}
-
-\begin{definition}[Physical equivalence]
-Two empirical theories are physically equivalent on $D$ only if (i) they are observationally equivalent on $D$, (ii) a correspondence identifies their preparations, interventions, outcomes, and target referents, and (iii) no claimed physically significant structure is lost under that correspondence.  This is a criterion adopted here, not an established physical result.
+\section{Noise, falsification, and scope}
+\begin{definition}[Compatibility region]
+For observations $\widehat y_x$ and tolerances $\delta_x\geq0$, define
+\[
+C(D)=\{m\in\mathcal M: d_Y(m(x),\widehat y_x)\leq\delta_x
+\text{ for every }x\in T\}.
+\]
+A model outside $C(D)$ is incompatible with the record relative to the adopted error specification.
 \end{definition}
 
-\begin{proposition}[Formal equivalence is insufficient]
-Structural equivalence of mathematical models alone does not imply physical equivalence.
+\begin{proposition}[Tolerance monotonicity]
+If $\delta'_x\geq\delta_x$ for every tested $x$, then $C(T,\delta)\subseteq C(T,\delta')$.
 \end{proposition}
 \begin{proof}
-The preceding measurement counterexample has identical state spaces and dynamics, hence the identity is a structural isomorphism, while observational equivalence fails.  Since clause (i) in the definition of physical equivalence fails, physical equivalence fails.
+Every inequality bounded by $\delta_x$ is also bounded by the larger number $\delta'_x$.
 \end{proof}
 
-\section{Composition and empirical interfaces}
+\begin{interpretation}
+Rejection is conditional on the observation model, calibration, and scope. Compatibility is weaker than truth: $C(D)$ can contain many mutually incompatible extrapolations.
+\end{interpretation}
 
-\begin{assumption}[Independent product composition]
-For independently prepared systems $A$ and $B$, the composite state space is $X_A\times X_B$, the preparation kernel factors, and uncoupled dynamics factor:
-\[
- K^P_{AB}=K^P_A\otimes K^P_B,
- \qquad \Phi_{AB,t}=\Phi_{A,t}\times\Phi_{B,t}.
-\]
+\begin{definition}[Scope claim]
+A scope claim is an explicit subset $S\subseteq X$ on which a model is asserted to meet a declared predictive criterion. Evidence on $T$ directly addresses the claim only where $T$ probes $S$; extension beyond $T$ invokes further assumptions.
+\end{definition}
+
+\begin{assumption}[Regularity-based extension]
+Suppose $m$ and the target response $f$ are $L$-Lipschitz on a metric space $S$, and every point of $S$ lies within distance $r$ of some tested point.
 \end{assumption}
 
-This assumption is not a theorem about every physical composite.  Correlated preparation, interaction constraints, and shared environments violate factorization.
-
-\begin{proposition}[Compositional error bound]
-Under independent product composition, if component outcome laws satisfy $\TV(P_A,Q_A)\leq\epsilon_A$ and $\TV(P_B,Q_B)\leq\epsilon_B$, then
+\begin{proposition}[A bounded extrapolation result]
+If $|m(t)-f(t)|\leq\epsilon$ for all tested $t$, then
 \[
- \TV(P_A\otimes P_B,Q_A\otimes Q_B)\leq\epsilon_A+\epsilon_B.
+|m(x)-f(x)|\leq\epsilon+2Lr
+\qquad(x\in S).
 \]
 \end{proposition}
 \begin{proof}
-Insert the intermediate product $Q_A\otimes P_B$ and use the triangle inequality.  Tensoring both measures with the same probability measure preserves total-variation distance, so the two terms are respectively bounded by $\epsilon_A$ and $\epsilon_B$.
+Choose $t$ with $d(x,t)\leq r$. The triangle inequality gives
+\[
+|m(x)-f(x)|\leq |m(x)-m(t)|+|m(t)-f(t)|+|f(t)-f(x)|.
+\]
+The two Lipschitz bounds contribute at most $Lr$ each, and the tested error contributes at most $\epsilon$.
 \end{proof}
 
 \begin{interpretation}
-A mathematical tensor or Cartesian product becomes an empirical claim only when the interface specifies which joint preparations and measurements are available.  Error budgets compose, but the stated bound can become uninformative for many components unless correlations and scaling are controlled.
+The proposition demonstrates the role of bridge assumptions: data plus regularity and coverage yield a quantitative scope bound. Whether the common Lipschitz bound is adequate is an empirical or independently justified modelling question.
 \end{interpretation}
 
-\section{Limits, approximations, and recovery}
-
-\begin{definition}[Uniform empirical limiting relation]
-Let $T_\lambda$ be a family of theories and $T_0$ a candidate limiting theory on $D$.  We say $T_\lambda\to T_0$ uniformly empirically on $D$ if
-\[
- r(\lambda):=\sup_{c\in D}\TV(P_\lambda^c,P_0^c)\longrightarrow0.
-\]
-Pointwise empirical convergence replaces the supremum statement with convergence for each fixed $c$.
+\section{Composition and hidden structure}
+\begin{definition}[Componentwise test]
+For components $A$ and $B$, a componentwise test records their responses under isolated interfaces. A composite test records the response of $A\otimes B$ after connection through a specified interface.
 \end{definition}
 
-\begin{newresult}[Uniform error-transfer theorem]
-Assume the target $S$ is realized by $T_\lambda$ with error $e_\lambda(c)$, meaning $\TV(P_S^c,P_\lambda^c)\leq e_\lambda(c)$.  If $T_\lambda\to T_0$ uniformly with error $r(\lambda)$, then
-\begin{equation}\label{eq:transfer}
- \sup_{c\in D}\TV(P_S^c,P_0^c)
- \leq \sup_{c\in D}e_\lambda(c)+r(\lambda).
-\end{equation}
-Thus $T_0$ is empirically adequate to tolerance $\delta$ whenever the right-hand side is at most $\delta$.
-\end{newresult}
-\begin{proof}
-For each $c$, the triangle inequality gives
-\[
- \TV(P_S^c,P_0^c)\leq\TV(P_S^c,P_\lambda^c)+\TV(P_\lambda^c,P_0^c)
- \leq e_\lambda(c)+r(\lambda).
-\]
-Taking the supremum over $D$ proves \eqref{eq:transfer}.
-\end{proof}
-
-The theorem is elementary but records the missing empirical premise in many limit claims: convergence among mathematical predictions transfers adequacy only when some family member is already connected to the target by evidence.
-
-\begin{counterexample}[Pointwise convergence is not uniform]
-On $D=[0,1]$, let a deterministic prediction be $f_n(c)=c^n$ and the proposed limit be $f(c)=0$ for $c<1$, $f(1)=1$.  Then $f_n(c)\to f(c)$ for every fixed $c$.  Yet
-\[
- \sup_{0\leq c<1}|f_n(c)-f(c)|=1
-\]
-for every $n$.  No single finite $n$ controls all contexts approaching the boundary.  A claim of uniform empirical recovery would therefore be false.
+\begin{counterexample}[Components do not determine every composite]
+Let isolated binary components output unbiased bits. Model I makes the composite outputs independent; Model II makes them perfectly correlated while preserving each isolated marginal. Both agree on every isolated single-component statistic but disagree on the joint event that the outputs coincide. Componentwise adequacy alone does not determine composite behaviour.
 \end{counterexample}
 
-\begin{counterexample}[Noncommuting limit and long observation]
-Let $q_\varepsilon(t)=\sin(\varepsilon t)$.  For each fixed finite $t$, $q_\varepsilon(t)\to0$ as $\varepsilon\to0$.  But at the context $t_\varepsilon=\pi/(2\varepsilon)$, $q_\varepsilon(t_\varepsilon)=1$.  Hence convergence on every fixed compact time interval does not license recovery over times scaling as $1/\varepsilon$.
-\end{counterexample}
+\begin{assumption}[Compositional closure]
+Predictions for a composite are determined by component models and the declared interface, with no unmodelled shared cause, memory channel, or context dependence across that interface.
+\end{assumption}
 
-\begin{definition}[Approximation versus idealization]
-Following Norton's distinction, an approximation is an inexact description of a target, whereas an idealization is a distinct system whose properties provide an inexact description of the target \cite{Norton2012}.  We call a limit \emph{representationally controlled} only when the target, metric, domain, and error rate are stated.
-\end{definition}
-
-Infinite or singular limit objects need not be physically realized.  Work on limiting relations emphasizes that novel limiting behavior can coexist with finite, physically realized precursor behavior \cite{Butterfield2011,ButterfieldBouatta2011}.  In the present finite-dimensional scope, this literature functions as a warning against reifying a limit point.
-
-\begin{proposition}[Limit realization does not follow from convergence]
-The statement $T_\lambda\to T_0$ in a mathematical topology does not by itself imply that a physical target realizes $T_0$.
-\end{proposition}
-\begin{proof}
-Choose any convergent family of mathematical predictions and a target whose observed distribution differs from the limit by total-variation distance $1$.  Convergence relates members of the model family to the limit; it contains no premise relating the target distribution to any member.  Equation \eqref{eq:transfer} identifies the absent premise.
-\end{proof}
-
-\section{Failure modes and adversarial tests}
-
-The framework makes failures localizable rather than treating ``the model failed'' as a single diagnosis.
-
-\begin{enumerate}[label=\textbf{F\arabic*.},leftmargin=*]
-\item \emph{State-space failure}: observed histories cannot be represented in $X$ without violating the declared interpretation.
-\item \emph{Preparation failure}: $K^P$ assigns weight to states not producible by the registered procedure, or omits systematic preparation drift.
-\item \emph{Dynamics failure}: residuals are structured beyond the declared stochastic and numerical error model.
-\item \emph{Measurement failure}: $K^Q$ omits saturation, hysteresis, latency, selection, or calibration uncertainty.
-\item \emph{Interface failure}: composition assumes independence or unrestricted coupling where the apparatus enforces correlations or constraints.
-\item \emph{Domain failure}: a theorem valid on $D$ is used outside $D$, or a pointwise limit is reported as uniform.
-\item \emph{Equivalence failure}: a formal map preserves equations while changing preparations, boundaries, observables, or referents.
-\item \emph{Identifiability failure}: distinct parameter values or models induce the same registered outcome laws.
-\end{enumerate}
-
-\begin{lemma}[Observational quotient]
-Exact observational equivalence on fixed $D$ is an equivalence relation on theories sharing the registered outcome spaces.
-\end{lemma}
-\begin{proof}
-Reflexivity follows from $\TV(P,P)=0$; symmetry from symmetry of total variation; transitivity follows because if $P_1^c=P_2^c$ and $P_2^c=P_3^c$ for every $c$, then $P_1^c=P_3^c$ for every $c$.
-\end{proof}
-
-\begin{interpretation}
-The quotient by observational equivalence represents what the registered experiments identify.  It should not automatically be read as an ontological quotient.  Enlarging $D$ refines or preserves its equivalence classes by restriction monotonicity.
-\end{interpretation}
-
-\begin{definition}[Registered finite falsifier]
-A finite falsifier for $T$ consists of a context $c$, sample size $N$, test statistic $Z_N$, rejection region $R$, and error guarantees fixed before examining the test data.  It rejects the empirical adequacy claim at tolerance $\epsilon(c)$ when $Z_N\in R$ and the test's type-I error is bounded by a declared $\alpha$ under every distribution admitted by that claim.
-\end{definition}
-
-\begin{proposition}[What falsification reaches]
-A valid rejection falsifies the conjunction of the model, interpretation, auxiliary calibration assumptions, domain claim, and statistical assumptions used to derive the rejected prediction.  It does not logically identify which conjunct failed.
-\end{proposition}
-\begin{proof}
-The tested distribution is derived from the conjunction.  Rejection supplies evidence against that conjunction under the test assumptions.  In propositional logic, $\neg(A\land B)$ does not entail $\neg A$ and does not entail $\neg B$.
-\end{proof}
-
-\begin{empirical}[Minimum evidence record]
-A realization or falsification report should contain raw or losslessly transformed observations, context and intervention identifiers, calibration provenance, exclusion rules, uncertainty decomposition, the prediction version, and the prespecified test.  Whether a particular record meets these conditions is an empirical and methodological audit question.
+\begin{empirical}[Interface completeness]
+Tests for cross-component correlations, memory, leakage, and contextual dependence provide empirical evidence for or against compositional closure. The categorical availability of a tensor product does not establish interface completeness.
 \end{empirical}
 
-\section{Worked finite-dimensional example}
+\section{Causal and theoretical limits}
+\begin{counterexample}[Observation does not fix causal direction]
+For correlated Gaussian variables $X,Y$, the same joint distribution can be factorized as $P(X)P(Y\mid X)$ or $P(Y)P(X\mid Y)$. Without intervention, temporal information, or structural restrictions, the observational distribution alone does not choose between the corresponding causal directions.
+\end{counterexample}
 
-Consider the harmonic oscillator
-\[
- X=\R^2,\quad \omega=dq\wedge dp,\quad
- H(q,p)=\frac{p^2}{2m}+\frac{m\Omega^2q^2}{2}.
-\]
-Its flow is
-\begin{equation}\label{eq:osc}
- q(t)=q_0\cos\Omega t+\frac{p_0}{m\Omega}\sin\Omega t,
- \quad
- p(t)=p_0\cos\Omega t-m\Omega q_0\sin\Omega t.
-\end{equation}
-
-\begin{assumption}[Oscillator interpretation]
-A preparation device produces a Gaussian $K^P=N((q_0,p_0),\Sigma_P)$; a position sensor has $Y=\R$ and kernel $K^Q(dy\mid q,p)=N(q,\sigma_Q^2)(dy)$; damping and driving are negligible over $0\leq t\leq T$ within a declared budget.
+\begin{assumption}[Causal identification]
+A causal conclusion must state its intervention semantics and the assumptions used for identification, such as randomization, absence of specified confounding, an instrumental-variable condition, or a structural causal model.
 \end{assumption}
 
-Under this assumption, \eqref{eq:osc} and affine propagation of Gaussian variables yield a Gaussian prediction for each measurement time.  That calculation is mathematical.  The values of $m,\Omega,\Sigma_P,\sigma_Q$, and the assertion that damping is negligible require calibration and data.
-
-Now perform the canonical rescaling $Q=aq$, $P=p/a$ for $a>0$.  Since $dQ\wedge dP=dq\wedge dp$, this is a symplectomorphism.  If preparations are pushed forward and the sensor is transformed to read $Q/a$, the hypotheses of the empirical-preservation theorem hold.  If instead the new sensor is interpreted as reporting $Q$ in the old numerical units, its prediction differs by the factor $a$.  The same canonical transformation is therefore empirically harmless under one interpretation and empirically consequential under another.
-
-For a small neglected quartic correction
-\[
- H_\lambda=H+\lambda q^4,
-\]
-standard continuous dependence of ODE solutions gives convergence to the harmonic flow on compact sets of initial data and compact time intervals as $\lambda\to0$.  This statement does not supply a global-in-time error bound.  An experiment that increases amplitude or duration as $\lambda$ decreases can expose the correction, mirroring the nonuniform counterexamples above.
-
-\section{Consequences for the founding thesis}
-
-\begin{newresult}[Typed realization criterion]
-Within the definitions of this paper, a compositional mathematical structure qualifies as an empirically realized theory only relative to the six-place interpretation data $(\mathcal C,\mathcal P,\mathcal Q,K,\epsilon,D)$ and supporting evidence $\mathcal E$.  Neither structural admissibility, formal equivalence, nor convergence alone supplies realization.
-\end{newresult}
-\begin{proof}
-Realization is defined by \eqref{eq:realize}, whose two arguments require both target distributions and interpreted model predictions.  Mathematical admissibility specifies neither.  Formal equivalence supplies the prediction equality only under the three intertwining conditions.  A limiting relation transfers adequacy only with the target-to-family bound in \eqref{eq:transfer}.  Each omitted ingredient has an explicit counterexample above.
-\end{proof}
-
-\begin{conjecture}[Compositional empirical adequacy]
-For a useful class of finite-dimensional classical laboratory systems, empirical interpretations and error budgets can be assigned compositionally so that subsystem adequacy plus verified interface assumptions entails system-level adequacy with nonvacuous bounds.
+\begin{conjecture}[Hierarchical empirical realization]
+A mature compositional physical theory can attach validated uncertainty and scope metadata to components and propagate them through compositions without uncontrolled loss. This is conjectural because dependence, model discrepancy, and interface misspecification can defeat naive propagation.
 \end{conjecture}
 
-This conjecture is stronger than the product error proposition because real interfaces generate correlations, feedback, and model discrepancy.  Testing it requires case studies with actual calibration records.
+\section{Dependency ledger and conclusion}
+The equivalence and quotient results depend only on set-theoretic definitions. The underdetermination theorem depends on perturbation closure; its smooth corollary uses bump functions. The extrapolation bound depends on explicit Lipschitz and coverage assumptions. Causal and compositional conclusions require additional structural premises whose adequacy is empirical. Accordingly, mathematical admissibility, finite-record compatibility, identifiability within a class, and physical realization are four different statuses.
 
-\section{Conclusion}
+\paragraph{Bibliographic note.}
+The underdetermination of theories by evidence has a long methodological history \cite{Duhem,Glymour}. Statistical identifiability is treated systematically by Lehmann and Casella \cite{LC}, while causal identification and its assumptions are developed by Pearl \cite{Pearl}. The formal results in this paper are elementary and are included to make their dependencies explicit.
 
-The mathematical/empirical boundary can be expressed without weakening mathematical rigor.  A model becomes a candidate physical theory only through typed preparation, intervention, measurement, domain, tolerance, and evidence data.  Observational equivalence is indexed by available experiments; physical equivalence additionally requires preservation of interpretation and significant structure.  Limits require uniformity on the intended domain and an independent empirical bridge.  Falsification targets a registered conjunction and must preserve its evidential provenance.  These results make the founding thesis precise enough to test, while leaving its general validity conjectural.
-
-\begin{thebibliography}{99}
-\bibitem{AbrahamMarsden1978}
-R. Abraham and J. E. Marsden,
-\emph{Foundations of Mechanics}, 2nd ed., Benjamin/Cummings, 1978.
-
-\bibitem{MarsdenRatiu1999}
-J. E. Marsden and T. S. Ratiu,
-\emph{Introduction to Mechanics and Symmetry}, 2nd ed., Springer, 1999,
-doi:10.1007/978-0-387-21792-5.
-
-\bibitem{Weatherall2019}
-J. O. Weatherall,
-``Theoretical equivalence in physics,''
-\emph{Philosophy Compass} 14 (2019), e12592,
-doi:10.1111/phc3.12592; arXiv:1810.08192.
-
-\bibitem{Weatherall2016}
-J. O. Weatherall,
-``Are Newtonian gravitation and geometrized Newtonian gravitation theoretically equivalent?''
-\emph{Erkenntnis} 81 (2016), 1073--1091; arXiv:1411.5757.
-
-\bibitem{WolfRead2023}
-W. J. Wolf and J. Read,
-``Respecting boundaries: theoretical equivalence and structure beyond dynamics,''
-preprint, PhilSci-Archive 22341 (2023), \url{https://philsci-archive.pitt.edu/22341/}.
-
-\bibitem{Norton2012}
-J. D. Norton,
-``Approximation and idealization: why the difference matters,''
-\emph{Philosophy of Science} 79 (2012), 207--232,
-doi:10.1086/664746.
-
-\bibitem{Butterfield2011}
-J. Butterfield,
-``Less is different: emergence and reduction reconciled,''
-\emph{Foundations of Physics} 41 (2011), 1065--1135,
-doi:10.1007/s10701-010-9516-1.
-
-\bibitem{ButterfieldBouatta2011}
-J. Butterfield and N. Bouatta,
-``Emergence and reduction combined in phase transitions,''
-arXiv:1104.1371 (2011).
+\begin{thebibliography}{9}
+\bibitem{Duhem} P. Duhem, \emph{The Aim and Structure of Physical Theory}, Princeton University Press, 1954.
+\bibitem{Glymour} C. Glymour, \emph{Theory and Evidence}, Princeton University Press, 1980.
+\bibitem{LC} E. L. Lehmann and G. Casella, \emph{Theory of Point Estimation}, 2nd ed., Springer, 1998.
+\bibitem{Pearl} J. Pearl, \emph{Causality}, 2nd ed., Cambridge University Press, 2009.
 \end{thebibliography}
-
 \end{document}

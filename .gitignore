@@ -1,9 +1,7 @@
-node_modules/
-.vercel/
+build/
+*.hi
+*.o
 *.aux
 *.log
 *.out
-*.fls
-*.fdb_latexmk
-*.hi
-*.o
+.DS_Store

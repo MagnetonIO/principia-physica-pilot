@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+ <rect width="1200" height="630" fill="#11151b"/><path d="M0 0h18v630H0z" fill="#d75b37"/>
+ <g fill="none" stroke="#59626a" opacity=".65"><circle cx="965" cy="315" r="270"/><circle cx="965" cy="315" r="190"/><circle cx="965" cy="315" r="108"/><path d="M695 315h540M965 45v540"/></g>
+ <circle cx="965" cy="315" r="35" fill="#d75b37"/><circle cx="844" cy="170" r="9" fill="#e7e5df"/>
+ <text x="85" y="90" fill="#e9e7e0" font-family="Arial, sans-serif" font-size="19" letter-spacing="5"><tspan font-weight="700">PRINCIPIA</tspan> PHYSICA</text>
+ <text x="85" y="238" fill="#faf8f2" font-family="Georgia, serif" font-size="68">Compositional</text><text x="85" y="315" fill="#faf8f2" font-family="Georgia, serif" font-size="68">Foundations of</text><text x="85" y="392" fill="#df7453" font-family="Georgia, serif" font-size="68" font-style="italic">Classical Mechanics</text>
+ <line x1="85" y1="458" x2="560" y2="458" stroke="#59626a"/><text x="85" y="510" fill="#aeb6ba" font-family="Arial, sans-serif" font-size="21" letter-spacing="2">PAPERS · FORMAL ARTIFACTS · EVIDENCE</text><text x="85" y="560" fill="#777f84" font-family="Arial, sans-serif" font-size="16" letter-spacing="3">RESEARCH PILOT / 2026</text>
+</svg>

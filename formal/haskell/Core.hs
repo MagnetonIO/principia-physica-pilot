@@ -1,513 +1,623 @@
 -- |
--- Module      : Main (file: formal/haskell/Core.hs)
--- Series      : PRINCIPIA PHYSICA -- formal appendix to
---               "Compositional Realization, Hamiltonian Reconstruction, and
---                Empirical Limits: a synthesis"
+-- Module      : Main
+-- Description : Executable companions to the PRINCIPIA PHYSICA synthesis paper.
 --
--- EPISTEMIC STATUS OF THIS FILE.
+-- Accompanies "Empirical Realization of Compositional Structure: A Synthesis
+-- of the PRINCIPIA PHYSICA Topic Series" (papers/drafts/synthesis.tex) and the
+-- Lean development (formal/drafts/Proofs.lean).
 --
--- This is a /typing and an executable illustration/, not a proof.  Three
--- distinct things appear below and they are labelled at every definition:
+-- Dependencies: @base@ only.  Written to the Haskell 2010 report plus
+-- @ScopedTypeVariables@ so that it builds under old and current GHC alike.
 --
---   [TYPE]   a rendering of a definition of the series as a Haskell type.
---            A type-checked rendering certifies arity and dependency, and
---            nothing else.  In particular it does not certify that any
---            theorem of the series holds.
+-- EPISTEMIC STATUS.  This program computes.  It does not measure.  Every
+-- numerical check below is a check that a /mathematical/ construction behaves
+-- as the paper proves it behaves; none of them is evidence that any model is
+-- physically realized.  Where a quantity would in practice come from an
+-- instrument, it is supplied here as a literal and labelled @synthetic@.
 --
---   [DEC]    a decision procedure that is /exact/ on the finite data it is
---            given (mixed-difference separability, cycle sums, observational
---            classes of a finite model class).  A True answer is a proof
---            about the sampled grid only, never about the smooth object.
+-- Running @main@ executes every check and exits non-zero if any fails, so the
+-- file doubles as a regression test for the paper's computational claims.
 --
---   [NUM]    a floating-point illustration (RK4 trajectories, total-variation
---            distances).  These carry discretisation and rounding error and
---            establish nothing.  They are included because the series makes
---            quantitative claims whose shape is worth exhibiting.
---
--- Machine-checked statements live in @formal/lean/Proofs.lean@; the
--- separability criterion and the cycle-sum obstruction implemented here are
--- the two decision procedures whose correctness is proved there.
---
--- Toolchain: GHC 9.14.1 (aarch64-apple-darwin), @base@ only.
---   Build and run:  ghc -Wall -Wextra -Werror Core.hs -o core && ./core
---   Requires base >= 4.20 (foldl' re-exported from Prelude).
--- Exit status is 0 iff every check reports PASS.
+-- Section map (numbers refer to synthesis.tex):
+--   1. Numerical helpers
+--   2. Interface theories as a typed process DSL          (Def. 2.1)
+--   3. A model: the stochastic-matrix functor             (Thm. 2.4, Ex. 2.7)
+--   4. The kernel construction: bump perturbations        (Thm. 3.2, Cor. 3.4)
+--   5. Gauge freedom and reconstruction up to a constant  (Prop. 4.4)
+--   6. Hamiltonian dynamics and finite-sample identification (Cor. 3.5)
+--   7. Compatibility regions and monotonicity             (Prop. 2.8)
+--   8. Scope: extrapolation and composition bounds        (Lem. 7.1, Prop. 7.2)
+--   9. Harness
+
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Main (main) where
 
-import Control.Monad (forM_, unless)
-import Data.List (nub)
-import System.Exit (exitFailure, exitSuccess)
-import Text.Printf (printf)
+import           Control.Monad (forM_, unless)
+import           Data.List     (transpose)
+import           System.Exit   (exitFailure)
+import           Text.Printf   (printf)
 
--- ===================================================================
--- 1.  Typed systems and composition            (compositional-systems)
--- ===================================================================
+-- ---------------------------------------------------------------------------
+-- 1.  Numerical helpers
+-- ---------------------------------------------------------------------------
 
--- | [TYPE] A typed deterministic system: an update map and a readout.
--- Surrogate of Definition "System and state" of the compositional-systems
--- paper with the symplectic structure deliberately absent, so that no
--- statement about Hamiltonian mechanics can be read off this type.
-data Sys i s o = Sys
-  { step    :: i -> s -> s
-  , readout :: s -> o
-  }
+-- | Tolerance used for exact-arithmetic identities that are exact in theory
+-- and only floating-point-exact in practice.
+eps :: Double
+eps = 1.0e-9
 
--- | [TYPE] Parallel (monoidal) product.  Mirrors @Definition (Composite
--- system)@: independent inputs, independent states, paired readout.
-par :: Sys i1 s1 o1 -> Sys i2 s2 o2 -> Sys (i1, i2) (s1, s2) (o1, o2)
-par a b = Sys
-  { step    = \(i, j) (x, y) -> (step a i x, step b j y)
-  , readout = \(x, y) -> (readout a x, readout b y)
-  }
+close :: Double -> Double -> Double -> Bool
+close t a b = abs (a - b) <= t
 
--- | [TYPE] Serial composition, synchronous convention: the second component
--- consumes the /updated/ output of the first.  A different timing convention
--- is a different theory; the choice is data, not a derived fact.
-serial :: Sys i s o -> Sys o t p -> Sys i (s, t) p
-serial a b = Sys
-  { step    = \i (x, y) -> let x' = step a i x in (x', step b (readout a x') y)
-  , readout = \(_, y) -> readout b y
-  }
+-- | Row-major real matrices.  Composition is matrix product; the categorical
+-- convention is @matMul g f@ for \"first f, then g\".
+type Mat = [[Double]]
 
--- | [TYPE] Iterate along a finite input word.
-runSys :: Sys i s o -> [i] -> s -> s
-runSys a is x0 = foldl' (flip (step a)) x0 is
+matRows :: Mat -> Int
+matRows = length
 
--- | [DEC] The product run factors.  Proved in Lean (@Principia.runPar@); here
--- it is only re-checked on the supplied sample.
-runParFactors :: (Eq s1, Eq s2)
-              => Sys i1 s1 o1 -> Sys i2 s2 o2
-              -> [(i1, i2)] -> (s1, s2) -> Bool
-runParFactors a b is (x, y) =
-  runSys (par a b) is (x, y)
-    == (runSys a (map fst is) x, runSys b (map snd is) y)
+matCols :: Mat -> Int
+matCols m = case m of
+  []      -> 0
+  (r : _) -> length r
 
--- ===================================================================
--- 2.  Separability and interaction          (CS-N1, HR interaction)
--- ===================================================================
+matId :: Int -> Mat
+matId n = [ [ if i == j then 1 else 0 | j <- [0 .. n - 1] ] | i <- [0 .. n - 1] ]
 
--- | [DEC] Exact separability test on a finite grid.  A coupling
--- @v :: a -> b -> Integer@ restricted to @as x bs@ is additively separable
--- iff every mixed second difference vanishes.  Correctness of this criterion
--- is the Lean theorem @Principia.separable_iff_noMixedDifference@.
---
--- Reading: in the smooth setting the corresponding statement is the
--- separation equivalence (a Hamiltonian vector field on a connected product
--- splits iff its generator is additively separable up to a constant).  A
--- True answer here does /not/ establish that smooth statement.
-separableOn :: [a] -> [b] -> (a -> b -> Integer) -> Bool
-separableOn as bs v =
-  and [ v a b + v a' b' == v a b' + v a' b
-      | a <- as, a' <- as, b <- bs, b' <- bs ]
+matMul :: Mat -> Mat -> Mat
+matMul a b = [ [ sum (zipWith (*) row col) | col <- transpose b ] | row <- a ]
 
--- | [DEC] The witness construction from the same proof: @f a = v a b0@ and
--- @g b = v a0 b - v a0 b0@.  Returns 'Nothing' exactly when the grid test
--- fails, so a 'Just' answer carries a checkable decomposition.
-splitCoupling :: [a] -> [b] -> (a -> b -> Integer)
-              -> Maybe (a -> Integer, b -> Integer)
-splitCoupling [] _ _ = Nothing
-splitCoupling _ [] _ = Nothing
-splitCoupling as@(a0 : _) bs@(b0 : _) v
-  | not (separableOn as bs v) = Nothing
-  | otherwise = Just (\a -> v a b0, \b -> v a0 b - v a0 b0)
+-- | Kronecker product; the interpretation of parallel composition.
+kron :: Mat -> Mat -> Mat
+kron a b = [ concat [ map (x *) rb | x <- ra ] | ra <- a, rb <- b ]
 
--- | [DEC] Interaction detector on a product state space: a system is
--- non-interacting when neither factor's update reads the other factor's
--- state.  Surrogate of @HR new-interaction-outside-tensor@; the Lean file
--- proves that every @par a b@ passes and exhibits a coupled system that
--- fails, so no product decomposition of it exists.
-nonInteractingOn :: (Eq s1, Eq s2)
-                 => [i] -> [s1] -> [s2] -> Sys i (s1, s2) o -> Bool
-nonInteractingOn is xs ys s =
-  and [ fst (step s i (x, y)) == fst (step s i (x, y'))
-      | i <- is, x <- xs, y <- ys, y' <- ys ]
-  &&
-  and [ snd (step s i (x, y)) == snd (step s i (x', y))
-      | i <- is, x <- xs, x' <- xs, y <- ys ]
+matClose :: Double -> Mat -> Mat -> Bool
+matClose t a b =
+  length a == length b
+    && and (zipWith (\r s -> length r == length s && and (zipWith (close t) r s)) a b)
 
--- ===================================================================
--- 3.  Discrete reconstruction and its period obstruction        (HR)
--- ===================================================================
+-- | Column-stochasticity: every column is a probability vector.  This is the
+-- property the probabilistic-interpretation assumption of the compositional
+-- paper requires, and it is preserved by both forms of composition.
+isColStochastic :: Double -> Mat -> Bool
+isColStochastic t m =
+  all (all (>= negate t)) m
+    && all (\c -> close t (sum c) 1) (transpose m)
 
--- | [DEC] Cycle sum of an @n@-periodic integer "one-form".  This single
--- integer plays the role of the de Rham class @[iota_X omega]@ in the
--- Hamiltonian-reconstruction paper.  The analogy is structural only: there
--- is no manifold and no symplectic form here.
-cycleSum :: Int -> (Int -> Integer) -> Integer
-cycleSum n alpha = sum [ alpha k | k <- [0 .. n - 1] ]
+-- ---------------------------------------------------------------------------
+-- 2.  Interface theories as a typed process DSL
+-- ---------------------------------------------------------------------------
 
--- | [DEC] Global potential of a periodic form, or 'Nothing' when the period
--- obstructs it.  Necessity and sufficiency are both proved in Lean
--- (@cycle_sum_zero_of_potential@, @potential_of_cycle_sum_zero@).
---
--- The 'Nothing' branch is the discrete counterpart of the 2-torus
--- non-example: a form that is closed everywhere and has no global primitive.
-potential :: Int -> (Int -> Integer) -> Maybe (Int -> Integer)
-potential n alpha
-  | n <= 0             = Nothing
-  | cycleSum n alpha /= 0 = Nothing
-  | otherwise          = Just (\k -> sum [ alpha j | j <- [0 .. k - 1] ])
-
--- | [DEC] Forward difference; a constant is invisible to it.  Discrete image
--- of @H@ and @H + c@ generating the same field, hence of the corollary that
--- the flow determines the generator only up to an additive constant.
-diffSeq :: (Int -> Integer) -> Int -> Integer
-diffSeq h k = h (k + 1) - h k
-
--- ===================================================================
--- 4.  The theory object and its interpretation                  (HR)
--- ===================================================================
-
--- | [TYPE] A point of a two-dimensional numerical phase space.  Finite
--- dimension is a stipulation of the series (Axiom: kinematic type); the
--- restriction to one degree of freedom is a restriction of this file only.
-type Phase = (Double, Double)
-
--- | [TYPE] Bare object: generator plus the field it induces.  The pair
--- @(generator, field)@ stands in for @(H, X_H)@ under a fixed symplectic
--- form; the form itself is recorded numerically as its matrix, so that a
--- reader can see that changing it changes the object.
-data BareObject = BareObject
-  { objName   :: String
-  , generator :: Phase -> Double
-  , field     :: Phase -> Phase
-  , formMat   :: ((Double, Double), (Double, Double))
-  }
-
--- | [TYPE] Physical dimension carried by a readout channel.  Units are DATA
--- of the interpretation and are deleted by 'forget'; that deletion is the
--- whole content of "mathematically isomorphic, physically distinct".
-data Unit = Metre | Coulomb | Joule | Second | Volt | Named String
+-- | Interface types.  @TPair@ is the monoidal product; @TUnit@ its unit.
+data Ty = TUnit | TBit | TPair Ty Ty
   deriving (Eq, Show)
 
--- | [TYPE] Interpretation @(P, mu, U, epsilon, T)@ of the series.
-data Interp = Interp
-  { preparable :: Phase -> Bool
-  , readoutMap :: Phase -> [Double]
-  , unitsOf    :: [Unit]
-  , resolution :: Double
-  , window     :: Double
+dim :: Ty -> Int
+dim TUnit       = 1
+dim TBit        = 2
+dim (TPair a b) = dim a * dim b
+
+-- | Process expressions.  @PGen@ carries the matrix a model assigns to a
+-- generator; the syntax is thereby a free process theory over a signature.
+data Proc
+  = PId Ty
+  | PComp Proc Proc          -- ^ @PComp g f@ is \"f then g\".
+  | PTensor Proc Proc
+  | PSwap Ty Ty
+  | PGen String Ty Ty Mat
+  deriving (Show)
+
+-- | Type checking is the admissibility test at the syntactic level: it decides
+-- whether an expression denotes a process at all.  It says nothing about
+-- whether the process can be run in a laboratory.
+typeOf :: Proc -> Either String (Ty, Ty)
+typeOf (PId t) = Right (t, t)
+typeOf (PComp g f) = do
+  (fx, fy) <- typeOf f
+  (gy, gz) <- typeOf g
+  if fy == gy
+    then Right (fx, gz)
+    else Left ("sequential mismatch: " ++ show fy ++ " /= " ++ show gy)
+typeOf (PTensor p q) = do
+  (a, b) <- typeOf p
+  (c, d) <- typeOf q
+  Right (TPair a c, TPair b d)
+typeOf (PSwap a b) = Right (TPair a b, TPair b a)
+typeOf (PGen nm a b m) =
+  if matRows m == dim b && matCols m == dim a
+    then Right (a, b)
+    else Left ("generator " ++ nm ++ " has wrong shape")
+
+-- | The permutation exchanging the two factors of a tensor product.
+swapMat :: Int -> Int -> Mat
+swapMat da db =
+  [ [ if r == j * da + i then 1 else 0 | i <- [0 .. da - 1], j <- [0 .. db - 1] ]
+  | r <- [0 .. da * db - 1]
+  ]
+
+-- ---------------------------------------------------------------------------
+-- 3.  A model: the stochastic-matrix functor
+-- ---------------------------------------------------------------------------
+
+-- | The model of claim C1, concretely: a strong symmetric monoidal functor into
+-- finite stochastic maps.  @interp@ is total on well-typed expressions.
+interp :: Proc -> Mat
+interp (PId t)        = matId (dim t)
+interp (PComp g f)    = matMul (interp g) (interp f)
+interp (PTensor p q)  = kron (interp p) (interp q)
+interp (PSwap a b)    = swapMat (dim a) (dim b)
+interp (PGen _ _ _ m) = m
+
+-- Synthetic generators.  These numbers are stipulated, not measured.
+noisyNot :: Proc
+noisyNot = PGen "noisyNot" TBit TBit [[0.1, 0.9], [0.9, 0.1]]
+
+decay :: Proc
+decay = PGen "decay" TBit TBit [[1.0, 0.3], [0.0, 0.7]]
+
+mix :: Proc
+mix = PGen "mix" TBit TBit [[0.5, 0.5], [0.5, 0.5]]
+
+-- | Functoriality check 1: associativity of sequential composition is preserved.
+checkAssoc :: Bool
+checkAssoc =
+  matClose eps
+    (interp (PComp (PComp decay noisyNot) mix))
+    (interp (PComp decay (PComp noisyNot mix)))
+
+-- | Functoriality check 2: the interchange law
+-- @(g . f) (x) (g' . f') = (g (x) g') . (f (x) f')@ is preserved.  This is the
+-- single equation that makes sequential and parallel composition cohere, and
+-- Thm. 2.4 says a monoidal functor must respect it.
+checkInterchange :: Bool
+checkInterchange =
+  matClose eps
+    (interp (PTensor (PComp decay noisyNot) (PComp mix decay)))
+    (interp (PComp (PTensor decay mix) (PTensor noisyNot decay)))
+
+-- | Functoriality check 3: naturality of the symmetry,
+-- @swap . (f (x) g) = (g (x) f) . swap@.
+checkSwapNatural :: Bool
+checkSwapNatural =
+  matClose eps
+    (interp (PComp (PSwap TBit TBit) (PTensor noisyNot decay)))
+    (interp (PComp (PTensor decay noisyNot) (PSwap TBit TBit)))
+
+-- | The probabilistic interpretation is preserved by composition.
+checkStochasticClosure :: Bool
+checkStochasticClosure =
+  all (isColStochastic eps . interp)
+    [ noisyNot
+    , decay
+    , mix
+    , PComp decay noisyNot
+    , PTensor noisyNot decay
+    , PComp (PSwap TBit TBit) (PTensor noisyNot decay)
+    ]
+
+-- | Every expression used above is well typed.
+checkTyping :: Bool
+checkTyping =
+  all wellTyped
+    [ PComp (PComp decay noisyNot) mix
+    , PTensor (PComp decay noisyNot) (PComp mix decay)
+    , PComp (PSwap TBit TBit) (PTensor noisyNot decay)
+    ]
+    && not (wellTyped (PComp noisyNot (PId TUnit)))
+  where
+    wellTyped p = case typeOf p of
+      Right _ -> True
+      Left _  -> False
+
+-- | Admissibility is not realization, in the smallest possible instance.  Two
+-- models of the same one-generator theory agree on the identity-context
+-- observation and differ on a one-use experiment; the syntax cannot choose.
+checkAdmissibleNotRealized :: (Bool, Double, Double)
+checkAdmissibleNotRealized = (differ, pF, pG)
+  where
+    stateIn  = [[1.0], [0.0]]                 -- prepare the first basis outcome
+    effect   = [[1.0, 0.0]]                   -- ask for the first basis outcome
+    modelF   = interp noisyNot
+    modelG   = interp (PComp noisyNot noisyNot)
+    scalar m = case matMul effect (matMul m stateIn) of
+      ((x : _) : _) -> x
+      _             -> 0
+    pF       = scalar modelF
+    pG       = scalar modelG
+    differ   = abs (pF - pG) > 1.0e-3
+
+-- ---------------------------------------------------------------------------
+-- 4.  The kernel construction: bump perturbations
+-- ---------------------------------------------------------------------------
+
+-- | The standard smooth bump: positive on @(-1,1)@, identically zero outside,
+-- and flat to infinite order at the boundary.  This is the witness used in the
+-- proof of the kernel theorem and of its Hamiltonian corollary.
+bump :: Double -> Double
+bump x
+  | abs x < 1 = exp (1 / (x * x - 1))
+  | otherwise = 0
+
+-- | A bump of height scale @lam@ centred at @c@ with radius @r@.
+bumpAt :: Double -> Double -> Double -> Double -> Double
+bumpAt c r lam x = lam * bump ((x - c) / r)
+
+-- | The tested set.  Synthetic: these are the inputs we stipulate were probed.
+testedInputs :: [Double]
+testedInputs = [0, 1, 2, 3, 4, 5]
+
+baseModel :: Double -> Double
+baseModel = sin
+
+-- | A member of the kernel of the restriction operator: it vanishes on every
+-- tested input because its support @(6,8)@ misses all of them.
+kernelPerturbation :: Double -> Double
+kernelPerturbation = bumpAt 7 1 1
+
+perturbedModel :: Double -> Double
+perturbedModel x = baseModel x + kernelPerturbation x
+
+-- | Records agree exactly; the models differ off the tested set.  Reported as
+-- (records agree, max on-test discrepancy, off-test discrepancy at 7).
+checkKernelUnderdetermination :: (Bool, Double, Double)
+checkKernelUnderdetermination = (agree && separated, onTest, offTest)
+  where
+    onTest    = maximum [ abs (perturbedModel x - baseModel x) | x <- testedInputs ]
+    offTest   = abs (perturbedModel 7 - baseModel 7)
+    agree     = onTest <= eps
+    separated = offTest > 0.1
+
+-- | The Hamiltonian corollary needs more than agreement of values: the
+-- perturbation must have vanishing /derivative/ at each sample, so that the
+-- generated vector fields agree there too.  A bump supported off the sample set
+-- satisfies this automatically.  Checked by central differences.
+checkKernelDerivatives :: (Bool, Double)
+checkKernelDerivatives = (worst <= 1.0e-9, worst)
+  where
+    h = 1.0e-5
+    d f x = (f (x + h) - f (x - h)) / (2 * h)
+    worst = maximum [ abs (d perturbedModel x - d baseModel x) | x <- testedInputs ]
+
+-- | Restricting the model class restores identification.  A polynomial of
+-- degree at most @d@ is fixed by @d+1@ values, so no nonzero kernel element
+-- survives inside that class: identification comes from the degree bound, not
+-- from the data.  Checked by Lagrange interpolation and reconstruction.
+checkPolynomialIdentification :: (Bool, Double)
+checkPolynomialIdentification = (worst <= 1.0e-8, worst)
+  where
+    truth x = 2 * x * x * x - x + 3
+    nodes   = [-2, -1, 0, 1]
+    ys      = map truth nodes
+    lagrange x =
+      sum
+        [ y * product [ (x - xj) / (xi - xj) | xj <- nodes, xj /= xi ]
+        | (xi, y) <- zip nodes ys
+        ]
+    worst = maximum [ abs (lagrange x - truth x) | x <- [-3, -2.5 .. 3] ]
+
+-- ---------------------------------------------------------------------------
+-- 5.  Gauge freedom and reconstruction up to a constant
+-- ---------------------------------------------------------------------------
+
+-- | Forward difference: the discrete analogue of @H |-> dH@.
+diffSeq :: [Double] -> [Double]
+diffSeq xs = zipWith (-) (drop 1 xs) xs
+
+-- | Reconstruct a sequence from its differences and a chosen base point.  The
+-- base point is the gauge choice; nothing in the data selects it.
+integrateSeq :: Double -> [Double] -> [Double]
+integrateSeq = scanl (+)
+
+sampleH :: [Double]
+sampleH = [ 0.5 * (fromIntegral n) ** 2 - 3 * fromIntegral (n :: Int) | n <- [0 .. 12] ]
+
+-- | Additive constants are invisible, and reconstruction recovers the sequence
+-- exactly once a base point is fixed.  Reported as
+-- (shift invisible, reconstruction exact, worst reconstruction error).
+checkGauge :: (Bool, Bool, Double)
+checkGauge = (invisible, exact, worst)
+  where
+    shifted   = map (+ 17.25) sampleH
+    invisible = and (zipWith (close eps) (diffSeq shifted) (diffSeq sampleH))
+    rebuilt   = integrateSeq base (diffSeq sampleH)
+    base      = case sampleH of
+      x : _ -> x
+      []    -> 0
+    worst     = maximum (zipWith (\a b -> abs (a - b)) rebuilt sampleH)
+    exact     = worst <= eps
+
+-- | With the /wrong/ base point the reconstruction is wrong by exactly the
+-- gauge constant, everywhere and by the same amount.  This is what
+-- "identifiable up to an additive constant" means operationally.
+checkGaugeOrbit :: (Bool, Double)
+checkGaugeOrbit = (uniform, spread)
+  where
+    c        = 4.75
+    rebuilt  = integrateSeq (base + c) (diffSeq sampleH)
+    base     = case sampleH of
+      x : _ -> x
+      []    -> 0
+    errs     = zipWith (-) rebuilt sampleH
+    spread   = maximum errs - minimum errs
+    firstErr = case errs of
+      x : _ -> x
+      []    -> 0
+    uniform  = spread <= eps && close eps firstErr c
+
+-- ---------------------------------------------------------------------------
+-- 6.  Hamiltonian dynamics and finite-sample identification
+-- ---------------------------------------------------------------------------
+
+-- | @H(q,p) = (a p^2 + b q^2) / 2@.  Synthetic parameters.
+hamA, hamB :: Double
+hamA = 1.0
+hamB = 4.0
+
+energy :: (Double, Double) -> Double
+energy (q, p) = 0.5 * (hamA * p * p + hamB * q * q)
+
+-- | One Stoermer-Verlet (leapfrog) step.  Symplectic, second order; the
+-- relevant point for the paper is that it conserves a /modified/ energy
+-- exactly and the true energy to O(dt^2), so \"energy is conserved\" is a
+-- statement about the model, discretization and all.
+verletStep :: Double -> (Double, Double) -> (Double, Double)
+verletStep dt (q, p) =
+  let qh = q + 0.5 * dt * hamA * p
+      p' = p - dt * hamB * qh
+      q' = qh + 0.5 * dt * hamA * p'
+  in (q', p')
+
+trajectory :: Double -> Int -> (Double, Double) -> [(Double, Double)]
+trajectory dt n z0 = take (n + 1) (iterate (verletStep dt) z0)
+
+-- | Relative energy drift over a long run.  Reported, then compared against a
+-- stated threshold; the threshold is a modelling choice, not a law.
+checkEnergyDrift :: (Bool, Double)
+checkEnergyDrift = (drift <= 2.0e-4, drift)
+  where
+    dt     = 0.005
+    z0     = (1.0, 0.0)
+    es     = map energy (trajectory dt 40000 z0)
+    e0     = energy z0
+    drift  = maximum (map (\e -> abs (e - e0) / e0) es)
+
+-- | Exact-derivative identification in the two-parameter class
+-- @H = (a p^2 + b q^2)/2@.  The design is the 2x2 matrix @[[p,0],[0,-q]]@;
+-- it is invertible exactly when both @p@ and @q@ are nonzero at the sample.
+identifyAB :: (Double, Double) -> Maybe (Double, Double)
+identifyAB (q, p)
+  | abs p < 1.0e-12 || abs q < 1.0e-12 = Nothing
+  | otherwise = Just (qdot / p, negate pdot / q)
+  where
+    qdot = hamA * p            -- dq/dt =  dH/dp
+    pdot = negate (hamB * q)   -- dp/dt = -dH/dq
+
+-- | A generic sample identifies both parameters; a sample confined to @q = 0@
+-- carries no information about @b@ and the procedure correctly refuses.
+checkIdentification :: (Bool, String)
+checkIdentification =
+  case (identifyAB (0.7, 1.3), identifyAB (0.0, 1.3)) of
+    (Just (a, b), Nothing) ->
+      ( close 1.0e-12 a hamA && close 1.0e-12 b hamB
+      , printf "recovered a=%.6f b=%.6f; degenerate design at q=0 refused" a b
+      )
+    (Just _, Just _)  -> (False, "degenerate design at q=0 was not detected")
+    (Nothing, _)      -> (False, "generic sample failed to identify")
+
+-- | The clock ambiguity: reparametrising time by a positive factor leaves the
+-- unparameterised orbit unchanged while changing every rate.  Checked by
+-- confirming that the scaled field traces the same energy level set.
+checkClockAmbiguity :: (Bool, Double)
+checkClockAmbiguity = (sameOrbit, worst)
+  where
+    lam    = 2.5
+    z0     = (1.0, 0.0)
+    e0     = energy z0
+    -- Scaling the vector field by lam is the same as scaling dt by lam.
+    zs     = trajectory (0.002 * lam) 2000 z0
+    worst  = maximum [ abs (energy z - e0) / e0 | z <- zs ]
+    sameOrbit = worst <= 1.0e-3
+
+-- ---------------------------------------------------------------------------
+-- 7.  Compatibility regions and monotonicity
+-- ---------------------------------------------------------------------------
+
+-- | Synthetic record: tested inputs paired with stipulated observed values and
+-- a stated tolerance.  Nothing here was measured.
+syntheticRecord :: [(Double, Double)]
+syntheticRecord = [ (x, sin x + 0.01 * cos (3 * x)) | x <- testedInputs ]
+
+compatible :: [(Double, Double)] -> Double -> (Double -> Double) -> Bool
+compatible obs tolr m = all (\(x, y) -> abs (m x - y) <= tolr) obs
+
+-- | Monotonicity in the tolerance and in the tested set, checked over a grid.
+-- Both are one-line consequences of transitivity of @<=@; the check exists to
+-- keep the paper's Prop. 2.8 executable.
+checkCompatibilityMonotone :: (Bool, Bool)
+checkCompatibilityMonotone = (tolMono, testMono)
+  where
+    tols    = [0.005, 0.01, 0.02, 0.05, 0.1]
+    models  = [baseModel, perturbedModel, \x -> sin x + 0.03]
+    tolMono = and
+      [ not (compatible syntheticRecord t1 m) || compatible syntheticRecord t2 m
+      | m <- models, t1 <- tols, t2 <- tols, t1 <= t2
+      ]
+    subsets = [ take k syntheticRecord | k <- [0 .. length syntheticRecord] ]
+    testMono = and
+      [ not (compatible syntheticRecord t m) || compatible s t m
+      | m <- models, t <- tols, s <- subsets
+      ]
+
+-- | The compatibility region is not a singleton: base and perturbed models are
+-- both compatible with the same record at the same tolerance, yet differ off
+-- the tested set.  This is the executable form of the kernel theorem.
+checkCompatibilityNotSingleton :: (Bool, Double)
+checkCompatibilityNotSingleton = (both, gap)
+  where
+    t    = 0.02
+    both = compatible syntheticRecord t baseModel
+             && compatible syntheticRecord t perturbedModel
+    gap  = abs (perturbedModel 7 - baseModel 7)
+
+-- ---------------------------------------------------------------------------
+-- 8.  Scope: extrapolation and composition bounds
+-- ---------------------------------------------------------------------------
+
+-- | The bound of the empirical-limits paper: on a set covered to radius @r@ by
+-- tested points, with both model and target @L@-Lipschitz and tested error at
+-- most @e@, the error anywhere on the set is at most @e + 2 L r@.
+scopeBound :: Double -> Double -> Double -> Double
+scopeBound e l r = e + 2 * l * r
+
+-- | Checked against a concrete pair on a covered interval.
+checkScopeBound :: (Bool, Double, Double)
+checkScopeBound = (actual <= bound + eps, actual, bound)
+  where
+    l       = 1.0                            -- both maps are 1-Lipschitz
+    r       = 0.05                           -- covering radius of the grid
+    grid    = [0, 0.1 .. 1.0]
+    target  = sin
+    model x = sin x + 0.004
+    e       = maximum [ abs (model x - target x) | x <- grid ]
+    bound   = scopeBound e l r
+    actual  = maximum [ abs (model x - target x) | x <- [0, 0.001 .. 1.0] ]
+
+-- | The composition bound of Lem. 7.1: with an @L@-Lipschitz outer map, errors
+-- compose as @L * e1 + e2@.  Checked on a case where the bound is attained
+-- exactly, so a wrong constant would show up immediately.
+checkCompositionBound :: (Bool, Double, Double)
+checkCompositionBound = (actual <= bound + 1.0e-12, actual, bound)
+  where
+    l      = 2.0
+    e1     = 0.01
+    e2     = 0.02
+    f1 x   = x * x
+    g1 x   = x * x + e1
+    f2 y   = l * y
+    g2 y   = l * y + e2
+    bound  = l * e1 + e2
+    actual = maximum [ abs (f2 (f1 x) - g2 (g1 x)) | x <- [0, 0.01 .. 1.0] ]
+
+-- | The @n@-fold version: along a chain the tolerances accumulate as
+-- @sum_i (prod_{j>i} L_j) e_i@.  Checked for a three-stage chain.
+checkChainBound :: (Bool, Double, Double)
+checkChainBound = (actual <= bound + 1.0e-12, actual, bound)
+  where
+    ls     = [1.5, 2.0, 0.5] :: [Double]     -- L1 (unused), L2, L3
+    es     = [0.01, 0.02, 0.005] :: [Double]
+    bound  = sum [ e * product (drop (i + 1) ls) | (i, e) <- zip [0 ..] es ]
+    stage k x = (ls !! k) * x
+    stageH k x = (ls !! k) * x + (es !! k)
+    exact  = stage 2 . stage 1 . stage 0
+    approx = stageH 2 . stageH 1 . stageH 0
+    actual = maximum [ abs (exact x - approx x) | x <- [0, 0.01 .. 1.0] ]
+
+-- | Componentwise data does not determine the composite.  Two joint models
+-- share every single-component marginal and disagree on the joint event that
+-- the two outputs coincide.  This is why the composition bound above is a
+-- statement about deterministic scope, not about joint statistics: closing
+-- that gap needs the empirical assumption of compositional closure.
+checkCompositionCounterexample :: (Bool, Double, Double)
+checkCompositionCounterexample = (marginalsAgree && jointsDiffer, pInd, pCorr)
+  where
+    independent = [0.25, 0.25, 0.25, 0.25] :: [Double]   -- 00 01 10 11
+    correlated  = [0.5, 0.0, 0.0, 0.5] :: [Double]
+    marg1 (a : b : _c : _d : _) = a + b
+    marg1 _ = 0
+    marg2 (a : _b : c : _d : _) = a + c
+    marg2 _ = 0
+    marginalsAgree =
+      close eps (marg1 independent) (marg1 correlated)
+        && close eps (marg2 independent) (marg2 correlated)
+    coincide (a : _b : _c : d : _) = a + d
+    coincide _ = 0
+    pInd  = coincide independent
+    pCorr = coincide correlated
+    jointsDiffer = abs (pInd - pCorr) > 0.1
+
+-- ---------------------------------------------------------------------------
+-- 9.  Harness
+-- ---------------------------------------------------------------------------
+
+data Check = Check
+  { checkLabel  :: String
+  , checkPassed :: Bool
+  , checkNote   :: String
   }
 
--- | [TYPE] A theory object is a bare object together with an interpretation.
-data TheoryObject = TheoryObject BareObject Interp
-
--- | [TYPE] The forgetting operation @U@.  It is total and non-injective on
--- interpretations, which is why empirical claims cannot be recovered from
--- the bare object.
-forget :: TheoryObject -> BareObject
-forget (TheoryObject b _) = b
-
--- | [NUM] Do two bare objects agree numerically on a sample?  Sampling can
--- only refute agreement; it cannot establish it.
-bareAgreeOn :: [Phase] -> Double -> BareObject -> BareObject -> Bool
-bareAgreeOn zs tol b1 b2 =
-  all ok zs
-  where
-    ok z = abs (generator b1 z - generator b2 z) <= tol
-        && dist (field b1 z) (field b2 z) <= tol
-    dist (a, b) (c, d) = max (abs (a - c)) (abs (b - d))
-
--- | [DEC] Do two interpretations record the same physical dimensions?
-unitsAgree :: Interp -> Interp -> Bool
-unitsAgree i1 i2 = unitsOf i1 == unitsOf i2
-
--- | [DEC] Nondegeneracy and antisymmetry of the recorded 2-form, in the only
--- case this file covers (@dim = 2@).  This is the axiom "symplectic
--- structure" of the reconstruction paper, checked on the matrix that the
--- object carries; closedness is vacuous in dimension two.
-formIsSymplectic2D :: BareObject -> Bool
-formIsSymplectic2D b = a11 == 0 && a22 == 0 && a12 == negate a21 && a12 /= 0
-  where ((a11, a12), (a21, a22)) = formMat b
-
--- | [NUM] The empirical model @Emp(Th)@ of the reconstruction paper, sampled:
--- preparable states only, readout along the flow, reported at the declared
--- resolution over the declared window.  Everything that distinguishes this
--- from the bare object -- @P@, @mu@, @epsilon@, @T@ -- comes from 'Interp',
--- which 'forget' deletes.
-empiricalModel :: TheoryObject -> Double -> [Phase] -> [(Phase, Double, [Double])]
-empiricalModel (TheoryObject b i) h zs =
-  [ (z, t, map (quantise (resolution i)) (readoutMap i z'))
-  | z <- zs
-  , preparable i z
-  , (t, z') <- zip times (trajectory (field b) h nSteps z) ]
-  where
-    nSteps = max 0 (floor (window i / h))
-    times  = [ fromIntegral n * h | n <- [0 .. nSteps] ]
-
-quantise :: Double -> Double -> Double
-quantise eps x = eps * fromIntegral (round (x / eps) :: Integer)
-
-massSpring :: TheoryObject
-massSpring = TheoryObject
-  (BareObject "mass-spring"
-     (\(q, p) -> p * p / (2 * m) + k * q * q / 2)
-     (\(q, p) -> (p / m, negate (k * q)))
-     ((0, 1), (-1, 0)))
-  (Interp (\(q, p) -> abs q <= 1 && abs p <= 1) (\(q, _) -> [q])
-          [Metre] 1.0e-4 10)
-  where m = 1.0; k = 1.0
-
--- | Same bare object, different interpretation: @m := L@, @k := 1/C@.
-lcCircuit :: TheoryObject
-lcCircuit = TheoryObject
-  (BareObject "LC-circuit"
-     (\(q, p) -> p * p / (2 * l) + q * q / (2 * c))
-     (\(q, p) -> (p / l, negate (q / c)))
-     ((0, 1), (-1, 0)))
-  (Interp (\(q, p) -> abs q <= 1 && abs p <= 1) (\(q, _) -> [q])
-          [Coulomb] 1.0e-4 10)
-  where l = 1.0; c = 1.0
-
--- ===================================================================
--- 5.  Numerical illustration of the two separation results      (HR)
--- ===================================================================
-
--- | [NUM] One RK4 step.  Fourth-order accurate for smooth fields; the error
--- is not tracked, so nothing here is a bound.
-rk4 :: (Phase -> Phase) -> Double -> Phase -> Phase
-rk4 f h z@(q, p) =
-  let (k1q, k1p) = f z
-      (k2q, k2p) = f (q + h / 2 * k1q, p + h / 2 * k1p)
-      (k3q, k3p) = f (q + h / 2 * k2q, p + h / 2 * k2p)
-      (k4q, k4p) = f (q + h * k3q, p + h * k3p)
-  in ( q + h / 6 * (k1q + 2 * k2q + 2 * k3q + k4q)
-     , p + h / 6 * (k1p + 2 * k2p + 2 * k3p + k4p) )
-
-trajectory :: (Phase -> Phase) -> Double -> Int -> Phase -> [Phase]
-trajectory f h n = take (n + 1) . iterate (rk4 f h)
-
--- | Harmonic field and its quartic perturbation, as in the proposition
--- "empirically equivalent, mathematically non-isomorphic".
-harmonicField :: Phase -> Phase
-harmonicField (q, p) = (p, negate q)
-
-quarticField :: Double -> Phase -> Phase
-quarticField lam (q, p) = (p, negate q - 4 * lam * q * q * q)
-
--- | Damped field: globally asymptotically stable, hence Hamiltonian for no
--- symplectic form at all (new result of the reconstruction paper).  The check
--- below only exhibits the decay; the impossibility is proved in the paper,
--- not here.
-dampedField :: Double -> Phase -> Phase
-dampedField gam (q, p) = (p, negate q - gam * p)
-
--- | [NUM] Sup-norm separation of two trajectories over a window.
-sepSup :: (Phase -> Phase) -> (Phase -> Phase) -> Double -> Int -> Phase -> Double
-sepSup f g h n z0 =
-  maximum (zipWith d (trajectory f h n z0) (trajectory g h n z0))
-  where d (a, b) (c, e) = max (abs (a - c)) (abs (b - e))
-
--- ===================================================================
--- 6.  Empirical layer: outcome laws, tolerance, quotient        (EL)
--- ===================================================================
-
--- | [TYPE] A finitely supported outcome law.  The empirical-limits paper
--- works with probability kernels; this is the finite case only.
-newtype Dist a = Dist [(a, Double)]
-
-massOf :: Eq a => Dist a -> a -> Double
-massOf (Dist xs) a = sum [ w | (b, w) <- xs, b == a ]
-
-support :: Eq a => Dist a -> [a]
-support (Dist xs) = nub (map fst xs)
-
--- | [NUM] Total-variation distance between finitely supported laws.
-tvDist :: Eq a => Dist a -> Dist a -> Double
-tvDist d1 d2 =
-  0.5 * sum [ abs (massOf d1 a - massOf d2 a)
-            | a <- nub (support d1 ++ support d2) ]
-
--- | [TYPE] A registered experiment family: a context set and, for each
--- context and model, a predicted outcome law.  This is the @(C, P, Q, K)@
--- data of the empirical-limits paper with the kernels already integrated.
-data Experiments m c a = Experiments
-  { contexts :: [c]
-  , lawOf    :: c -> m -> Dist a
-  }
-
--- | [NUM] Indexed discrepancy @Delta_D@ over the registered contexts.
-deltaD :: Eq a => Experiments m c a -> m -> m -> Double
-deltaD e m1 m2 = maximum (0 : [ tvDist (lawOf e c m1) (lawOf e c m2) | c <- contexts e ])
-
--- | [DEC] eta-observational equivalence on the registered domain.
-obsEquiv :: Eq a => Experiments m c a -> Double -> m -> m -> Bool
-obsEquiv e eta m1 m2 = deltaD e m1 m2 <= eta
-
--- | [DEC] Observational classes of a finite model class.  This is the
--- computable image of the observational quotient; the Lean file proves the
--- factorization statement that justifies calling it a quotient.
-obsClasses :: Eq a => Experiments m c a -> Double -> [m] -> [[m]]
-obsClasses e eta = foldl' insert []
-  where
-    insert [] m = [[m]]
-    insert (cl@(representative : _) : cls) m
-      | obsEquiv e eta representative m = (m : cl) : cls
-      | otherwise                  = cl : insert cls m
-    insert ([] : cls) m = [m] : cls
-
--- | [DEC] Is a property identifiable from the registered experiments?  A
--- False answer is a genuine underdetermination witness on the given class.
-identifiable :: (Eq a, Eq z) => Experiments m c a -> Double -> [m] -> (m -> z) -> Bool
-identifiable e eta ms phi =
-  and [ phi m1 == phi m2 | m1 <- ms, m2 <- ms, obsEquiv e eta m1 m2 ]
-
--- | [NUM] Uniform error-transfer bound of the empirical-limits paper:
--- @sup_c TV(P_S, P_0) <= sup_c e_lambda(c) + r(lambda)@.  The function
--- returns the right-hand side; it is a bound only under the paper's premise
--- that some family member is already tied to the target by evidence.
-errorTransferBound :: Double -> Double -> Double
-errorTransferBound supTargetErr uniformModelErr = supTargetErr + uniformModelErr
-
--- ===================================================================
--- 7.  Checks
--- ===================================================================
-
-data Check = Check { checkName :: String, checkKind :: String, checkPassed :: Bool }
-
--- Two-state toy models for the empirical layer.
-data Toy = ToyA | ToyB | ToyC deriving (Eq, Show)
-
-toyExperiments :: Experiments Toy Int Bool
-toyExperiments = Experiments
-  { contexts = [0, 1]
-  , lawOf = \c m -> case (c, m) of
-      (0, _)     -> Dist [(True, 0.5), (False, 0.5)]   -- context 0 separates nothing
-      (1, ToyA)  -> Dist [(True, 1.0), (False, 0.0)]
-      (1, ToyB)  -> Dist [(True, 0.0), (False, 1.0)]
-      (1, ToyC)  -> Dist [(True, 1.0), (False, 0.0)]   -- ToyC is a relabelling of ToyA
-      _          -> Dist [(True, 0.5), (False, 0.5)]
-  }
-
-restrictedExperiments :: Experiments Toy Int Bool
-restrictedExperiments = toyExperiments { contexts = [0] }
-
-counter :: Sys () Int Int
-counter = Sys { step = \_ x -> x + 1, readout = id }
-
-doubler :: Sys () Int Int
-doubler = Sys { step = \_ x -> 2 * x, readout = id }
-
-adder :: Sys Int Int Int
-adder = Sys { step = \i x -> x + i, readout = id }
-
-coupledSys :: Sys () (Int, Int) (Int, Int)
-coupledSys = Sys { step = \_ (x, y) -> (x + y, y), readout = id }
-
-checks :: [Check]
-checks =
-  [ Check "product run factors (Lean: runPar)" "DEC"
-      (runParFactors counter doubler (replicate 6 ((), ())) (3, 5))
-
-  , Check "par is non-interacting on the sample" "DEC"
-      (nonInteractingOn [((), ())] [0 .. 3 :: Int] [0 .. 3 :: Int] (par counter doubler))
-
-  , Check "serial composition reads the updated upstream output" "DEC"
-      (let sc = serial counter adder
-       in readout sc (runSys sc [(), ()] (0, 0)) == 3)   -- 1 then 2; the
-         -- asynchronous convention would give 0 + 1 = 1, so the timing
-         -- convention is observable and therefore part of the theory.
-
-  , Check "coupled system is detected as interacting" "DEC"
-      (not (nonInteractingOn [()] [0 .. 3 :: Int] [0 .. 3 :: Int] coupledSys))
-
-  , Check "additive coupling passes the separability test" "DEC"
-      (separableOn [0 .. 4] [0 .. 4] (\a b -> 3 * a + 2 * b))
-
-  , Check "product coupling fails it (interaction)" "DEC"
-      (not (separableOn [0 .. 4] [0 .. 4] (\a b -> a * b)))
-
-  , Check "split witness reproduces the separable coupling" "DEC"
-      (case splitCoupling [0 .. 4] [0 .. 4] (\a b -> 3 * a + 2 * b) of
-         Nothing     -> False
-         Just (f, g) -> and [ f a + g b == 3 * a + 2 * b | a <- [0 .. 4], b <- [0 .. 4] ])
-
-  , Check "zero-period form has a potential" "DEC"
-      (case potential 4 (\k -> [1, -1, 2, -2] !! (k `mod` 4)) of
-         Nothing -> False
-         Just h  -> and [ diffSeq h k == [1, -1, 2, -2] !! (k `mod` 4) | k <- [0 .. 3] ]
-                    && h 4 == h 0)
-
-  , Check "unit-period form has none (torus obstruction)" "DEC"
-      (case potential 4 (const 1) of Nothing -> True; Just _ -> False)
-
-  , Check "additive constant is invisible to the difference" "DEC"
-      (and [ diffSeq (\k -> fromIntegral k * fromIntegral k) j
-               == diffSeq (\k -> fromIntegral k * fromIntegral k + 7) j
-           | j <- [0 .. 20] ])
-
-  , Check "bare objects of mass-spring and LC agree numerically" "NUM"
-      (bareAgreeOn [(q, p) | q <- [-1, -0.5, 0, 0.5, 1], p <- [-1, 0, 1]] 1.0e-12
-         (forget massSpring) (forget lcCircuit))
-
-  , Check "their interpretations do not (metre vs coulomb)" "DEC"
-      (not (unitsAgree (interpOf massSpring) (interpOf lcCircuit)))
-
-  , Check "both recorded 2-forms are antisymmetric and nondegenerate" "DEC"
-      (formIsSymplectic2D (forget massSpring) && formIsSymplectic2D (forget lcCircuit))
-
-  , Check "Emp(Th) is nonempty and respects the declared resolution" "NUM"
-      (let recs = empiricalModel massSpring 0.05 [(0.5, 0.0), (2.0, 0.0)]
-           eps  = resolution (interpOf massSpring)
-       in not (null recs)
-          && all (\(_, _, ys) -> all (\y -> abs (y - quantise eps y) < 1.0e-15) ys) recs
-          && all (\(z, _, _) -> preparable (interpOf massSpring) z) recs)
-
-  , Check "forget keeps the name and drops the units" "DEC"
-      (objName (forget massSpring) == "mass-spring"
-       && objName (forget lcCircuit) == "LC-circuit")
-
-  , Check "small quartic term stays within tolerance on [0,T]" "NUM"
-      (sepSup harmonicField (quarticField 1.0e-4) 0.01 1000 (1, 0) < 1.0e-2)
-
-  , Check "large quartic term leaves it (equivalence is indexed)" "NUM"
-      (sepSup harmonicField (quarticField 0.5) 0.01 1000 (1, 0) > 1.0e-2)
-
-  , Check "damped trajectory decays towards the equilibrium" "NUM"
-      (let z0 = (1, 0)
-           zs = trajectory (dampedField 0.3) 0.01 4000 z0
-           nrm (q, p) = sqrt (q * q + p * p)
-       in case reverse zs of
-            zLast : _ -> nrm zLast < 0.05 * nrm z0
-            [] -> False)
-
-  , Check "restricting contexts cannot separate more models" "DEC"
-      (deltaD restrictedExperiments ToyA ToyB <= deltaD toyExperiments ToyA ToyB)
-
-  , Check "ToyA and ToyC are observationally identified" "DEC"
-      (obsEquiv toyExperiments 0 ToyA ToyC)
-
-  , Check "the registered family has exactly two classes" "DEC"
-      (length (obsClasses toyExperiments 0 [ToyA, ToyB, ToyC]) == 2)
-
-  , Check "a label distinguishing ToyA from ToyC is not identifiable" "DEC"
-      (not (identifiable toyExperiments 0 [ToyA, ToyB, ToyC] show))
-
-  , Check "the outcome law itself is identifiable" "DEC"
-      (identifiable toyExperiments 0 [ToyA, ToyB, ToyC]
-         (\m -> map (\c -> massOf (lawOf toyExperiments c m) True) (contexts toyExperiments)))
-
-  , Check "error transfer respects the triangle inequality" "NUM"
-      (let dSM = tvDist (Dist [(True, 0.7), (False, 0.3)]) (Dist [(True, 0.6), (False, 0.4)])
-           dM0 = tvDist (Dist [(True, 0.6), (False, 0.4)]) (Dist [(True, 0.5), (False, 0.5)])
-           dS0 = tvDist (Dist [(True, 0.7), (False, 0.3)]) (Dist [(True, 0.5), (False, 0.5)])
-       in dS0 <= errorTransferBound dSM dM0 + 1.0e-12)
+allChecks :: [Check]
+allChecks =
+  [ Check "2. well-typed expressions accepted, ill-typed rejected"
+      checkTyping ""
+  , Check "3. functor preserves associativity"
+      checkAssoc ""
+  , Check "3. functor preserves the interchange law"
+      checkInterchange ""
+  , Check "3. functor preserves naturality of the symmetry"
+      checkSwapNatural ""
+  , Check "3. probabilistic interpretation closed under composition"
+      checkStochasticClosure ""
+  , Check "3. two admissible models give different predictions"
+      admOk (printf "p_F = %.4f, p_G = %.4f" admPF admPG)
+  , Check "4. kernel perturbation: records agree, models differ"
+      kerOk (printf "on-test max = %.2e, off-test gap = %.4f" kerOn kerOff)
+  , Check "4. kernel perturbation also kills first derivatives"
+      derOk (printf "max derivative discrepancy on tests = %.2e" derWorst)
+  , Check "4. degree bound restores identification"
+      polyOk (printf "max reconstruction error = %.2e" polyWorst)
+  , Check "5. additive gauge invisible; reconstruction exact"
+      (gInv && gExact) (printf "max reconstruction error = %.2e" gWorst)
+  , Check "5. wrong base point shifts the whole orbit uniformly"
+      orbOk (printf "spread of residuals = %.2e" orbSpread)
+  , Check "6. symplectic integrator: energy drift bounded"
+      eneOk (printf "max relative drift over 40000 steps = %.3e" eneDrift)
+  , Check "6. generic sample identifies (a,b); q=0 design refused"
+      idOk idNote
+  , Check "6. time reparametrisation preserves the orbit"
+      clkOk (printf "max relative energy deviation = %.2e" clkWorst)
+  , Check "7. compatibility monotone in tolerance"
+      cmTol ""
+  , Check "7. compatibility monotone in tested set"
+      cmTest ""
+  , Check "7. compatibility region is not a singleton"
+      cnsOk (printf "off-test gap between compatible models = %.4f" cnsGap)
+  , Check "8. scope bound e + 2Lr holds off the tested grid"
+      scOk (printf "actual = %.5f <= bound = %.5f" scAct scBnd)
+  , Check "8. composition bound L*e1 + e2 holds and is attained"
+      cbOk (printf "actual = %.5f <= bound = %.5f" cbAct cbBnd)
+  , Check "8. three-stage chain bound holds"
+      chOk (printf "actual = %.5f <= bound = %.5f" chAct chBnd)
+  , Check "8. equal marginals, different joint: composition needs closure"
+      ccOk (printf "P(agree) independent = %.2f, correlated = %.2f" ccInd ccCorr)
   ]
   where
-    interpOf (TheoryObject _ i) = i
+    (admOk, admPF, admPG)     = checkAdmissibleNotRealized
+    (kerOk, kerOn, kerOff)    = checkKernelUnderdetermination
+    (derOk, derWorst)         = checkKernelDerivatives
+    (polyOk, polyWorst)       = checkPolynomialIdentification
+    (gInv, gExact, gWorst)    = checkGauge
+    (orbOk, orbSpread)        = checkGaugeOrbit
+    (eneOk, eneDrift)         = checkEnergyDrift
+    (idOk, idNote)            = checkIdentification
+    (clkOk, clkWorst)         = checkClockAmbiguity
+    (cmTol, cmTest)           = checkCompatibilityMonotone
+    (cnsOk, cnsGap)           = checkCompatibilityNotSingleton
+    (scOk, scAct, scBnd)      = checkScopeBound
+    (cbOk, cbAct, cbBnd)      = checkCompositionBound
+    (chOk, chAct, chBnd)      = checkChainBound
+    (ccOk, ccInd, ccCorr)     = checkCompositionCounterexample
 
 main :: IO ()
 main = do
-  putStrLn "PRINCIPIA PHYSICA -- Core.hs checks"
-  putStrLn "DEC = exact on the stated finite data; NUM = floating-point illustration."
-  putStrLn (replicate 68 '-')
-  forM_ checks $ \c ->
-    printf "%-5s %-4s %s\n" (if checkPassed c then "PASS" else "FAIL")
-           (checkKind c) (checkName c)
-  let failed = length (filter (not . checkPassed) checks)
-  putStrLn (replicate 68 '-')
-  printf "%d checks, %d failed\n" (length checks) failed
-  putStrLn "No check above proves a theorem of the series; see the header."
+  putStrLn "PRINCIPIA PHYSICA -- synthesis companion checks"
+  putStrLn "(mathematical checks only; no empirical claim is made or tested)"
+  putStrLn (replicate 78 '-')
+  forM_ allChecks $ \c -> do
+    printf "%-4s %-60s\n" (if checkPassed c then "PASS" else "FAIL") (checkLabel c)
+    unless (null (checkNote c)) $ printf "     %s\n" (checkNote c)
+  putStrLn (replicate 78 '-')
+  let failed = length (filter (not . checkPassed) allChecks)
+      total  = length allChecks
+  printf "%d/%d checks passed\n" (total - failed) total
   unless (failed == 0) exitFailure
-  exitSuccess

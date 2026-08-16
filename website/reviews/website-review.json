@@ -1,20 +1,23 @@
 {
-  "schema": "principia.website-review.v1",
-  "review_round": 2,
-  "reviewed": "website/index.html",
+  "schema": "principia-website-self-review.v1",
+  "pass": 2,
+  "reviewed_at": "2026-08-16",
   "verdict": "ACCEPT",
-  "checks": {
-    "content_completeness": "pass",
-    "epistemic_labels": "pass",
-    "formal_scope_disclosure": "pass",
-    "responsive_css_review": "pass",
-    "open_graph_dimensions": "pass",
-    "relative_links": "pass"
-  },
   "findings": [],
   "resolved_findings": [
-    "Created both final website evidence targets and reran the complete relative-link check with no missing targets."
+    {
+      "id": "A11Y-FOCUS-01",
+      "resolution": "Added a high-contrast three-pixel focus-visible outline and four-pixel offset to all links."
+    }
   ],
-  "fix_passes_used": 1,
-  "maximum_fix_passes": 2
+  "checks": {
+    "content_completeness": "pass",
+    "formal_scope_disclosure": "pass",
+    "twelve_epistemic_labels": "pass",
+    "responsive_layout_review": "pass",
+    "semantic_structure_review": "pass",
+    "visual_design_review": "pass",
+    "local_asset_inventory": "pass",
+    "keyboard_focus_review": "pass"
+  }
 }

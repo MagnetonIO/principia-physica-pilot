@@ -1,14 +1,16 @@
 {
-  "schema": "principia.correction-cycle.v1",
-  "review_inputs": ["reviews/topic-series-review.json","reviews/synthesis-review.json"],
-  "correction_passes_used": 2,
-  "maximum_allowed": 2,
-  "resolved_findings": [
-    "Restored the complete reviewed topic papers so each final paper is 6–10 pages and retains its epistemic environments, dependencies, counterexamples, citations, and limitations.",
-    "Corrected SYN-N1: coordinate separation delta(kappa) is distinct from the noiseless total-variation discrepancy, which equals 1 for every nonzero coupling.",
-    "Corrected SYN-I1: the noiseless TV example has no smooth small-error regime; the general error-transfer bound remains explicitly conditional.",
-    "Removed partial list operations and an unused import from Core.hs under the strict GHC warning policy.",
-    "Removed all residual LaTeX build diagnostics without changing claim status."
+  "schema": "principia-publication-recovery-receipt.v1",
+  "task_id": "complete_publication",
+  "review_fix_passes": 2,
+  "topic_review_applied": true,
+  "synthesis_review_applied": true,
+  "corrections": [
+    "Separated categorical compositional models from the linear observation-operator vocabulary.",
+    "Made compositional closure an explicit empirical premise for composite physical realization.",
+    "Retained gauge and Aharonov-Bohm counterexamples and did not infer realization from tensor admissibility.",
+    "Used the proved Hamiltonian existence criterion and labelled finite-data conclusions conditionally.",
+    "Kept unsupported scaling claims conjectural or conditional rather than empirical facts.",
+    "Removed partial-list operations rejected by the strict GHC warning policy."
   ],
-  "final_acceptance": {"latex":true,"page_range":true,"lean":true,"lean_placeholders":false,"haskell_strict":true,"unresolved_errors":0}
+  "acceptance": {"latex_clean":true,"page_range_6_to_10":true,"lean_accepted":true,"lean_placeholders":0,"haskell_strict_accepted":true,"unresolved_verifier_errors":0}
 }

@@ -1,357 +1,321 @@
 /-
   Proofs.lean
-  PRINCIPIA PHYSICA -- formal appendix to
-  "Compositional Realization, Hamiltonian Reconstruction, and Empirical Limits:
-   a synthesis".
+  Machine-checked fragments accompanying
+  "Empirical Realization of Compositional Structure: A Synthesis of the
+   PRINCIPIA PHYSICA Topic Series".
 
-  SCOPE AND EPISTEMIC STATUS (read before using this file).
+  Lean 4 core only.  No Mathlib dependency.
 
-  What this file is: a machine-checked development of DISCRETE SURROGATES of
-  six structural claims of the paper series.  Each theorem below is proved in
-  Lean 4 core (no Mathlib and no proof placeholders or added axioms). The surrogate replaces a
-  smooth manifold by a type, a symplectic form by nothing at all, a vector
-  field by a step function, and de Rham cohomology of the circle by the
-  telescoping sum of a periodic integer sequence.
+  EPISTEMIC STATUS.  Every declaration in this file is a mathematical
+  statement about definitions introduced in this file.  Nothing here
+  asserts, or is capable of asserting, that any model is physically
+  realized.  Realization enters only as a *parameter*: a tested set, an
+  observation operator, a tolerance.  The file is therefore a formalization
+  of the admissibility side of the treatise thesis, and of the precise
+  points at which the admissibility side stops.
 
-  What this file is NOT: it is not a formalization of the smooth theorems of
-  the series.  Nothing here mentions a manifold, a 2-form, or a flow.  A
-  surrogate that checks does not certify the smooth statement; it certifies
-  the combinatorial skeleton that the smooth proof specializes.  Where the
-  correspondence is only an analogy we say so in the comment above the
-  theorem, and Section 6 of the synthesis paper lists what is lost.
-
-  Correspondence table (surrogate  |->  smooth claim in the series):
-    par / runPar          |-> CS-P1, HR prop-product-well-typed  (product is
-                              well typed and the composite run factors)
-    par_nonInteracting,
-    coupled_not_par       |-> HR new-interaction-outside-tensor  (interaction
-                              is outside the range of the monoidal product)
-    separable_iff_noMixedDifference
-                          |-> CS-N1 separation equivalence       (split
-                              dynamics iff additively separable generator)
-    d_add_const,
-    d_determines_upto_const
-                          |-> HR cor-underdetermination          (generator
-                              determined up to an additive constant)
-    cycle_sum_zero_of_potential,
-    potential_of_cycle_sum_zero,
-    no_potential_on_cycle |-> HR thm-exact-sequence, nonex-torus (a closed
-                              form with nonzero period has no global potential)
-    identifiable_iff_factors
-                          |-> EL C2 / observational quotient     (a property
-                              is identifiable iff it factors through the
-                              observational quotient)
-
-  Toolchain: Lean (version 4.33.0).  Build: `lean Proofs.lean` (no imports).
+  Section map (numbers refer to papers/drafts/synthesis.tex):
+    1.  Identifiability and identifiability up to a gauge      (Def. 2.5-2.6)
+    2.  Records, record congruence, the kernel theorem         (Thm. 3.2)
+    3.  Gauge freedom: kernel of a difference operator         (Prop. 4.4)
+    4.  Compatibility regions and monotonicity                 (Prop. 2.8)
+    5.  Propagation of tolerance through composition           (Lem. 7.1)
+    6.  Process theories, models, substitution                 (Lem. 2.2)
+    7.  Admissibility is not realization                       (Interp. 8.1)
 -/
 
 namespace Principia
 
-/-! ############################################################
-    ## 1.  Typed deterministic systems and parallel composition
-    ############################################################
+/-! ###########################################################################
+    ## 1.  Observation operators and identifiability
+    ########################################################################### -/
 
-    Surrogate for the compositional layer of the series.  A system is a
-    step map and a readout; the symplectic structure of the smooth papers
-    has NO counterpart here, which is exactly why nothing below can be read
-    as a statement about Hamiltonian mechanics. -/
+/-- A model class `M` is *identifiable* under the observation operator
+`O : M → D` when the record determines the model.  This is injectivity of `O`,
+stated separately because in the treatise `O` carries the empirical content
+(which experiments were run) while `M` carries the mathematical content. -/
+def Identifiable {M D : Type} (O : M → D) : Prop :=
+  ∀ m n : M, O m = O n → m = n
 
-structure Sys (I S O : Type) where
-  step : I → S → S
-  read : S → O
+/-- Identifiability *up to* an equivalence `R`.  This is the form that actually
+occurs in physics: the record fixes a gauge orbit, not a representative. -/
+def IdentifiableUpTo {M D : Type} (O : M → D) (R : M → M → Prop) : Prop :=
+  ∀ m n : M, O m = O n → R m n
 
-/-- Parallel (monoidal) product: independent inputs, independent states. -/
-def par {I₁ S₁ O₁ I₂ S₂ O₂ : Type}
-    (a : Sys I₁ S₁ O₁) (b : Sys I₂ S₂ O₂) :
-    Sys (I₁ × I₂) (S₁ × S₂) (O₁ × O₂) where
-  step := fun i x => (a.step i.1 x.1, b.step i.2 x.2)
-  read := fun x => (a.read x.1, b.read x.2)
+/-- Identifiability is the special case in which the gauge group is trivial. -/
+theorem identifiableUpTo_eq_iff {M D : Type} (O : M → D) :
+    IdentifiableUpTo O (fun a b => a = b) ↔ Identifiable O := Iff.rfl
 
-/-- Serial composition with the synchronous convention: the second component
-    reads the *updated* output of the first. -/
-def serial {I S O T P : Type} (a : Sys I S O) (b : Sys O T P) :
-    Sys I (S × T) P where
-  step := fun i x =>
-    let s' := a.step i x.1
-    (s', b.step (a.read s') x.2)
-  read := fun x => b.read x.2
+/-- A single confusion refutes identifiability.  This is the schema of every
+underdetermination argument in the series. -/
+theorem not_identifiable_of_confusion {M D : Type} (O : M → D)
+    {m n : M} (hobs : O m = O n) (hne : m ≠ n) : ¬ Identifiable O := by
+  intro hid
+  exact hne (hid m n hobs)
 
-/-- Iterate a system along a finite input word. -/
-def run {I S O : Type} (a : Sys I S O) : List I → S → S
-  | [], x => x
-  | i :: is, x => run a is (a.step i x)
+/-! ###########################################################################
+    ## 2.  Records on a tested set, and the kernel theorem
+    ########################################################################### -/
 
-/-- The run of a product is the pair of the runs: the monoidal product does
-    not create dependence between the factors.  Surrogate of CS-P1 and of
-    HR prop-product-well-typed. -/
-theorem runPar {I₁ S₁ O₁ I₂ S₂ O₂ : Type}
-    (a : Sys I₁ S₁ O₁) (b : Sys I₂ S₂ O₂) :
-    ∀ (is : List (I₁ × I₂)) (x : S₁) (y : S₂),
-      run (par a b) is (x, y)
-        = (run a (is.map Prod.fst) x, run b (is.map Prod.snd) y) := by
-  intro is
-  induction is with
-  | nil => intro x y; rfl
-  | cons i is ih => intro x y; simpa [run, par] using ih (a.step i.1 x) (b.step i.2 y)
+/-- The record produced by evaluating an integer-valued model on a finite list
+of tested inputs.  `T` is the tested set; everything outside `T` is untested by
+construction, which is the whole point. -/
+def record {X : Type} (T : List X) (m : X → Int) : List Int := T.map m
 
-/-- Symmetry (braiding) at the level of runs. -/
-theorem runPar_swap {I₁ S₁ O₁ I₂ S₂ O₂ : Type}
-    (a : Sys I₁ S₁ O₁) (b : Sys I₂ S₂ O₂)
-    (is : List (I₁ × I₂)) (x : S₁) (y : S₂) :
-    run (par b a) (is.map Prod.swap) (y, x)
-      = Prod.swap (run (par a b) is (x, y)) := by
-  rw [runPar, runPar]
-  simp [List.map_map, Function.comp_def]
+/-- Models agreeing pointwise on the tested set produce the same record. -/
+theorem record_congr {X : Type} (m n : X → Int) :
+    ∀ T : List X, (∀ x, x ∈ T → m x = n x) → record T m = record T n := by
+  intro T
+  induction T with
+  | nil => intro _; rfl
+  | cons a t ih =>
+    intro h
+    have ha : m a = n a := h a (List.mem_cons.mpr (Or.inl rfl))
+    have ht : record t m = record t n :=
+      ih (fun x hx => h x (List.mem_cons.mpr (Or.inr hx)))
+    show m a :: record t m = n a :: record t n
+    rw [ha, ht]
 
-/-! ############################################################
-    ## 2.  Interaction is outside the range of the product
-    ############################################################ -/
+/-- **Kernel theorem, finite-record form** (synthesis Thm. 3.2, discrete case).
 
-/-- A system on a product state space is *non-interacting* when the next
-    state of each factor is independent of the other factor's state. -/
-def NonInteracting {I₁ S₁ I₂ S₂ O : Type}
-    (s : Sys (I₁ × I₂) (S₁ × S₂) O) : Prop :=
-  (∀ i x y y', (s.step i (x, y)).1 = (s.step i (x, y')).1) ∧
-  (∀ i x x' y, (s.step i (x, y)).2 = (s.step i (x', y)).2)
+A perturbation `h` that vanishes on the tested set leaves the record unchanged.
+If `h` is nonzero anywhere, the perturbed model is a genuinely different model.
+Hence the record does not identify the model.
 
-theorem par_nonInteracting {I₁ S₁ O₁ I₂ S₂ O₂ : Type}
-    (a : Sys I₁ S₁ O₁) (b : Sys I₂ S₂ O₂) : NonInteracting (par a b) :=
-  ⟨fun _ _ _ _ => rfl, fun _ _ _ _ => rfl⟩
-
-/-- An explicitly coupled system on the same product state space. -/
-def coupled : Sys (Unit × Unit) (Int × Int) (Int × Int) where
-  step := fun _ x => (x.1 + x.2, x.2)
-  read := fun x => x
-
-theorem coupled_interacts : ¬ NonInteracting coupled := by
-  intro h
-  have h0 : ((coupled.step ((), ()) (0, 0)).1) = ((coupled.step ((), ()) (0, 1)).1) :=
-    h.1 ((), ()) 0 0 1
-  simp [coupled] at h0
-
-/-- Surrogate of HR new-interaction-outside-tensor: a coupled system is not
-    equal to any parallel product, so `par` alone cannot express interaction.
-    The smooth theorem is sharper -- it characterises the image of the
-    monoidal product by local constancy of the coupling term -- and is NOT
-    proved here. -/
-theorem coupled_not_par :
-    ¬ ∃ (a b : Sys Unit Int Int), coupled = par a b := by
-  intro h
-  match h with
-  | ⟨a, b, hab⟩ =>
-      exact coupled_interacts (hab ▸ par_nonInteracting a b)
-
-/-! ############################################################
-    ## 3.  Separation equivalence (surrogate of CS-N1)
-    ############################################################
-
-    In the smooth paper, a Hamiltonian vector field on a connected product
-    splits componentwise iff the generator is additively separable up to a
-    constant.  The combinatorial content of "additively separable" is the
-    vanishing of the mixed second difference, and that is what is proved
-    here.  No dynamics is involved. -/
-
-def Separable {α β : Type} (V : α → β → Int) : Prop :=
-  ∃ f : α → Int, ∃ g : β → Int, ∀ a b, V a b = f a + g b
-
-def NoMixedDifference {α β : Type} (V : α → β → Int) : Prop :=
-  ∀ a a' b b', V a b + V a' b' = V a b' + V a' b
-
-theorem separable_iff_noMixedDifference {α β : Type}
-    (V : α → β → Int) (a₀ : α) (b₀ : β) :
-    Separable V ↔ NoMixedDifference V := by
+This is the single mechanism behind claim C4 (Hamiltonians from finite
+trajectory samples) and claim C5 (general finite-data underdetermination) of the
+topic series: both are the statement that a *linear* observation operator has
+nonzero kernel. -/
+theorem underdetermined_of_vanishing_perturbation
+    {X : Type} (T : List X) (m h : X → Int)
+    (hvanish : ∀ x, x ∈ T → h x = 0)
+    (x₀ : X) (hx₀ : h x₀ ≠ 0) :
+    record T (fun x => m x + h x) = record T m ∧ (fun x => m x + h x) ≠ m := by
   constructor
-  · intro hsep a a' b b'
-    match hsep with
-    | ⟨f, g, hV⟩ => simp [hV]; omega
-  · intro hmix
-    refine ⟨fun a => V a b₀, fun b => V a₀ b - V a₀ b₀, ?_⟩
-    intro a b
-    have h := hmix a a₀ b b₀
-    show V a b = V a b₀ + (V a₀ b - V a₀ b₀)
+  · refine record_congr _ _ T (fun x hx => ?_)
+    have hz : h x = 0 := hvanish x hx
+    show m x + h x = m x
     omega
+  · intro hEq
+    have hpt : m x₀ + h x₀ = m x₀ := congrFun hEq x₀
+    exact hx₀ (by omega)
 
-/-- A concrete interacting coupling: `V a b = a * b` is not separable.  This
-    is the discrete counterpart of the interaction potential in the
-    coupled-oscillator counterexample of the compositional-systems paper. -/
-theorem mul_not_separable : ¬ Separable (fun a b : Int => a * b) := by
-  intro h
-  have hmix := (separable_iff_noMixedDifference (fun a b : Int => a * b) 0 0).mp h
-  have := hmix 0 1 0 1
-  simp at this
+/-- Concretely: the zero model on `Nat`. -/
+def m0 : Nat → Int := fun _ => 0
 
-/-! ############################################################
-    ## 4.  The generator is determined up to an additive constant
-    ############################################################
+/-- A discrete "bump" supported entirely off the tested set `[0,1,2,3]`. -/
+def bump7 : Nat → Int := fun n => if n = 7 then 1 else 0
 
-    Surrogate of HR cor-underdetermination.  `d` is the forward difference,
-    standing in for the exterior derivative; a constant is invisible to it,
-    and on the (connected) linear order that is the only ambiguity. -/
+/-- The perturbed model. -/
+def m1 : Nat → Int := fun n => m0 n + bump7 n
 
-def d (H : Nat → Int) (n : Nat) : Int := H (n + 1) - H n
+theorem bump7_vanishes_on_tests : ∀ x, x ∈ [0, 1, 2, 3] → bump7 x = 0 := by
+  decide
 
-theorem d_add_const (H : Nat → Int) (c : Int) : d (fun n => H n + c) = d H := by
+theorem records_agree : record [0, 1, 2, 3] m1 = record [0, 1, 2, 3] m0 := by
+  decide
+
+theorem models_differ_off_tests : m1 7 ≠ m0 7 := by
+  decide
+
+/-- The record operator on this tested set is not identifiable. -/
+theorem record_not_identifiable :
+    ¬ Identifiable (fun m : Nat → Int => record [0, 1, 2, 3] m) := by
+  refine not_identifiable_of_confusion _ (m := m1) (n := m0) records_agree ?_
+  intro hEq
+  exact models_differ_off_tests (congrFun hEq 7)
+
+/-! ###########################################################################
+    ## 3.  Gauge freedom: the kernel of a difference operator is the constants
+    ########################################################################### -/
+
+/-- A discrete analogue of `H ↦ dH`: the forward difference.  The continuous
+statement (a Hamiltonian is determined by its vector field up to an additive
+constant on a connected manifold) is Prop. 4.4 of the synthesis; this is its
+one-dimensional discrete shadow, proved here by induction. -/
+def diff (H : Nat → Int) : Nat → Int := fun n => H (n + 1) - H n
+
+/-- Additive constants are invisible to the difference operator: one half of
+"identifiable exactly up to a constant". -/
+theorem diff_shift (H : Nat → Int) (c : Int) :
+    diff (fun n => H n + c) = diff H := by
   funext n
-  simp [d]
+  show H (n + 1) + c - (H n + c) = H (n + 1) - H n
   omega
 
-theorem d_determines_upto_const (H K : Nat → Int) (h : d H = d K) :
-    ∀ n, H n - K n = H 0 - K 0 := by
+/-- Conversely, equal differences force agreement up to a *single* constant:
+the kernel of `diff` contains nothing beyond the constants.  Together with
+`diff_shift` this pins the gauge group exactly. -/
+theorem eq_add_const_of_diff_eq (H K : Nat → Int) (hd : diff H = diff K) :
+    ∀ n, K n = H n + (K 0 - H 0) := by
   intro n
   induction n with
-  | zero => rfl
-  | succ k ih =>
-      have hk : d H k = d K k := congrFun h k
-      simp [d] at hk
-      omega
-
-/-- Consequently the additive constant is empirically idle for any readout
-    that is a function of the difference alone. -/
-theorem const_invisible (H : Nat → Int) (c : Int) (μ : (Nat → Int) → Prop)
-    (hμ : ∀ F G, d F = d G → (μ F ↔ μ G)) :
-    μ H ↔ μ (fun n => H n + c) :=
-  (hμ H (fun n => H n + c) (d_add_const H c).symm)
-
-/-! ############################################################
-    ## 5.  Periods obstruct a global potential
-    ############################################################
-
-    Surrogate of HR thm-exact-sequence and of the torus non-example.  A
-    "closed one-form" is a sequence `α : Nat → Int` that is `n`-periodic; a
-    "global potential" is an `n`-periodic `H` with `H (k+1) - H k = α k`.
-    The period of the form is the cycle sum `psum α n`, and it is the exact
-    obstruction.  The de Rham cohomology of the smooth statement is replaced
-    by this single integer. -/
-
-def psum (α : Nat → Int) : Nat → Int
-  | 0 => 0
-  | n + 1 => psum α n + α n
-
-def Periodic (n : Nat) (f : Nat → Int) : Prop := ∀ k, f (k + n) = f k
-
-theorem psum_telescope (α H : Nat → Int) (h : ∀ k, H (k + 1) - H k = α k) :
-    ∀ m, psum α m = H m - H 0 := by
-  intro m
-  induction m with
   | zero =>
-      have hz : psum α 0 = 0 := rfl
-      omega
-  | succ k ih =>
-      have hk := h k
-      have hs : psum α (k + 1) = psum α k + α k := rfl
-      omega
-
-/-- Necessity: a global potential forces the period to vanish. -/
-theorem cycle_sum_zero_of_potential (n : Nat) (α H : Nat → Int)
-    (h : ∀ k, H (k + 1) - H k = α k) (hper : Periodic n H) :
-    psum α n = 0 := by
-  have h1 : psum α n = H n - H 0 := psum_telescope α H h n
-  have h2 : H (0 + n) = H 0 := hper 0
-  have h3 : (0 : Nat) + n = n := Nat.zero_add n
-  rw [h3] at h2
-  omega
-
-/-- Sufficiency: if the period vanishes, the partial-sum sequence is a
-    global potential. -/
-theorem potential_of_cycle_sum_zero (n : Nat) (α : Nat → Int)
-    (hα : Periodic n α) (h0 : psum α n = 0) :
-    (∀ k, psum α (k + 1) - psum α k = α k) ∧ Periodic n (psum α) := by
-  constructor
-  · intro k
-    have hs : psum α (k + 1) = psum α k + α k := rfl
+    show K 0 = H 0 + (K 0 - H 0)
     omega
-  · intro k
-    induction k with
-    | zero =>
-        have hz : (0 : Nat) + n = n := Nat.zero_add n
-        rw [hz]
-        exact h0
-    | succ j ih =>
-        have hshift : j + 1 + n = (j + n) + 1 := by omega
-        have hαj : α (j + n) = α j := hα j
-        rw [hshift]
-        simp [psum, ih, hαj]
-
-/-- Nonvacuity: the constant form `1` on an `n`-cycle with `n > 0` has period
-    `n ≠ 0`, hence no global potential.  Discrete counterpart of
-    `ι_X ω = dθ²` on the 2-torus. -/
-theorem psum_one : ∀ n : Nat, psum (fun _ => 1) n = (n : Int) := by
-  intro n
-  induction n with
-  | zero => rfl
   | succ k ih =>
-      have hs : psum (fun _ => (1 : Int)) (k + 1) = psum (fun _ => (1 : Int)) k + 1 := rfl
-      omega
+    have hstep : H (k + 1) - H k = K (k + 1) - K k := congrFun hd k
+    show K (k + 1) = H (k + 1) + (K 0 - H 0)
+    omega
 
-theorem no_potential_on_cycle (n : Nat) (hn : 0 < n) :
-    ¬ ∃ H : Nat → Int, (∀ k, H (k + 1) - H k = 1) ∧ Periodic n H := by
-  intro h
-  match h with
-  | ⟨H, hH, hper⟩ =>
-      have hz : psum (fun _ => 1) n = 0 :=
-        cycle_sum_zero_of_potential n (fun _ => 1) H hH hper
-      have : (n : Int) = 0 := by rw [← psum_one n]; exact hz
-      omega
+/-- The difference operator is identifiable exactly up to an additive constant.
+The empirical content of `H` is its orbit under the additive group, not `H`. -/
+theorem diff_identifiableUpTo_const :
+    IdentifiableUpTo diff (fun H K => ∃ c : Int, ∀ n, K n = H n + c) := by
+  intro H K hd
+  exact ⟨K 0 - H 0, eq_add_const_of_diff_eq H K hd⟩
 
-/-! ############################################################
-    ## 6.  Observational equivalence and identifiability
-    ############################################################
+/-- And it is *not* identifiable on the nose: the gauge orbit is nontrivial. -/
+theorem diff_not_identifiable : ¬ Identifiable diff := by
+  refine not_identifiable_of_confusion diff
+    (m := fun n => (n : Int)) (n := fun n => (n : Int) + 1) ?_ ?_
+  · funext n
+    show (↑(n + 1) : Int) - ↑n = (↑(n + 1) + 1 : Int) - (↑n + 1)
+    omega
+  · intro hEq
+    have h0 : ((0 : Nat) : Int) = ((0 : Nat) : Int) + 1 := congrFun hEq 0
+    omega
 
-    Surrogate of the empirical-limits layer.  Outcome laws are replaced by
-    values in an arbitrary type `O`; total variation, tolerances and the
-    error budget of the paper have NO counterpart here, so nothing below
-    says anything about statistical identification from finite data. -/
+/-! ###########################################################################
+    ## 4.  Compatibility regions and monotonicity
+    ########################################################################### -/
 
-structure Experiments (M C O : Type) where
-  law : C → M → O
+/-- `a` and `b` differ by at most `e`, stated two-sidedly so that all reasoning
+below is linear integer arithmetic. -/
+def Within (e : Int) (a b : Int) : Prop := -e ≤ a - b ∧ a - b ≤ e
 
-def obsEq {M C O : Type} (E : Experiments M C O) (m m' : M) : Prop :=
-  ∀ c, E.law c m = E.law c m'
+/-- A model is compatible with a record at tolerance `δ` when it fits every
+tested input to within `δ`.  Compatibility is weaker than truth: the
+compatibility region generally contains mutually incompatible extrapolations,
+which is exactly `record_not_identifiable` above. -/
+def Compatible {X : Type} (T : List X) (δ : Int) (obs m : X → Int) : Prop :=
+  ∀ x, x ∈ T → Within δ (m x) (obs x)
 
-theorem obsEq_equivalence {M C O : Type} (E : Experiments M C O) :
-    Equivalence (obsEq E) where
-  refl _ := fun _ => rfl
-  symm h := fun c => (h c).symm
-  trans h h' := fun c => (h c).trans (h' c)
+/-- Loosening the tolerance can only enlarge the compatibility region. -/
+theorem compatible_mono_tol {X : Type} (T : List X) (δ δ' : Int) (obs m : X → Int)
+    (hδ : δ ≤ δ') (hc : Compatible T δ obs m) : Compatible T δ' obs m := by
+  intro x hx
+  obtain ⟨h1, h2⟩ := hc x hx
+  exact ⟨by omega, by omega⟩
 
-def obsSetoid {M C O : Type} (E : Experiments M C O) : Setoid M :=
-  ⟨obsEq E, obsEq_equivalence E⟩
+/-- Shrinking the tested set can only enlarge the compatibility region. -/
+theorem compatible_mono_tests {X : Type} (T T' : List X) (δ : Int) (obs m : X → Int)
+    (hsub : ∀ x, x ∈ T' → x ∈ T) (hc : Compatible T δ obs m) :
+    Compatible T' δ obs m :=
+  fun x hx => hc x (hsub x hx)
 
-/-- Restriction monotonicity: reindexing the context set along any map cannot
-    separate models that the larger family already failed to separate.
-    Surrogate of the EL restriction lemma. -/
-theorem obsEq_reindex {M C C' O : Type} (E : Experiments M C O)
-    (f : C' → C) (m m' : M) (h : obsEq E m m') :
-    obsEq (Experiments.mk (fun c' => E.law (f c'))) m m' :=
-  fun c' => h (f c')
+/-! ###########################################################################
+    ## 5.  Propagation of tolerance through composition
+    ########################################################################### -/
 
-def Identifiable {M C O Z : Type} (E : Experiments M C O) (φ : M → Z) : Prop :=
-  ∀ m m', obsEq E m m' → φ m = φ m'
+/-- Tolerances add along a chain. -/
+theorem within_trans (a b c e₁ e₂ : Int)
+    (h₁ : Within e₁ a b) (h₂ : Within e₂ b c) : Within (e₁ + e₂) a c := by
+  obtain ⟨p, q⟩ := h₁
+  obtain ⟨r, s⟩ := h₂
+  exact ⟨by omega, by omega⟩
 
-/-- A property is identifiable exactly when it factors through the
-    observational quotient.  Surrogate of EL C2 and of the factorization
-    limit; the smooth/statistical paper states it for probability laws. -/
-theorem identifiable_iff_factors {M C O Z : Type}
-    (E : Experiments M C O) (φ : M → Z) :
-    Identifiable E φ ↔
-      ∃ ψ : Quotient (obsSetoid E) → Z,
-        ∀ m, φ m = ψ (Quotient.mk (obsSetoid E) m) := by
-  constructor
-  · intro hid
-    exact ⟨Quotient.lift φ hid, fun _ => rfl⟩
-  · intro hfac m m' hmm
-    match hfac with
-    | ⟨ψ, hψ⟩ =>
-        have : Quotient.mk (obsSetoid E) m = Quotient.mk (obsSetoid E) m' :=
-          Quotient.sound hmm
-        rw [hψ m, hψ m', this]
+/-- **Composition bound** (synthesis Lem. 7.1, integer case).
 
-/-- No decision rule reading only the registered outcome laws can separate
-    observationally equivalent models.  Surrogate of the EL corollary. -/
-theorem no_rule_separates {M C O : Type} (E : Experiments M C O)
-    (rule : (C → O) → Bool) (m m' : M) (h : obsEq E m m') :
-    rule (fun c => E.law c m) = rule (fun c => E.law c m') := by
-  have : (fun c => E.law c m) = (fun c => E.law c m') := funext h
-  rw [this]
+If the inner components agree to `e₁`, the outer map carries scale `e₁` to
+scale `d` (a modulus of continuity; in the Lipschitz case `d = L * e₁`), and
+the outer components agree to `e₂`, then the composites agree to `d + e₂`.
+
+Note what this does *not* say.  It bounds the discrepancy between two
+deterministic composites.  It says nothing about joint statistics of the
+components, which componentwise data does not determine at all (synthesis
+Prop. 7.4).  The gap between the two is the assumption of compositional
+closure, which is empirical. -/
+theorem within_comp {X : Type}
+    (f₁ g₁ : X → Int) (f₂ g₂ : Int → Int) (e₁ e₂ d : Int)
+    (hmod : ∀ a b : Int, Within e₁ a b → Within d (f₂ a) (f₂ b))
+    (h₁ : ∀ x, Within e₁ (f₁ x) (g₁ x))
+    (h₂ : ∀ b, Within e₂ (f₂ b) (g₂ b))
+    (x : X) : Within (d + e₂) (f₂ (f₁ x)) (g₂ (g₁ x)) :=
+  within_trans _ _ _ d e₂ (hmod (f₁ x) (g₁ x) (h₁ x)) (h₂ (g₁ x))
+
+/-! ###########################################################################
+    ## 6.  Process theories, models, and the substitution lemma
+    ########################################################################### -/
+
+/-- The sequential fragment of an interface theory.  Only what the substitution
+lemma actually uses is axiomatized; associativity and unit laws are not needed
+and are therefore not assumed.  This is deliberate: the treatise distinguishes
+the structure a theorem *uses* from the structure a formalism *offers*. -/
+structure ProcessTheory where
+  Obj  : Type
+  Hom  : Obj → Obj → Type
+  id   : (X : Obj) → Hom X X
+  comp : {X Y Z : Obj} → Hom Y Z → Hom X Y → Hom X Z
+
+/-- A model is a composition-preserving assignment of mathematics to
+interfaces.  This is the sequential shadow of the strong symmetric monoidal
+functor of claim C1. -/
+structure Model (E M : ProcessTheory) where
+  onObj  : E.Obj → M.Obj
+  onHom  : {X Y : E.Obj} → E.Hom X Y → M.Hom (onObj X) (onObj Y)
+  onId   : ∀ X, onHom (E.id X) = M.id (onObj X)
+  onComp : ∀ {X Y Z : E.Obj} (g : E.Hom Y Z) (f : E.Hom X Y),
+             onHom (E.comp g f) = M.comp (onHom g) (onHom f)
+
+/-- **Substitution.**  Equal processes have equal images in every sequential
+context.  The proof is one rewrite: this is a theorem about the formalization,
+not about physical indistinguishability. -/
+theorem substitution {E M : ProcessTheory} (F : Model E M)
+    {W X Y Z : E.Obj} (a : E.Hom W X) (e e' : E.Hom X Y) (b : E.Hom Y Z)
+    (h : e = e') :
+    F.onHom (E.comp b (E.comp e a)) = F.onHom (E.comp b (E.comp e' a)) := by
+  rw [h]
+
+/-- Functoriality rewrites the image of a context as the context of images. -/
+theorem context_factorization {E M : ProcessTheory} (F : Model E M)
+    {W X Y Z : E.Obj} (a : E.Hom W X) (e : E.Hom X Y) (b : E.Hom Y Z) :
+    F.onHom (E.comp b (E.comp e a))
+      = M.comp (F.onHom b) (M.comp (F.onHom e) (F.onHom a)) := by
+  rw [F.onComp, F.onComp]
+
+/-- Contextual invariance (synthesis Cor. 2.3): no sequential context separates
+the images of processes identified in the interface theory. -/
+theorem contextual_invariance {E M : ProcessTheory} (F : Model E M)
+    {W X Y Z : E.Obj} (a : E.Hom W X) (e e' : E.Hom X Y) (b : E.Hom Y Z)
+    (h : e = e') :
+    M.comp (F.onHom b) (M.comp (F.onHom e) (F.onHom a))
+      = M.comp (F.onHom b) (M.comp (F.onHom e') (F.onHom a)) := by
+  rw [h]
+
+/-! ###########################################################################
+    ## 7.  Admissibility is not realization
+    ########################################################################### -/
+
+/-- Two models can both be admissible members of the class and produce the same
+record, while disagreeing on an untested input.  No amount of further
+mathematics inside the class removes the disagreement; only a new experiment
+does.  This is the formal residue of Interpretation 8.1. -/
+theorem admissibility_not_realization :
+    ∃ m n : Nat → Int,
+      record [0, 1, 2, 3] m = record [0, 1, 2, 3] n ∧ m 7 ≠ n 7 :=
+  ⟨m1, m0, records_agree, models_differ_off_tests⟩
+
+/-- The converse direction is *not* provable here and is not proved anywhere in
+the series: nothing in this file entails that either `m1` or `m0` describes any
+physical system.  That statement has no formal content in this language, which
+is the point of separating the Lean development from the empirical sections of
+the papers. -/
+theorem no_realization_predicate_is_definable
+    (Realized : (Nat → Int) → Prop)
+    (hgauge : ∀ m n : Nat → Int,
+      record [0, 1, 2, 3] m = record [0, 1, 2, 3] n → (Realized m ↔ Realized n)) :
+    (Realized m1 ↔ Realized m0) :=
+  hgauge m1 m0 records_agree
 
 end Principia
+
+/-
+  Axiom audit.  These commands print the axiom dependencies of the main
+  results; they are diagnostics, not claims.
+-/
+#print axioms Principia.underdetermined_of_vanishing_perturbation
+#print axioms Principia.eq_add_const_of_diff_eq
+#print axioms Principia.within_comp
+#print axioms Principia.contextual_invariance
+#print axioms Principia.admissibility_not_realization

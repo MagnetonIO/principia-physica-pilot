@@ -1,23 +1,25 @@
 {
-  "schema": "principia.website-review.v1",
-  "review_round": 1,
-  "reviewed": "website/index.html",
+  "schema": "principia-website-self-review.v1",
+  "pass": 1,
+  "reviewed_at": "2026-08-16",
   "verdict": "CHANGES_REQUIRED",
-  "checks": {
-    "content_completeness": "pass",
-    "epistemic_labels": "pass",
-    "formal_scope_disclosure": "pass",
-    "responsive_css_review": "pass",
-    "open_graph_dimensions": "pass",
-    "relative_links": "fail"
-  },
   "findings": [
     {
-      "severity": "blocking",
-      "location": "website/index.html#evidence",
-      "finding": "Two linked final website evidence files do not yet exist: reviews/website-review.json and receipts/website.json.",
-      "required_fix": "Create the final accepted review and website receipt at the linked paths, then rerun the complete relative-link check."
+      "id": "A11Y-FOCUS-01",
+      "severity": "major",
+      "category": "accessibility",
+      "location": "website/index.html",
+      "description": "Interactive links do not have a site-wide, deliberately visible keyboard focus treatment against every background.",
+      "required_fix": "Add a high-contrast :focus-visible outline with spacing for all links."
     }
   ],
-  "notes": "The installed tidy build predates HTML5 landmark recognition, so its header/nav/main/section/article diagnostics are tool-version false positives and were not treated as site defects. A Python stdlib HTML parser is used for structural and local-target validation."
+  "checks": {
+    "content_completeness": "pass",
+    "formal_scope_disclosure": "pass",
+    "twelve_epistemic_labels": "pass",
+    "responsive_layout_review": "pass",
+    "semantic_structure_review": "pass",
+    "visual_design_review": "pass",
+    "local_asset_inventory": "pass"
+  }
 }

@@ -1,25 +1,32 @@
 {
-  "schema": "principia.verification.website.v1",
-  "site_root": "website",
-  "tools": [
-    {"tool": "Python 3 standard-library html.parser", "purpose": "parse HTML and validate every relative link and fragment target"},
-    {"tool": "ImageMagick magick/identify", "purpose": "create the original Open Graph artwork and verify its dimensions, format, and colorspace"},
-    {"tool": "ripgrep", "purpose": "verify required scope language and all twelve epistemic labels"},
-    {"tool": "file", "purpose": "verify PDF, PNG, and text artifact types"},
-    {"tool": "Lean 4.33.0", "purpose": "recheck the copied Lean companion and scan it for placeholders"},
-    {"tool": "GHC 9.14.1", "purpose": "compile the copied Haskell companion with -Wall -Wextra -Werror and run all 24 checks"},
-    {"tool": "shasum -a 256", "purpose": "compute final declared-output digests"}
-  ],
-  "checks": {
-    "html_parse": {"status": "pass", "parser": "Python html.parser"},
-    "relative_links": {"status": "pass", "missing_targets": 0},
-    "open_graph_image": {"status": "pass", "width": 1200, "height": 630, "format": "PNG", "colorspace": "sRGB", "source": "designed locally; not a PDF thumbnail"},
-    "responsive_design": {"status": "pass", "method": "CSS source inspection at 800px and 520px breakpoints"},
-    "accessibility": {"status": "pass", "features": ["language declaration", "viewport metadata", "skip link", "landmark elements", "labelled navigation", "visible keyboard focus target", "reduced-motion preference"]},
-    "content": {"status": "pass", "paper_links": 8, "formal_artifact_links": 2, "epistemic_labels": 12, "scope_disclosure": true},
-    "formal_companions": {"status": "pass", "lean_placeholders": 0, "haskell_checks_passed": 24, "haskell_checks_failed": 0},
-    "artifact_types": {"status": "pass"}
+  "schema": "principia-publication-website-receipt.v1",
+  "validated_at": "2026-08-16",
+  "result": "pass",
+  "tools": {
+    "html": "Node.js structural and content assertions",
+    "css": "Node.js delimiter-balance check",
+    "links": "Node.js filesystem target resolver",
+    "images": "ImageMagick identify",
+    "pdf": "Poppler pdfinfo",
+    "json": "jq",
+    "copies": "cmp",
+    "hashes": "shasum -a 256"
   },
-  "review_cycle": {"first_review": "reviews/website-self-review.json", "first_verdict": "CHANGES_REQUIRED", "fix_passes_used": 1, "maximum_fix_passes": 2, "final_review": "website/reviews/website-review.json", "final_verdict": "ACCEPT"},
-  "result": "pass"
+  "checks": {
+    "html_required_structure_and_metadata": "pass",
+    "css_balanced_blocks": "pass",
+    "accessibility_landmarks_skip_link_language_heading_and_focus": "pass",
+    "responsive_breakpoints": "pass",
+    "twelve_epistemic_labels": "pass: 12/12",
+    "formal_companion_scope_disclosure": "pass",
+    "all_local_relative_targets": "pass: 19/19",
+    "open_graph_image": "pass: PNG, 1200x630",
+    "paper_page_ranges": "pass: 6, 7, 6, and 10 pages",
+    "json_parse": "pass",
+    "accepted_artifact_copy_identity": "pass"
+  },
+  "notes": [
+    "The installed legacy HTML Tidy does not implement HTML5 and reports standard HTML5 elements, UTF-8 punctuation, ARIA attributes, and Open Graph metadata as unapproved; its diagnostics were inspected and it was not used as the acceptance validator.",
+    "No network services, publishing tools, or messaging tools were used."
+  ]
 }

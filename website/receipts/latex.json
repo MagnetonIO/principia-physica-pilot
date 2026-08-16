@@ -1,38 +1,42 @@
 {
-  "schema": "principia.verification.latex.v1",
-  "tool": "latexmk 4.88 with pdfTeX 1.40.29 (TeX Live 2026)",
-  "command": "latexmk -pdf -interaction=nonstopmode -halt-on-error -g -outdir=papers/pdf <source>",
-  "correction_passes": 3,
+  "schema": "principia-publication-latex-receipt.v1",
+  "verification_passes": 2,
+  "tools": {
+    "latexmk": "4.88",
+    "pdftex": "3.141592653-2.6-1.40.29 (TeX Live 2026)",
+    "pdfinfo": "Poppler pdfinfo"
+  },
+  "command": "latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error -outdir=build/latex/<paper> papers/latex/<paper>.tex",
   "exit_status": 0,
-  "diagnostic_check": "final .log files contain no LaTeX/package warnings, overfull/underfull boxes, undefined references, or multiply-defined labels",
+  "diagnostic_policy": "No LaTeX Warning, package warning, overfull/underfull box, TeX error, or unresolved reference in final logs",
   "papers": [
     {
       "source": "papers/latex/compositional-systems.tex",
       "pdf": "papers/pdf/compositional-systems.pdf",
       "pages": 6,
-      "source_sha256": "3d8747847e804078e7133f63b0b50626ec726a7ad3b02d80fd3389ee2b452194",
-      "pdf_sha256": "1efa667a79bcb6e02a1203d4004db7bbbef645e9ebfde2d9a1582ad6c6d60eb9"
+      "source_sha256": "1db18d5b33005c421668df3bbd981ebf41aed0c89484f2643c8d492811d8d7ac",
+      "pdf_sha256": "59225230c74fa4ecc598115de03dfe589b71ea954f3103ae6e0811835a50897d"
     },
     {
       "source": "papers/latex/hamiltonian-reconstruction.tex",
       "pdf": "papers/pdf/hamiltonian-reconstruction.pdf",
-      "pages": 10,
-      "source_sha256": "9ef0bf90f91b4008b0f40052e25396617c7c18f4a9c8329e03f04166c684bcf7",
-      "pdf_sha256": "dcd00848cf9382d96e394cc7cc62e9d58b1cea35f5253addddda7f62d1e3cdac"
+      "pages": 7,
+      "source_sha256": "48d5792ded3976fa4d45f50dcca440b6fec564edea6e7d4426cec47a2890e3be",
+      "pdf_sha256": "c5813b8839c1026922b04c81bca6bf061a19cff6a74057c63bd8b3710ddd14c4"
     },
     {
       "source": "papers/latex/empirical-limits.tex",
       "pdf": "papers/pdf/empirical-limits.pdf",
-      "pages": 8,
-      "source_sha256": "a651667e839ec3bccb844b77af889d25805dd9c6074d9c60534e91907fb18dbf",
-      "pdf_sha256": "486e47a79736bd780396bdf288a75f41f1e548b989e5a60ae9ca5a66f6948437"
+      "pages": 6,
+      "source_sha256": "d67d7b16349e4f4679b91f5425966963043b9ff2860893d74ec9e582ed80d12d",
+      "pdf_sha256": "d8942fed90f622fd1898001d6ae5a76eee642ae244c5339704af91c9c57a175c"
     },
     {
       "source": "papers/latex/synthesis.tex",
       "pdf": "papers/pdf/synthesis.pdf",
       "pages": 10,
-      "source_sha256": "c0e31a1099ce7a74385dbaa10b09ea8c6c1a9b0103419aaa5b937aea4a6757d0",
-      "pdf_sha256": "424c1aea7c39d8c9a312d39f4492197f3f6305eff362ad67a4a9ee76b5a8a149"
+      "source_sha256": "b34f8b25601e8aace381018e4cd57bba54ac691257456fc34c2c68e02695c518",
+      "pdf_sha256": "9ed67895ebf8e9d5432c613cbd7abd24477fb8c9e3a7f1d7b6123e15b560e463"
     }
   ]
 }
