@@ -1,4 +1,75 @@
 {
-  "status": "pending",
-  "note": "Publication in progress. This file is replaced by the validated receipt only after the corresponding remote action succeeds and is read back."
+  "schema": "principia.pilot.github.v1",
+  "status": "published",
+  "url": "https://github.com/MagnetonIO/principia-physica-pilot",
+  "readback_validated": true,
+  "repository": "MagnetonIO/principia-physica-pilot",
+  "configured_repo_name_source": "PRINCIPIA_PILOT_GITHUB_REPO=principia-physica-pilot",
+  "selected_tool": {
+    "name": "gh",
+    "version": "gh version 2.97.0 (2026-07-31)",
+    "authenticated_account": "MagnetonIO",
+    "auth_check": "gh auth status -> logged in to github.com, token scopes gist, read:org, repo, workflow",
+    "companion_tool": "git version 2.50.1 (Apple Git-155) over HTTPS"
+  },
+  "release_checkout": {
+    "path": ".principia/release-work/repo",
+    "idempotent": true,
+    "method": "directory removed and re-created, then git clone --quiet https://github.com/MagnetonIO/principia-physica-pilot.git repo",
+    "excluded_from_sync": [".vercel", ".env*"]
+  },
+  "publication": {
+    "branch": "main",
+    "parent_commit": "063b475",
+    "release_commit": "fd0bffdeed0cf316f22e20f8599e6a6970c4af63",
+    "push_command": "git push origin main",
+    "push_result": "063b475..fd0bffd  main -> main",
+    "files_changed": 19,
+    "insertions": 598,
+    "deletions": 107
+  },
+  "readback_evidence": {
+    "remote_head_command": "gh api repos/MagnetonIO/principia-physica-pilot/commits/main --jq .sha",
+    "remote_head_sha": "fd0bffdeed0cf316f22e20f8599e6a6970c4af63",
+    "local_head_sha": "fd0bffdeed0cf316f22e20f8599e6a6970c4af63",
+    "head_sha_match": true,
+    "repo_metadata": {
+      "full_name": "MagnetonIO/principia-physica-pilot",
+      "html_url": "https://github.com/MagnetonIO/principia-physica-pilot",
+      "clone_url": "https://github.com/MagnetonIO/principia-physica-pilot.git",
+      "default_branch": "main",
+      "private": false,
+      "pushed_at": "2026-08-16T05:09:02Z"
+    },
+    "http_status_of_url": 200,
+    "content_readback": [
+      {
+        "path": "papers/latex/synthesis.tex",
+        "method": "gh api contents?ref=fd0bffd, base64-decoded, shasum -a 256",
+        "remote_sha256": "a1924f101e2263e25b4533a36cb55f8ce1af91faec80fc8662770c4b7399f747",
+        "matches_local": true
+      },
+      {
+        "path": "papers/pdf/synthesis.pdf",
+        "method": "gh api contents?ref=fd0bffd, base64-decoded, shasum -a 256",
+        "remote_sha256": "281cf923ede60f574d3201a168fab2032c6390f40272680cf00507bd60d483e6",
+        "matches_local": true
+      },
+      {
+        "path": "website/index.html",
+        "method": "gh api contents?ref=fd0bffd, base64-decoded, shasum -a 256",
+        "remote_sha256": "ffa520782c19adce70592a5cc0591d03a555b55e8553f0f8d4e133daa3dec718",
+        "matches_local": true
+      },
+      {
+        "path": "website/reviews/website-review.json",
+        "method": "gh api contents?ref=fd0bffd, base64-decoded, shasum -a 256",
+        "remote_sha256": "87ece0a91897c4f2860e1fd940afe196ef1ec9b07cbea785db699834a7c74a44",
+        "matches_local": true,
+        "semantic_check": "verdict field on the remote copy reads MAJOR, confirming the external review is what is published"
+      }
+    ],
+    "repaired_content_confirmed_on_remote": "The corrected Lemma S-L1 line reads =(C_{12}q_2)\\cdot dq_1+(C_{21}q_1)\\cdot dq_2 in the file fetched back from the remote."
+  },
+  "note": "A follow-up commit on the same branch carries these validated publication receipts. It changes only receipts/*.json and no released paper, formal source, or website file."
 }

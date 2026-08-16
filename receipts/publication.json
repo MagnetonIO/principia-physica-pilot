@@ -1,4 +1,64 @@
 {
-  "status": "pending",
-  "note": "Publication in progress. This file is replaced by the validated receipt only after the corresponding remote action succeeds and is read back."
+  "schema": "principia.pilot.publication.v1",
+  "status": "published",
+  "validated": true,
+  "urls": [
+    "https://github.com/MagnetonIO/principia-physica-pilot",
+    "https://principia-physica-pilot.vercel.app"
+  ],
+  "github_url": "https://github.com/MagnetonIO/principia-physica-pilot",
+  "vercel_url": "https://principia-physica-pilot.vercel.app",
+  "gate": {
+    "rule": "no external write before the final verdict is ACCEPT with zero blocking findings",
+    "final_review": "reviews/final-release-review.json",
+    "verdict": "ACCEPT",
+    "blocking_findings": 0,
+    "review_fix_passes": 2,
+    "satisfied_before_first_external_write": true
+  },
+  "validation": {
+    "github": {
+      "receipt": "receipts/github.json",
+      "status": "published",
+      "readback_validated": true,
+      "release_commit": "fd0bffdeed0cf316f22e20f8599e6a6970c4af63",
+      "remote_head_matches_local_head": true,
+      "files_refetched_from_remote_and_hash_matched": 4,
+      "repo_url_http_status": 200
+    },
+    "vercel": {
+      "receipt": "receipts/vercel.json",
+      "status": "deployed",
+      "readback_validated": true,
+      "deployment_id": "dpl_FeBqZ9NX5ijU1BMgv7w1rpEGc5o9",
+      "readyState": "READY",
+      "target": "production",
+      "production_urls_validated": 22,
+      "http_200": 22,
+      "byte_matches": 22,
+      "failures": 0
+    },
+    "slack": {
+      "receipt": "receipts/slack.json",
+      "status": "sent",
+      "channel": "C0AK269AVSA",
+      "message_ts": "1786857084.844909",
+      "readback_validated": true
+    }
+  },
+  "released_content_integrity": {
+    "papers": 4,
+    "pdf_pages_each": 6,
+    "formal_companions": 2,
+    "published_reviews": 4,
+    "published_receipts": 4,
+    "workspace_to_website_mirror": "18 of 18 files byte-identical (cmp)",
+    "website_to_production_mirror": "22 of 22 URLs byte-identical (curl + shasum -a 256)"
+  },
+  "repairs_included_in_this_release": [
+    "papers/latex/synthesis.tex Lemma S-L1 contraction sign corrected and the PDF rebuilt",
+    "website/reviews/website-review.json replaced with the external MAJOR review; the round-two self-review published separately",
+    "website/index.html unique accessible link names, absolute og:image and og:url, evidence copy naming the MAJOR verdict",
+    "receipts/latex.json updated to the real post-rebuild hashes; receipts/website.json artifact counts corrected"
+  ]
 }
