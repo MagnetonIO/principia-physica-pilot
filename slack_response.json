@@ -1,1 +1,0 @@
-{"ok":false,"error":"missing_scope","needed":"chat:write:bot","provided":"incoming-webhook"}

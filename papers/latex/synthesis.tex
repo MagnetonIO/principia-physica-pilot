@@ -1,6 +1,8 @@
 \documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath,amssymb,amsthm,booktabs,hyperref}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,enumitem,microtype}
+\usepackage[hidelinks]{hyperref}
 
 \newtheorem{definition}{Definition}[section]
 \newtheorem{axiom}[definition]{Axiom}
@@ -15,442 +17,765 @@
 \newtheorem{established}[definition]{Established physical result}
 \newtheorem{newresult}[definition]{New result claimed by this work}
 \newtheorem{counterexample}[definition]{Counterexample}
-\newtheorem{example}[definition]{Example}
+\newtheorem{openproblem}[definition]{Open problem}
 
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\Lie}{\mathcal{L}}
+\newcommand{\Rr}{\mathbb{R}}
+\newcommand{\Th}{\mathsf{T}}
+\newcommand{\Emp}{\mathrm{Emp}}
+\newcommand{\TV}{d_{\mathrm{TV}}}
+\newcommand{\Ham}{\mathsf{Ham}}
 
-\title{Layered Composition, Reciprocity, and Protocol-Relative Realization}
-\author{PRINCIPIA PHYSICA Synthesis}
-\date{15 August 2026}
+\title{Compositional Realization, Hamiltonian Reconstruction,\\
+and Empirical Limits: a Synthesis\\[2mm]
+\large What the three-paper series proves jointly, where its papers pull
+against each other, and what its formal appendix does not certify}
+\author{PRINCIPIA PHYSICA pilot --- synthesis node}
+\date{16 August 2026}
 
 \begin{document}
+\sloppy
+\hbadness=10000
 \maketitle
 
 \begin{abstract}
-This synthesis separates mathematical admissibility from physical realization.
-It defines a layered realized theory object, proves a reciprocity trichotomy for
-a linear interconnection, and proves that closed-system isomorphism need not
-preserve a fixed empirical protocol. It also corrects an earlier claim about
-limits and composition: for the oscillator family, the zero-frequency limit
-commutes with composition when the interaction parameter is retained. A
-different trajectory arises only when that interface datum is discarded.
-Lean and Haskell companions formalize finite logical and computational shadows
-of these claims; neither artifact formalizes the differential geometry in full.
+This paper synthesises three companion drafts of the PRINCIPIA PHYSICA pilot:
+\emph{Compositional Systems in Finite-Dimensional Classical Mechanics}
+(hereafter CS), \emph{Hamiltonian Reconstruction as a Physical Theory Object}
+(HR), and \emph{Empirical Realization, Equivalence, and Limits} (EL).  A
+synthesis is a typed merge, not an amplification: no claim acquires a
+stronger epistemic type by appearing in more than one paper, and consensus
+among the drafts is never treated as proof.  We consolidate the definitions
+into one three-layer object (compositional structure, generator, registered
+interpretation), give a dependency ledger keyed to the companion papers'
+claim identifiers, and prove four statements that are visible only across
+papers: the additive constant of a generator is invisible to every registered
+experiment (Proposition~\ref{prop:constant}); factor-level empirical adequacy
+plus the monoidal product does not entail composite adequacy, with an
+explicit tolerance witness (New result~\ref{thm:adequacy}); bare isomorphism and
+$\varepsilon$-empirical equivalence are incomparable in the precise sense
+supplied by HR's two counterexamples, with one residual gap recorded
+(Proposition~\ref{prop:incomparable}); and no arrow class considered in the
+series simultaneously preserves Hamiltonian structure, contains
+coarse-graining, and composes totally (Proposition~\ref{prop:arrows}).  We
+preserve, rather than resolve, three disagreements between the drafts and
+four failed constructions.  A machine-checked Lean file and a type-checked
+Haskell file accompany the paper; Section~\ref{sec:formal} states exactly
+which claims they do and do not certify, and the answer is: none of the
+smooth theorems.
 \end{abstract}
 
-\section{Epistemic discipline}
+\section{What this paper is, and what a synthesis may not do}
+\label{sec:scope}
 
-\begin{assumption}[Finite-dimensional scope, S-A1]
-All state spaces considered below are finite-dimensional smooth manifolds.
-Claims about field theory, general relativity, and quantum theory are outside
-the proved scope.
-\end{assumption}
+The pilot's founding thesis is that physics is the study of empirically
+realized compositional mathematical structures.  All three companion papers
+carry that sentence as a \emph{conjecture} and use it as a premise nowhere.
+This paper does the same.
 
-\begin{axiom}[Synthesis discipline, S-A2]
-A synthesis may translate inherited claims and prove consequences from jointly
-satisfiable hypotheses. It may not promote an inherited epistemic label, treat
-agreement as evidence, or identify mathematical admissibility with empirical
-realization.
+Three constraints govern what follows.  First, every displayed statement
+carries exactly one epistemic type from the pilot contract: Definition,
+Axiom, Assumption, Conjecture, Lemma, Proposition, Theorem, Corollary,
+Interpretation, Empirical statement, Established physical result, or New
+result claimed by this work.  Second, a claim imported from a companion paper
+keeps the type it had there; agreement between two drafts is not evidence and
+does not promote a conjecture to a theorem.  Third, where the drafts conflict,
+or where a construction they attempt fails, the conflict and the failure are
+recorded in Section~\ref{sec:tensions} rather than smoothed away.
+
+Scope is inherited from the pilot charter: smooth, finite-dimensional, real
+classical systems.  Field theory, infinite-dimensional analysis, general
+relativity, and quantum theory appear only as boundary markers, and each such
+appearance below is an Established physical result cited to its source or an
+explicit statement that the present type stops there.  No new experimental
+claim is made anywhere in this paper.
+
+\section{The consolidated typed object}
+\label{sec:object}
+
+The three drafts define overlapping objects with different names.  We fix one
+vocabulary and record the correspondence.
+
+\begin{definition}[Three-layer object]
+\label{def:layers}
+A \emph{three-layer object} is a triple $(\mathcal{C}, \Th, \mathcal{I})$ in
+which
+\begin{enumerate}[label=(L\arabic*),leftmargin=*,itemsep=1pt]
+\item $\mathcal{C}$ is a symmetric monoidal category of systems and processes
+      (CS Definitions of system, process, and composite; HR
+      Definition of morphism and Cartesian product);
+\item $\Th = (M,\omega,\mathcal{A}(M),H,\Phi)$ is a bare Hamiltonian object
+      in $\mathcal{C}$: a symplectic manifold, its observable algebra, a
+      generator, and the maximal local flow of the field $X_H$ determined by
+      $\iota_{X_H}\omega = dH$ (HR Axioms on kinematic type, symplectic
+      structure, observable type, generator, dynamical law);
+\item $\mathcal{I} = (\mathcal{C}_{\mathrm{ctx}}, K^P, K^Q, \varepsilon, D)$
+      is a registered interpretation: experimental contexts, preparation and
+      measurement kernels, a declared tolerance, and an intended domain (EL
+      Definition of empirical interpretation; HR
+      $\mathcal{I}=(P,\mu,\mathcal{U},\varepsilon,T)$ is the deterministic
+      special case, augmented by units).
+\end{enumerate}
+Write $U(\mathcal{C},\Th,\mathcal{I}) = (\mathcal{C},\Th)$ for the forgetting
+of layer (L3).
+\end{definition}
+
+\begin{definition}[Predicted law, realization, discrepancy]
+\label{def:law}
+For a context $c\in D$ with control $u_c$ and duration $t_c$, the predicted
+outcome law is
+\begin{equation}\label{eq:pred}
+  \Pr_{\Th,\mathcal{I}}(A \mid c)
+   = \int_M K^Q_c\bigl(A \mid \Phi^{u_c}_{t_c}(x)\bigr)\, K^P_c(dx).
+\end{equation}
+A physical target $S$ \emph{realizes} the object on $D$ to tolerance
+$\varepsilon$ when $\TV\bigl(P^c_S, \Pr_{\Th,\mathcal{I}}(\cdot\mid c)\bigr)
+\le \varepsilon(c)$ for every registered $c \in D$.  For two objects sharing
+the registered outcome spaces,
+$\Delta_D = \sup_{c\in D}\TV(P_1^c,P_2^c)$, and they are
+$\eta$-observationally equivalent on $D$ when $\Delta_D \le \eta$.
+\end{definition}
+
+Definition~\ref{def:law} is EL's, transcribed.  Its role here is that
+layers (L1) and (L2) never enter an empirical claim except through
+\eqref{eq:pred}; that is the single channel through which mathematics reaches
+data in this series, and every result below is a statement about what does or
+does not pass through it.
+
+\begin{axiom}[Typed equality]
+\label{ax:typed}
+States, processes, observables, interpretations, and empirical records are
+distinct types.  An equality is admitted only between terms of one type; a
+map relating two types is part of the data and is never suppressed.
 \end{axiom}
 
-\begin{interpretation}[Founding thesis, S-I1]
-The thesis that physics studies empirically realized compositional mathematical
-structures is treated as a methodological proposal. The mathematical results
-below test distinctions required by that proposal; they do not establish its
-exhaustiveness or empirical truth.
-\end{interpretation}
+Axiom~\ref{ax:typed} is CS's, and it is what makes
+Proposition~\ref{prop:incomparable} statable rather than paradoxical.
 
-\section{Layered realized systems}
+\section{Dependency ledger: what the series proves}
+\label{sec:ledger}
 
-\begin{definition}[Realized theory object, S-D1]
-A realized theory object is a tuple
-\[
-  \mathcal R=(K,D,I,E,P,A),
-\]
-where $K$ contains states, observables, and declared geometry; $D$ contains a
-generator and its flow domain; $I$ contains ports and interaction data; $E$
-contains preparations, measurement kernels, calibration, and uncertainty;
-$P$ is a protocol; and $A$ is a predeclared adequacy rule. Mathematical
-admissibility concerns the appropriate mathematical components. Physical
-realization additionally requires empirical input in $E$, $P$, and $A$.
-\end{definition}
+Table~\ref{tab:ledger} lists the imported claims used below, with the
+identifier under which each appears in its companion paper's metadata.  The
+ledger is exhaustive for the results this synthesis \emph{uses}; it is not a
+census of the companion papers, and Section~\ref{sec:tensions} records that
+the companion metadata is itself incomplete.
 
-\begin{proposition}[Vocabulary translation is not top-level injective, S-P1]
-The assignment in Table~\ref{tab:translation} is a function on the listed
-source notions, but it is not injective into the set
-$\{K,D,I,E,P,A\}$. In particular, kinematical product and observable embedding
-both map to $K$, while preparation distributions and measurement kernels both
-map to $E$.
-\end{proposition}
-
-\begin{proof}
-Every row in Table~\ref{tab:translation} has one source and one target, so the
-displayed assignment is a function. The first two rows have the same target
-$K$, and the last two rows have the same target $E$. Hence the assignment is
-not injective into the six top-level components. The parenthetical qualifiers
-identify distinct substructures within those components; they do not create
-additional top-level tuple entries.
-\end{proof}
-
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
-\begin{tabular}{lll}
+\footnotesize
+\begin{tabular}{@{}p{0.26\textwidth}lp{0.46\textwidth}@{}}
 \toprule
-Source notion & Target & Internal field \\
+Identifier & Type & Content used here \\
 \midrule
-Kinematical product & $K$ & state space \\
-Observable embedding & $K$ & observable algebra \\
-Dynamical factorization & $D$ & generator and flow \\
-Port observable & $I$ & distinguished observable \\
-Preparation distribution & $E$ & preparation field \\
-Measurement kernel & $E$ & measurement field \\
-Adequacy rule & $A$ & acceptance region \\
+CS-D1 & definition & Composite system
+  $(M\times N,\ \pi_M^*\omega + \pi_N^*\eta)$. \\
+CS-P1 & proposition & Symplectic systems and smooth maps form a symmetric
+  monoidal category $\Ham_{\rm kin}$. \\
+CS-T1 & theorem & An additively separable generator has componentwise field
+  and product flow. \\
+CS-N1 & new result & Converse: on a connected product the field splits iff
+  the generator is separable up to a constant. \\
+CS-I1 & interpretation & Product composition represents physical
+  independence only relative to operational separability. \\
+HR ax-symplectic, ax-dynamical-law & axiom & $d\omega=0$, $\omega$
+  nondegenerate; $\Phi$ is the maximal local flow of $X_H$. \\
+HR lem-hamiltonian-field & lemma & $X_H$ exists and is unique. \\
+HR thm-exact-sequence & theorem & $0\to H^0_{\mathrm{dR}}\to \mathcal{A}(M)
+  \to \mathfrak{X}_{\mathrm{Symp}} \to H^1_{\mathrm{dR}}\to 0$ is exact. \\
+HR cor-underdetermination & corollary & On connected $M$ the flow determines
+  $H$ up to one additive constant. \\
+HR lem-symplectic-immersion & lemma & $\varphi^*\omega'=\omega$ forces
+  $d\varphi$ injective. \\
+HR new-no-coarse-graining & new result & No morphism decreases dimension. \\
+HR new-interaction-outside-tensor & new result & On a split product,
+  $\Phi^H=\Phi^1\times\Phi^2$ iff the coupling is locally constant. \\
+HR prop-equivalent-not-isomorphic & proposition & Gr\"onwall witness:
+  $\varepsilon$-equivalent, non-isomorphic. \\
+HR prop-isomorphic-not-physically-equivalent & proposition & Unit witness:
+  isomorphic bare objects, distinct empirical models. \\
+HR new-damped-no-symplectic-form & new result & A globally asymptotically
+  stable planar field is Hamiltonian for no symplectic form. \\
+HR est-weinstein-not-category & established & Canonical relations do not
+  compose totally. \\
+HR est-groenewold-van-hove & established & No structure-preserving
+  quantization functor on $\Rr^{2n}$. \\
+HR est-darboux, est-gromov-nonsqueezing & established & Local triviality;
+  symplectic rigidity. \\
+EL C2 & theorem & Intertwining of preparation, dynamics, and measurement
+  preserves every registered law. \\
+EL C3 & new result & Uniform error transfer:
+  $\sup_c \TV(P_S,P_0) \le \sup_c e_\lambda + r(\lambda)$. \\
+EL C4 & proposition & Structural equivalence alone does not give physical
+  equivalence. \\
+EL restriction lemma & lemma & $D'\subseteq D$ implies
+  $\Delta_{D'}\le\Delta_D$. \\
 \bottomrule
 \end{tabular}
-\caption{A non-injective translation into the layered carrier.}
-\label{tab:translation}
+\caption{Imported claims, with their companion-paper identifiers.  Types are
+those assigned in the source paper and are not upgraded here.}
+\label{tab:ledger}
 \end{table}
 
-\section{Reciprocity and factorization}
+\section{Results visible only across the three papers}
+\label{sec:results}
 
-Let $X=\R^{2n_1}\times\R^{2n_2}$ have canonical product symplectic form
-$\omega_\oplus$. For matrices $C_{12}$ and $C_{21}$, define
-\[
- Y=(0,-C_{12}q_2,0,-C_{21}q_1).
-\]
+Each result in this section uses inputs from at least two companion papers.
+Each is elementary given those inputs; the claim is to the explicit
+cross-paper statement, and where the argument is a quantified restatement of
+a companion result we say so in the same breath.
 
-\begin{lemma}[Contraction calculation, S-L1]
-For the stated field,
+\subsection{The additive constant is empirically idle}
+
+\begin{proposition}[Constant invisibility]
+\label{prop:constant}
+Let $(\mathcal{C},\Th,\mathcal{I})$ be a three-layer object with connected
+$M$, and let $\Th_c$ be obtained by replacing $H$ with $H + c$ for a constant
+$c\in\Rr$.  Then for every registered context set $D$ and every choice of
+kernels in $\mathcal{I}$,
 \[
- \iota_Y\omega_\oplus
- =(C_{12}q_2)\cdot dq_1+(C_{21}q_1)\cdot dq_2,
+  \Pr_{\Th,\mathcal{I}}(\,\cdot \mid c') = \Pr_{\Th_c,\mathcal{I}}(\,\cdot\mid c')
+  \quad\text{for all } c' \in D,
+  \qquad\text{hence}\qquad \Delta_D(\Th,\Th_c) = 0 .
 \]
-and
-\[
- d(\iota_Y\omega_\oplus)
- =\sum_{a,b}\bigl((C_{21})_{ba}-(C_{12})_{ab}\bigr)
-   dq_{1a}\wedge dq_{2b}.
-\]
-\end{lemma}
+Conversely, if $\Th'=(M,\omega,\mathcal{A}(M),H',\Phi')$ has $\Phi'=\Phi$ on a
+neighbourhood of $t=0$, then $H' = H + c$ for some constant $c$.
+\end{proposition}
 
 \begin{proof}
-For a canonical pair, contraction of $(\dot q,\dot p)$ with
-$dq\wedge dp$ is $\dot q\,dp-\dot p\,dq$. The two velocity components of $Y$
-vanish, so the $dp$ terms drop out, and the two momentum components enter with
-the sign reversal carried by $-\dot p\,dq$; this gives the first display.
-Differentiating each coefficient and
-reordering $dq_{2b}\wedge dq_{1a}=-dq_{1a}\wedge dq_{2b}$ gives the second.
+By HR lem-hamiltonian-field, $X_{H+c}$ is the unique field with
+$\iota_{X_{H+c}}\omega = d(H+c) = dH$, so $X_{H+c} = X_H$, and two vector
+fields that are equal have the same maximal local flow: $\Phi^{H+c}=\Phi^H$.
+Both sides of \eqref{eq:pred} then integrate the same kernel against the same
+pushforward, so the predicted laws agree context by context, and the supremum
+of a family of zeros is zero.  For the converse, equality of the flows near
+$t=0$ gives equality of their generators' fields by differentiation at
+$t=0$, and HR cor-underdetermination on connected $M$ gives $H'-H$ locally
+constant, hence constant.
 \end{proof}
 
-\begin{newresult}[Linear composition trichotomy, S-N1]
-Relative to $\omega_\oplus$, the stated family has three disjoint classes:
-(i) $C_{12}=C_{21}=0$, for which the dynamics factorize; (ii)
-$C_{21}=C_{12}^{T}\ne0$, for which the interconnection is Hamiltonian but does
-not factorize; and (iii) $C_{21}\ne C_{12}^{T}$, for which the interconnection
-does not preserve $\omega_\oplus$.
-\end{newresult}
-
-\begin{proof}
-By Cartan's formula and $d\omega_\oplus=0$,
-$\Lie_Y\omega_\oplus=d(\iota_Y\omega_\oplus)$. Lemma S-L1 makes this zero
-exactly when $C_{21}=C_{12}^{T}$. If both matrices vanish, $Y=0$ and an
-additive factor generator remains. If the reciprocal matrices are nonzero,
-$Y$ has a component depending on the other factor, so the vector field is not
-a product field. If reciprocity fails, the displayed Lie derivative is
-nonzero. These conditions are mutually exclusive and exhaustive.
-\end{proof}
-
-\begin{corollary}[Hamiltonian does not imply factorized, S-C1]
-The decoupled class is a proper subset of the Hamiltonian class whenever a
-nonzero matrix $C$ is available: take $C_{12}=C$ and $C_{21}=C^T$.
+\begin{corollary}[The observational map is not injective]
+\label{cor:noninjective}
+The assignment sending a bare object to its observational class on $D$ is not
+injective on generators: it identifies $H$ with $H+c$ for every $c$.  No
+enlargement of $D$ within Definition~\ref{def:law} separates them.
 \end{corollary}
 
-\begin{example}[Normal modes expose the middle class]
-For one degree of freedom in each factor, take
-$C_{12}=C_{21}=c\ne0$ and add identical oscillator Hamiltonians.  The equations
-for $q_\pm=(q_1\pm q_2)/\sqrt2$ decouple into normal modes with squared
-frequencies $\omega^2\pm c/m$.  Thus the total system has a Hamiltonian flow,
-yet neither original factor evolves without reference to the other.  The
-example witnesses class (ii) of S-N1 without relying only on the abstract
-matrix criterion.
-\end{example}
+\begin{proof}
+Proposition~\ref{prop:constant} gives $\Delta_D = 0$ for every $D$, and the
+EL restriction lemma states only that shrinking $D$ cannot increase
+$\Delta$; enlarging $D$ leaves the computation of \eqref{eq:pred} unchanged
+because the flows are equal.
+\end{proof}
 
-\begin{counterexample}[Volume preservation is not reciprocity]
-The divergence of $Y$ is zero for every pair $C_{12},C_{21}$ because its
-Jacobian has zero diagonal.  Taking $C_{12}=0$ and $C_{21}\ne0$ therefore
-gives a volume-preserving interconnection in class (iii).  Preservation of
-phase volume alone cannot replace preservation of $\omega_\oplus$.
-\end{counterexample}
+\begin{interpretation}[Zero of energy]
+\label{int:zero}
+Within this scope an absolute zero of energy is not an empirically realized
+element of the object: it is a coordinate on the space of generators that
+\eqref{eq:pred} annihilates.  HR records the same reading at
+int-energy-zero.  That gravitation changes the situation is a boundary fact,
+outside the present type, and is not used.
+\end{interpretation}
 
-\section{Closed isomorphism and empirical protocol}
+\subsection{Factor adequacy does not compose}
 
-\begin{newresult}[Protocol distinction survives closed isomorphism, S-N2]
-Let
+CS supplies the counterexample that interaction defeats product dynamics; HR
+sharpens it to an exact characterisation of the range of $\otimes$; EL
+supplies the tolerance language in which ``adequate'' is defined.  Only the
+combination states what an experimenter would need.
+
+\begin{assumption}[Registered isolated adequacy]
+\label{as:isolated}
+Let the target be a pair of laboratory oscillators that can be operated
+singly.  We assume: (i) for the isolated contexts $D_1$ (one subsystem
+prepared and read, the other absent), the uncoupled objects
+$\Th_i = (T^*\Rr, dq_i\wedge dp_i, H_i)$ with $H_i = (p_i^2+q_i^2)/2$ realize
+the target exactly, with noiseless readout $\mu(z)=q_1$ in metres; (ii) the
+joint contexts $D_{12}$ prepare both subsystems together.  Clause (i) is an
+empirical premise, not a theorem, and it is chosen exact only to isolate the
+compositional failure from measurement error.
+\end{assumption}
+
+\begin{newresult}[Composite adequacy is not inherited]
+\label{thm:adequacy}
+Adopt Assumption~\ref{as:isolated}, and let the joint target be governed by
 \[
- H_m(q,p)=\frac{p^2}{2m}+\frac{m\omega_0^2q^2}{2}.
+  H^{\kappa} = \tfrac12(p_1^2+p_2^2) + \tfrac12(q_1^2+q_2^2)
+             + \tfrac{\kappa}{2}(q_1-q_2)^2, \qquad \kappa>0 ,
 \]
-For positive $m,m'$, the map
-$F(q,p)=(\alpha q,p/\alpha)$ with $\alpha=\sqrt{m/m'}$ is symplectic and
-satisfies $H_{m'}\circ F=H_m$. Nevertheless, a fixed protocol preparing
-$(q,p)=(0,1)$ and reading the unscaled coordinate $q(t)$ distinguishes the
-masses whenever the two predicted readings differ.
+on $(T^*\Rr)^{\otimes 2}$ with the split form.  Let $\Th_1\otimes\Th_2$ be the
+monoidal composite of the two factor objects.  Then for the joint context that
+prepares $z_0=(q_1,q_2,p_1,p_2)=(1,-1,0,0)$ and reads $\mu = q_1$ at time
+$t_\kappa := \pi/\sqrt{1+2\kappa}$,
+\[
+  \bigl|\mu(\Phi^{\kappa}_{t_\kappa} z_0) - \mu\bigl((\Phi^{1}\times\Phi^{2})_{t_\kappa} z_0\bigr)\bigr|
+  \;=\; 1 + \cos\!\Bigl(\frac{\pi}{\sqrt{1+2\kappa}}\Bigr) \;=:\; \delta(\kappa) \;>\; 0 .
+\]
+The coordinate separation is $\delta(\kappa)$, whereas the total-variation
+discrepancy of the noiseless outcome laws is exactly $1$. Consequently, for
+every total-variation tolerance $\varepsilon < 1$ and every
+window $T \ge t_\kappa$, the factor objects realize the target on $D_1$ while
+$\Th_1\otimes\Th_2$ fails to realize it on $D_{12}$.  Moreover
+$\delta(\kappa)\to 0$ as $\kappa\downarrow 0$ and $\delta(\kappa)\to 2$ as
+$\kappa\to\infty$.
 \end{newresult}
 
 \begin{proof}
-The pullback of $dq\wedge dp$ under $F$ is
-$d(\alpha q)\wedge d(p/\alpha)=dq\wedge dp$. Direct substitution gives
-$H_{m'}(F(q,p))=H_m(q,p)$. The prepared solution is
-$q_m(t)=\sin(\omega_0t)/(m\omega_0)$. Thus, for example, $m=1$, $m'=4$,
-$\omega_0=1$, and $t=1$ give readings $\sin 1$ and $\sin 1/4$, which are
-unequal. The mathematical isomorphism does not transport the fixed calibration
-used by the protocol.
+Set $u=(q_1+q_2)/\sqrt2$, $v=(q_1-q_2)/\sqrt2$ and correspondingly for the
+momenta; this is a linear symplectic change of coordinates, so the split form
+is preserved and
+$H^{\kappa} = \tfrac12(p_u^2+p_v^2) + \tfrac12 u^2 + \tfrac12(1+2\kappa)v^2$.
+The two normal modes are uncoupled harmonic oscillators with frequencies
+$\omega_+=1$ and $\omega_-=\sqrt{1+2\kappa}$.  The initial datum $z_0$ has
+$u=0$, $p_u=0$, $v=\sqrt2$, $p_v=0$, so $u(t)\equiv 0$ and
+$v(t)=\sqrt2\cos(\omega_- t)$, whence $q_1(t) = \cos(\omega_- t)$.
+
+By CS-T1 (equivalently HR prop-product-well-typed), the composite
+$\Th_1\otimes\Th_2$ has generator $H_1\circ\pi_1 + H_2\circ\pi_2$ and flow
+$\Phi^1_t\times\Phi^2_t$, so its prediction for the same datum is
+$q_1(t)=\cos t$.  At $t_\kappa = \pi/\omega_-$ the target value is
+$\cos\pi = -1$ and the composite's prediction is $\cos(\pi/\omega_-)$.  Since
+$\kappa>0$ gives $\omega_->1$, we have $0 < \pi/\omega_- < \pi$ and therefore
+$\cos(\pi/\omega_-) > -1$; the absolute difference is
+$1+\cos(\pi/\omega_-) = \delta(\kappa) > 0$.  Thus the predicted point masses
+are distinct. Under Definition~\ref{def:law}, their total-variation distance
+is exactly $1$, so realization fails precisely for tolerances $\varepsilon<1$.
+The limits stated for the separate coordinate diagnostic follow by continuity of
+$\kappa\mapsto 1+\cos(\pi/\sqrt{1+2\kappa})$ at the endpoints.
 \end{proof}
 
-\begin{interpretation}[Calibration transport, S-I2]
-Transporting the port calibration with $F$ removes this particular protocol
-difference. Keeping the calibration fixed does not. This is an interpretation
-of S-N2, not an empirical assertion that either oscillator is physically
-realized.
+\begin{interpretation}[Reading of New result~\ref{thm:adequacy}]
+\label{int:adequacy}
+The mathematics here is a quantified restatement of HR
+new-interaction-outside-tensor: because $\kappa\ne0$ makes the coupling
+non-constant, the target's flow is outside the range of $\otimes$, and the
+only contribution of this paper is the explicit coordinate diagnostic
+$\delta(\kappa)$ and its separation from the total-variation discrepancy.
+Under noiseless readout the latter jumps from $0$ to $1$ for every nonzero
+coupling; it does not inherit the smooth small-coupling behavior of
+$\delta(\kappa)$. Two
+readings must be resisted.  It does not show that composition fails in
+general. EL's compositional error bound remains a conditional positive result
+under its independence assumption, but this noiseless TV example supplies no
+small-error regime. It does show that the assumption is load-bearing, and that reporting factor
+adequacy without an interface test reports nothing about the composite.
 \end{interpretation}
 
-\begin{proposition}[Transported protocol restores equivalence, S-P2]
-Let a protocol for $H_m$ have preparation measure $\pi$, evolution $\phi_t$,
-and measurement kernel $K$.  Define the protocol for $H_{m'}$ by
-$\pi'=F_*\pi$, $\phi'_t=F\phi_tF^{-1}$, and
-$K'(x,B)=K(F^{-1}x,B)$.  Then the two predicted outcome measures agree for
-every admitted time and event $B$.
+\subsection{Isomorphism and empirical equivalence are incomparable}
+
+\begin{proposition}[Incomparability, with a recorded residual]
+\label{prop:incomparable}
+Consider bare isomorphism $\cong$ (HR Definition of morphism) and
+$\varepsilon$-empirical equivalence $\sim_\varepsilon$ on $(P,T)$
+(HR Definition of $\varepsilon$-empirical equivalence).  Then:
+\begin{enumerate}[label=(\roman*),leftmargin=*,itemsep=1pt]
+\item $\sim_\varepsilon$ does not imply $\cong$.  Witness: the harmonic object
+      and its quartic perturbation $H_\lambda = H_0 + \lambda q^4$ for
+      $\lambda$ small (HR prop-equivalent-not-isomorphic).
+\item $\cong$ does not imply identity of empirical models.  Witness: the
+      mass--spring and $LC$ objects with $m=L$, $k=1/C$, whose bare objects
+      are equal and whose empirical models are records in metres and in
+      coulombs respectively (HR prop-isomorphic-not-physically-equivalent).
+\end{enumerate}
+The two relations are therefore incomparable in this precise sense.  Residual:
+(ii) exhibits objects whose empirical models are not comparable without a
+translation of units, not two objects with a common registered outcome space
+and different laws.  Whether $\cong$ can fail to imply $\sim_\varepsilon$
+\emph{after} a fixed unit translation and a common registered outcome space is
+not settled by the series, and is recorded as
+Open problem~\ref{op:iso}.
 \end{proposition}
-\begin{proof}
-The primed prediction is
-\[
- \int K'(\phi'_t(x),B)\,d\pi'(x)
- =\int K(F^{-1}F\phi_t(y),B)\,d\pi(y)
- =\int K(\phi_t(y),B)\,d\pi(y),
-\]
-where the first equality uses the pushforward change of variables.  This is
-the unprimed prediction.  S-N2 differs because it intentionally fixes rather
-than transports the preparation and coordinate calibration.
-\end{proof}
-
-\begin{counterexample}[Partial transport is insufficient]
-Transport the Hamiltonian and preparation by $F$ but retain the original
-coordinate-reading kernel.  The evolved mathematical states correspond, but
-the unscaled readout again returns $q_m(t)$ versus $q_{m'}(t)$.  Dynamical
-intertwining alone does not establish protocol equivalence.
-\end{counterexample}
-
-\section{Limits and interface retention}
-
-\begin{newresult}[Fixed-interface commutation, S-N3]
-Let $\Sigma^{(i)}_\omega$ be identical oscillators of mass $m$ and frequency
-$\omega$, and let $\otimes_\kappa$ add the interaction $\kappa q_1q_2$. Then
-\[
- \lim_{\omega\to0}
- (\Sigma^{(1)}_\omega\otimes_\kappa\Sigma^{(2)}_\omega)
- =
- (\lim_{\omega\to0}\Sigma^{(1)}_\omega)
- \otimes_\kappa
- (\lim_{\omega\to0}\Sigma^{(2)}_\omega).
-\]
-If $\otimes_0$ is used on the right instead, its Hamiltonian differs from the
-fixed-interface limit by $\kappa q_1q_2$.
-\end{newresult}
 
 \begin{proof}
-Before taking the limit, the composite Hamiltonian is
-\[
- H_{\omega,\kappa}
- =\frac{p_1^2+p_2^2}{2m}
-  +\frac{m\omega^2(q_1^2+q_2^2)}2+\kappa q_1q_2.
-\]
-Taking $\omega\to0$ gives
-$H_{0,\kappa}=(p_1^2+p_2^2)/(2m)+\kappa q_1q_2$. Taking the isolated limits
-first gives $p_i^2/(2m)$, and applying the same $\otimes_\kappa$ adds the same
-interaction term. Both orders therefore yield $H_{0,\kappa}$. Applying
-$\otimes_0$ after the factor limits instead yields $H_{0,0}$, whose difference
-from $H_{0,\kappa}$ is $\kappa q_1q_2$.
+(i) HR proves a $\lambda$-independent Gr\"onwall bound
+$\sup_{z\in P}\sup_{t\in[0,T]}\|\Phi^\lambda_t z-\Phi^0_t z\|\le C\lambda$ and,
+separately, that the period function of $H_\lambda$ is non-constant while that
+of $H_0$ is constant, which blocks any isomorphism because isomorphisms
+intertwine flows and hence preserve periods.  Choosing $\lambda<\varepsilon/C$
+gives $\sim_\varepsilon$ without $\cong$.
+(ii) HR exhibits the identity of $\Rr^2$ as an isomorphism of bare objects and
+observes that $U$ deletes the unit assignment $\mathcal{U}$, so no bare
+isomorphism induces a map of empirical models.  By Axiom~\ref{ax:typed} the
+records are of different types, so the equality of empirical models is not
+merely false but ill-typed.  Combining the two witnesses gives
+incomparability.
 \end{proof}
 
-\begin{counterexample}[Counterexample to the rejected non-commutation claim]
-Retain $\kappa$ in both composition operations. The two Hamiltonians are then
-identical. Thus a comparison using $\otimes_\kappa$ before the limit and
-$\otimes_0$ afterward does not establish non-commutation of a fixed operation;
-it establishes that changing the interface data changes the system.
-\end{counterexample}
-
-\begin{proposition}[Vector-field form of fixed-interface commutation, S-P3]
-For the Hamiltonians in S-N3, the Hamiltonian vector fields converge
-coefficientwise, uniformly on compact subsets of phase space, to the vector
-field of $H_{0,\kappa}$.  Taking isolated limits and then applying the same
-$\otimes_\kappa$ produces that identical limiting field.
+\begin{proposition}[No arrow class in the series does all three jobs]
+\label{prop:arrows}
+Let $\mathcal{A}$ be one of the three arrow classes considered in the series:
+(a) all smooth maps (CS's $\Ham_{\rm kin}$); (b) maps with
+$\varphi^*\omega'=\omega$ and $H=H'\circ\varphi+c$ (HR's morphisms);
+(c) canonical relations.  Then no one of them has all three properties:
+preservation of Hamiltonian structure, containment of a dimension-decreasing
+(coarse-graining) arrow, and totally defined composition.
 \end{proposition}
+
 \begin{proof}
-Hamilton's equations are
-\[
- \dot q_i=p_i/m,\qquad
- \dot p_1=-m\omega^2q_1-\kappa q_2,\qquad
- \dot p_2=-m\omega^2q_2-\kappa q_1.
-\]
-On a compact set with $|q_i|\le R$, the difference from the $\omega=0$ field
-has norm at most $\sqrt2m\omega^2R$.  This tends uniformly to zero.  Applying
-the retained interface after the isolated limits writes down the same last
-two terms, so it gives exactly the same vector field.
+Class (a) contains the dilation $f(q,p)=(2q,p)$, for which
+$f^*(dq\wedge dp) = 2\,dq\wedge dp \ne dq\wedge dp$ (CS counterexample), so
+it fails preservation.  Class (b) satisfies preservation by definition, and
+by HR lem-symplectic-immersion every arrow is an immersion, so
+$\dim M\le\dim M'$ and HR new-no-coarse-graining excludes dimension decrease;
+it fails containment.  Class (c) contains reductions but, by HR
+est-weinstein-not-category, the set-theoretic composite of two canonical
+relations need not be a submanifold and need not be Lagrangian when it is, so
+composition is partial; it fails total composability.
 \end{proof}
 
-\begin{interpretation}[What the estimate does not prove]
-Uniform convergence of vector fields on compact phase-space sets supports
-finite-time trajectory comparison only together with an ODE stability
-argument and a common compact region containing the trajectories.  It does
-not establish uniform agreement for all initial data or all times.  The
-bounded-domain warning inherited from EL therefore remains relevant even
-though the algebraic commutation statement is exact.
-\end{interpretation}
+\begin{openproblem}
+\label{op:arrows}
+Proposition~\ref{prop:arrows} is a statement about the three classes the
+series considers, not a proof that no class succeeds.  Whether some class of
+arrows --- spans, decorated cospans, or the loose arrows of a double category
+--- achieves all three properties simultaneously for finite-dimensional
+symplectic objects is open, and is the content of HR
+conj-interconnection-completeness.
+\end{openproblem}
 
-\begin{proposition}[Finite-time trajectory estimate, S-P5]
-Fix a compact convex phase-space region $B$ and $T>0$.  Suppose the
-$\omega$ and zero-frequency solutions with common initial data remain in $B$
-for $0\le t\le T$.  Then, for a constant $L$ bounding the Lipschitz constant
-of the limiting linear vector field on $B$,
-\[
- \|z_\omega(t)-z_0(t)\|
- \le \frac{\sqrt2m\omega^2R}{L}(e^{Lt}-1)
-\]
-when $L>0$, with the quotient replaced by $t$ when $L=0$.
-\end{proposition}
-\begin{proof}
-Write the vector fields as $f_\omega$ and $f_0$.  The calculation in S-P3
-gives $\|f_\omega(z)-f_0(z)\|\le\varepsilon_\omega:=\sqrt2m\omega^2R$ on
-$B$.  The integral equations imply
-\[
- \|z_\omega(t)-z_0(t)\|
- \le\int_0^t\bigl(\varepsilon_\omega
-       +L\|z_\omega(s)-z_0(s)\|\bigr)\,ds.
-\]
-Gr\"onwall's inequality yields the displayed estimate.  The explicit
-compact-region hypothesis prevents the finite-time statement from being
-mistaken for a global uniform limit.
-\end{proof}
+\begin{openproblem}
+\label{op:iso}
+Do there exist two theory objects with isomorphic bare objects, a common
+registered outcome space, a fixed unit translation, and
+$\Delta_D>\varepsilon$?  A positive answer would strengthen
+Proposition~\ref{prop:incomparable}(ii) from a typing obstruction to a
+measured discrepancy; a negative answer would show that after unit
+translation isomorphism does imply empirical equivalence within this scope.
+\end{openproblem}
 
-\begin{counterexample}[Long times evade the estimate]
-Even for a single uncoupled oscillator,
-$q_\omega(t)=q_0\cos(\omega t)+(v_0/\omega)\sin(\omega t)$ approaches the free
-trajectory on bounded time intervals but not uniformly for all time.  Taking
-$t=2\pi/\omega$ with $v_0\ne0$ produces a discrepancy
-$2\pi|v_0|/\omega$.  Exact commutation of the Hamiltonian formula in S-N3
-therefore does not erase the domain qualifications attached to convergence of
-solutions.
-\end{counterexample}
+\section{Preserved disagreements and failed constructions}
+\label{sec:tensions}
 
-\subsection{Protocol quotient and composition}
+A synthesis that reported only the compatible parts would misrepresent the
+series.  Four failures and three tensions are recorded.  None is resolved
+here.
 
-For a fixed protocol, observational equivalence identifies realized models
-having identical families of predicted outcome measures.  Composition can
-descend to this quotient only if replacing either factor by an equivalent
-representative leaves every composite prediction unchanged.  This is a
-congruence requirement, stronger than equivalence of isolated predictions.
+\paragraph{Tension 1: the compositional verdict.}
+CS concludes with a layered positive result --- symmetric monoidal kinematics
+proved, factorized dynamics proved for separable generators, physical
+compositionality left to empirical assumption.  HR concludes that the
+compositional reading is \emph{incomplete in a provable way}: $\otimes$ cannot
+express interaction, the richer composition is partial, and the category has
+no coarse-graining arrows.  These are logically compatible --- CS proves that
+a monoidal structure exists, HR computes the range of that structure --- but
+they support different summaries, and the difference matters for the thesis.
+The consolidated position taken here: the existence claim is proved (CS-P1),
+the sufficiency claim is refuted for $\otimes$ alone (HR
+new-interaction-outside-tensor), and New result~\ref{thm:adequacy} shows the
+refutation survives translation into tolerance language.
 
-\begin{definition}[Protocol congruence, S-D3]
-An observational equivalence $\sim_P$ is a congruence for an
-interface-indexed operation $\otimes_\kappa$ when
-$M\sim_PM'$ and $N\sim_PN'$ imply
-$M\otimes_\kappa N\sim_{P_\kappa}M'\otimes_\kappa N'$ for the declared
-composite protocol $P_\kappa$.
-\end{definition}
+\paragraph{Tension 2: which arrows are the physics.}
+CS admits all smooth maps as processes, so that preparation and readout maps
+exist, and then must add a counterexample showing such arrows preserve
+neither the symplectic form nor Poisson brackets.  HR admits only
+form-preserving maps and then must record that coarse-graining leaves the
+category.  Proposition~\ref{prop:arrows} states the cost of each choice.  The
+series does not select between them, and this synthesis does not either.
 
-\begin{counterexample}[Isolated equivalence need not be a congruence]
-Let an isolated protocol read only positions at time zero.  Two oscillator
-models with identical prepared position distributions but different momenta
-are equivalent under that impoverished protocol.  Couple each to a second
-system and later read position.  Hamiltonian evolution can convert the hidden
-momentum difference into a position difference, so the composites are
-distinguishable.  Equivalence under the isolated protocol is therefore not
-automatically substitutive under richer composite interventions.
-\end{counterexample}
+\paragraph{Tension 3: metadata integrity of the series.}
+The round-four series review returned verdict \texttt{MAJOR} with five
+blocking findings, all of them about the correspondence between each paper's
+LaTeX and its machine-readable claim list: CS exported 7 claims against 27
+epistemic environments in the source; HR exported 44 against 53; EL exported
+5, with dependency fields containing free text (for example ``Definitions of
+empirical interpretation and indexed observational equivalence'') instead of
+claim identifiers; and CS-T1 depends on an identifier CS-L1 that its own
+metadata omits.  This synthesis repairs the ledger only for the claims it
+uses (Table~\ref{tab:ledger}, where every dependency is an identifier or a
+named established result).  It does not repair the companion papers' own
+metadata, and the review's finding stands against them.
 
-\begin{interpretation}[Required interface information]
-The counterexample does not show that quotient composition is impossible.  It
-shows that a protocol must expose enough port behavior, or equivalence must be
-defined against a sufficiently rich family of interventions, before
-congruence can be expected.  This motivates the interface datum in S-D1 and
-the qualification ``suitable'' in S-C3.
-\end{interpretation}
+\paragraph{Failed construction 1: the symplectic category.}
+Objects symplectic manifolds, arrows canonical relations, is the natural
+repair for the expressive deficit of $\otimes$.  It is not a category: the
+composite of two canonical relations need not be a submanifold, and need not
+be Lagrangian when it is (HR est-weinstein-not-category).  Transversality or
+clean-intersection hypotheses restore composition only partially.
 
-\begin{empirical}[Computational cross-check, S-E2]
-For $m=\kappa=1$ and initial data $(0,0,1,0)$, the retained-interface system
-has $q_1(t)=\tfrac12(\cos t-\cosh t)$, while the discarded-interface system
-has $q_1(t)=0$. The accompanying Haskell program evaluates both at $t=1$ by
-fourth-order Runge--Kutta integration. This finite-precision calculation is a
-software-process record, not a proof and not an observation of a physical
-system.
+\paragraph{Failed construction 2: a quantization functor.}
+No linear, unit-preserving map from the Poisson algebra of polynomials on
+$\Rr^{2n}$ to self-adjoint operators sends $\{f,g\}$ to
+$\frac{1}{i\hbar}[\hat f,\hat g]$ and acts irreducibly on linear polynomials
+(HR est-groenewold-van-hove).  The obstruction is a theorem, so the typed
+object does not extend functorially past its boundary.  Quantum theory is a
+boundary marker for this series and nothing is claimed inside it.
+
+\paragraph{Failed construction 3: dissipation inside the type.}
+A globally asymptotically stable planar field is Hamiltonian for \emph{no}
+symplectic form (HR new-damped-no-symplectic-form), so no change of geometry
+rescues damped systems within the type on that domain.  Time-dependent or
+restricted-domain presentations exist and are standard; they are different
+objects.
+
+\paragraph{Failed construction 4: formalizing the smooth theorems.}
+The intended formal appendix for this series was a machine-checked
+verification of its central results.  That was not achieved and is not
+claimed.  What was achieved is described next.
+
+\section{The formal companions, and what they do not certify}
+\label{sec:formal}
+
+Two files accompany this paper: \texttt{formal/lean/Proofs.lean} and
+\texttt{formal/haskell/Core.hs}.
+
+\begin{empirical}[Verification record]
+\label{emp:verification}
+The following are facts about this build environment, reported as run, not as
+claims about the mathematics.  \texttt{Proofs.lean} was checked by Lean
+version 4.33.0 with no imports beyond the core prelude, no Mathlib, and no
+occurrence of \texttt{sorry}; \texttt{\#print axioms} on each of its nineteen
+theorems reports dependence only on \texttt{propext} and \texttt{Quot.sound}
+(four of them on no axiom at all), and no theorem depends on
+\texttt{sorryAx} or on the axiom of choice.  \texttt{Core.hs} was compiled by
+GHC 9.14.1 on \texttt{aarch64-apple-darwin} under
+\texttt{-Wall -Wextra -Werror -fforce-recomp}, which reported no diagnostic
+and linked an executable; running that executable exits $0$ and reports all
+24 self-checks as \texttt{PASS} and none as \texttt{FAIL}.  A compilation and
+an exit status are facts about this host and this toolchain, and about
+nothing else: neither is evidence for any statement of the series, and
+Interpretations~\ref{int:lean} and \ref{int:haskell} bound what the two files
+can be read as certifying.
 \end{empirical}
 
-\section{Formal scope and dependencies}
+\begin{interpretation}[What the Lean file certifies]
+\label{int:lean}
+It certifies six discrete surrogates and nothing else.  In the surrogate a
+manifold is a bare type, a symplectic form is absent, a vector field is a step
+function, and the first de Rham cohomology of the circle is replaced by the
+cycle sum of a periodic integer sequence.  The checked statements are: the run
+of a monoidal product factors into the runs of its factors; every product is
+non-interacting and an explicitly coupled system is therefore not a product;
+a coupling is additively separable exactly when its mixed second difference
+vanishes; a difference operator determines its potential up to an additive
+constant; a periodic form admits a global potential exactly when its cycle sum
+vanishes, with the constant form on an $n$-cycle as an explicit obstruction;
+and a property is identifiable exactly when it factors through the
+observational quotient.  These are surrogates of CS-P1, HR
+new-interaction-outside-tensor, CS-N1, HR cor-underdetermination, HR
+thm-exact-sequence with its torus non-example, and EL C2, respectively.  A
+surrogate that checks does not certify the smooth statement.  Nothing in the
+file mentions a manifold, a $2$-form, a flow, a probability kernel, or a
+tolerance, so no theorem of the series is verified by it.
+\end{interpretation}
 
-\begin{definition}[Dependency ledger, S-D2]
-A dependency ledger records, for each inherited claim used by the synthesis,
-its source identifier, epistemic type, hypotheses, and the exact conclusion
-imported.  Recording a dependency does not re-prove it; it makes the boundary
-between inherited and newly proved content inspectable.
+\begin{interpretation}[What the Haskell file certifies]
+\label{int:haskell}
+Less.  Its type declarations render Definition~\ref{def:layers} and
+Definition~\ref{def:law} as types, which fixes arities and dependencies and
+makes the deletion performed by $U$ visible: units are a field of the
+interpretation record and are unreachable from the bare object.  Its checks
+are of two kinds, marked in the source.  Those marked \texttt{DEC} are exact
+on the finite data supplied --- separability on a grid, cycle sums,
+observational classes of a three-element model class --- and their
+correctness criteria are the statements proved in the Lean file.  Those marked
+\texttt{NUM} are floating-point illustrations with untracked discretisation
+and rounding error: RK4 trajectories exhibiting the Gr\"onwall-type
+separation of Proposition~\ref{prop:incomparable}(i), the decay of the damped
+field, and total-variation arithmetic.  A \texttt{NUM} check that passes is
+an illustration and is not evidence.
+\end{interpretation}
+
+\begin{openproblem}
+\label{op:formal}
+Formalize, in a proof assistant with a differential-geometry library, at least
+HR lem-hamiltonian-field and HR cor-underdetermination, and then
+Proposition~\ref{prop:constant} on top of them.  The surrogate development
+here indicates only that the combinatorial skeleton is consistent; the smooth
+content --- nondegeneracy, Cartan's formula, the Poincar\'e lemma --- is
+exactly what the surrogate omits.
+\end{openproblem}
+
+\section{Falsification conditions for the synthesised object}
+\label{sec:falsification}
+
+\begin{definition}[Refutation of the type on a domain]
+\label{def:refute}
+The three-layer type is refuted for a domain $D$ of physical systems when
+there are a system in $D$, a registered interpretation, and recorded data
+$\mathcal{D}$ such that no object satisfying the HR axioms on any
+finite-dimensional $M$, with any registered interpretation, satisfies
+Definition~\ref{def:law}'s realization criterion for $\mathcal{D}$.
 \end{definition}
 
-\begin{proposition}[No empirical promotion by conjunction, S-P4]
-Conjoining finitely many mathematical theorems and interpretations cannot by
-itself entail an empirical realization statement under S-A2 unless an
-empirical premise connecting the model to a procedure or observation is also
-supplied.
-\end{proposition}
-\begin{proof}
-S-A2 forbids identifying mathematical admissibility with realization.  The
-conclusions of the mathematical results constrain $K,D,$ and $I$, while a
-realization assertion additionally concerns $E,P,$ and $A$ by S-D1.  Without
-a premise about those components, the required connection is absent.  This is
-a typed consequence of the stipulated synthesis discipline, not a theorem of
-untyped propositional logic.
-\end{proof}
+Four registered targets, stated as targets and not as claims, and each with
+the companion result that makes it discriminating:
+\begin{enumerate}[label=\textbf{(F\arabic*)},leftmargin=*,itemsep=2pt]
+\item \emph{Bracket failure}: measured response functions of a closed
+      finite-dimensional system whose induced bracket violates the Jacobi
+      identity beyond tolerance.  This refutes $d\omega=0$ for that system
+      (HR lem-poisson-identities).
+\item \emph{Global generator failure}: measured evolution preserving $\omega$
+      with a measurably nonzero class $[\iota_X\omega]\in
+      H^1_{\mathrm{dR}}(M)$.  This refutes the dynamical-law axiom while
+      leaving the kinematic axioms intact (HR cor-underdetermination; the
+      Lean file's cycle-sum obstruction is the discrete shadow of this test).
+\item \emph{Irreducible dissipation}: a closed finite-dimensional system with
+      a globally asymptotically stable equilibrium.  By HR
+      new-damped-no-symplectic-form this refutes the dynamical law under
+      \emph{every} symplectic form on its state space.
+\item \emph{Interface failure}: two subsystems each realized to tolerance
+      $\varepsilon$ on isolated contexts whose joint records exceed
+      $\varepsilon$ on joint contexts by more than the EL compositional
+      bound permits.  By New result~\ref{thm:adequacy} this refutes the
+      independence assumption rather than the type, which is what makes it a
+      diagnostic rather than a global test.
+\end{enumerate}
 
-\begin{counterexample}[Agreement of artifacts is not independent evidence]
-If a Lean registry and a Haskell test are both transcribed from the same false
-paper premise, they may agree with one another while inheriting the same
-error.  Their agreement checks consistency of selected encodings, not the
-truth of an empirical premise or the correctness of omitted differential
-geometry.  S-E3 therefore records their limited scope explicitly.
-\end{counterexample}
-
-\begin{empirical}[Tool artifact record, S-E3]
-The accompanying \texttt{Proofs.lean} uses Lean core to check a finite claim
-registry and algebraic witnesses. The accompanying \texttt{Core.hs} provides
-finite numerical checks. These files do not formalize smooth manifolds,
-differential forms, ODE existence, or physical realization.
+\begin{empirical}[Evidential status]
+\label{emp:status}
+None of (F1)--(F4) is reported as observed here; no new measurement is
+presented in this paper.  The series' only empirical anchor is the cited
+adequacy of laboratory mass--spring and $LC$ objects within stated regimes
+(HR emp-laboratory-anchor), and its only cited refutation of a specific
+object is the perihelion advance of Mercury against the two-body Newtonian
+Hamiltonian~\cite{Will2014}, which refutes that object and not the type.
 \end{empirical}
 
-\begin{conjecture}[Interface-indexed composition, S-C3]
-There may exist a category of realized theory objects in which composition is
-indexed by explicit interface data and is compatible with protocol quotients
-and suitable limits. No such category, coherence theorem, or general
-continuity theorem is constructed here.
+\section{Open conjectures carried forward}
+
+\begin{conjecture}[Interconnection completeness; HR]
+\label{conj:interconnection}
+There is a symmetric monoidal double category whose loose arrows are
+partially-defined canonical relations and whose tight arrows are
+symplectomorphisms, in which every object
+$(M_1\times M_2,\ \omega_1\oplus\omega_2,\ H_1\oplus H_2 + V)$ arises as a
+composite of the factors and one arrow determined by $V$.
 \end{conjecture}
 
-\section{Bibliographic notes}
+\begin{conjecture}[Compositional empirical adequacy; EL]
+\label{conj:adequacy}
+For a useful class of finite-dimensional classical laboratory systems,
+interpretations and error budgets can be assigned compositionally so that
+subsystem adequacy plus verified interface assumptions entails system-level
+adequacy with nonvacuous bounds.
+\end{conjecture}
 
-The dependency identifiers CS, HR, and EL refer respectively to the supplied
-papers \emph{Compositional Systems in Finite-Dimensional Classical Mechanics},
-\emph{Hamiltonian Reconstruction, Reciprocity, and Typed Physical Structure},
-and \emph{Empirical Realization, Equivalence, Limits, and Falsification}.
-CS-P4 is used only for the statement that isolated factors do not determine an
-interaction. EL-P3 and EL-P4 are cited only for their bounded-domain limit
-warnings. The 15 August 2026 synthesis review supplied the counterexample that
-forced the corrected formulation of S-N3 and identified the non-injectivity
-error in the former S-P1.
+\begin{conjecture}[Joint form; this paper]
+\label{conj:joint}
+Conjectures~\ref{conj:interconnection} and \ref{conj:adequacy} are the
+mathematical and the empirical halves of one statement: that the
+interconnection arrow determined by a coupling $V$ can be assigned an error
+budget depending only on $V$ and on the interface, in such a way that
+New result~\ref{thm:adequacy}'s $\delta(\kappa)$ is recovered as the special
+case of a quadratic coupling.  We do not assert this; it is offered as the
+shape a positive result would have to take, and it inherits every obstruction
+recorded in Section~\ref{sec:tensions}.
+\end{conjecture}
 
-\section{Conclusion}
+\begin{conjecture}[Empirical bite of symplectic rigidity; HR]
+\label{conj:rigidity}
+There exist a finite-dimensional classical laboratory system, an
+interpretation, and two candidate objects agreeing on all volume-theoretic
+predictions within tolerance whose readout predictions differ by more than the
+tolerance solely as a consequence of Gromov non-squeezing.  No such
+realization is known to the series, and none is asserted.
+\end{conjecture}
 
-The synthesis establishes three scoped mathematical points. Reciprocal
-coupling can be Hamiltonian without being factorized. Closed Hamiltonian
-isomorphism does not determine equivalence under a fixed empirical protocol.
-For the oscillator family, a limit commutes with a fixed interaction-indexed
-composition, whereas discarding the interaction produces a different system.
-None of these mathematical results supplies evidence that a modeled structure
-is empirically realized.
+\section{Assessment}
+
+\begin{interpretation}[Status of the founding thesis after synthesis]
+\label{int:status}
+The bounded report the three papers jointly support, and nothing stronger.
+\emph{Precision:} for finite-dimensional classical mechanics the thesis is
+statable, by Definitions~\ref{def:layers} and \ref{def:law}.
+\emph{Internal coherence:} the object reproduces the standard formalism (HR
+thm-local-reconstruction, thm-exact-sequence) without modification.
+\emph{Usefulness:} the typing did work; it produced HR's three new results,
+CS's separation equivalence, EL's error-transfer theorem, and the four
+cross-paper statements of Section~\ref{sec:results}, and it converted the
+methodological preference for interconnection over tensor into a theorem
+about the range of $\otimes$.
+\emph{Costs, named:} $\otimes$ cannot express interaction; the natural richer
+composition is only partially defined; the structure-preserving arrow class
+contains no coarse-graining; the type does not extend functorially to quantum
+theory; and its formal appendix verifies discrete surrogates only.
+\emph{Verdict:} we do not report the thesis as established.  We report that,
+in this domain, it is precise, non-trivial, partially falsifiable by
+(F1)--(F4), and encumbered by five named deficits.  Realization remains what
+CS-I1, HR int-locus and EL's realization criterion each independently make it:
+empirical input, never a consequence of mathematical admissibility.
+\end{interpretation}
+
+\paragraph{Source status.}
+Bibliographic identity for the items below was verified in the Topic-2
+verification record and is inherited here rather than re-verified.  Two
+residuals from that record persist and are repeated so that they are not lost:
+the end page of Weinstein's \emph{Symplectic categories} is inferred, not
+confirmed; and chapter-level pointers into Abraham--Marsden, Arnold, and
+Marsden--Ratiu were not re-paginated against the physical editions.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{AbrahamMarsden1978}
+R.~Abraham and J.~E. Marsden, \emph{Foundations of Mechanics}, 2nd ed.,
+Benjamin/Cummings, Reading, MA, 1978.
+
+\bibitem{Arnold1989}
+V.~I. Arnold, \emph{Mathematical Methods of Classical Mechanics}, 2nd ed.,
+trans.\ K.~Vogtmann and A.~Weinstein, Graduate Texts in Mathematics 60,
+Springer, New York, 1989.
+
+\bibitem{BaezStay2011}
+J.~C. Baez and M.~Stay, ``Physics, topology, logic and computation: a Rosetta
+Stone,'' in B.~Coecke (ed.), \emph{New Structures for Physics}, Lecture Notes
+in Physics 813, Springer, Berlin, 2011, pp.~95--174; arXiv:0903.0340.
+
+\bibitem{Douglas1941}
+J.~Douglas, ``Solution of the inverse problem of the calculus of
+variations,'' \emph{Trans.\ Amer.\ Math.\ Soc.} \textbf{50} (1941), 71--128.
+
+\bibitem{Fong2015}
+B.~Fong, ``Decorated cospans,'' \emph{Theory Appl.\ Categ.} \textbf{30}
+(2015), no.~33, 1096--1120; arXiv:1502.00872.
+
+\bibitem{Gotay1998}
+M.~J. Gotay, ``Obstructions to quantization,'' arXiv:math-ph/9809011 (1998).
+
+\bibitem{Gromov1985}
+M.~Gromov, ``Pseudo holomorphic curves in symplectic manifolds,''
+\emph{Invent.\ Math.} \textbf{82} (1985), 307--347.
+
+\bibitem{MacLane1998}
+S.~Mac~Lane, \emph{Categories for the Working Mathematician}, 2nd ed.,
+Graduate Texts in Mathematics 5, Springer, New York, 1998.
+
+\bibitem{MarsdenRatiu1999}
+J.~E. Marsden and T.~S. Ratiu, \emph{Introduction to Mechanics and Symmetry},
+2nd ed., Texts in Applied Mathematics 17, Springer, New York, 1999.
+
+\bibitem{Norton2012}
+J.~D. Norton, ``Approximation and idealization: why the difference matters,''
+\emph{Philosophy of Science} \textbf{79} (2012), 207--232.
+
+\bibitem{Weatherall2019}
+J.~O. Weatherall, ``Theoretical equivalence in physics,'' \emph{Philosophy
+Compass} \textbf{14} (2019), e12592; arXiv:1810.08192.
+
+\bibitem{Weinstein2010}
+A.~Weinstein, ``Symplectic categories,'' \emph{Portugaliae Mathematica}
+\textbf{67} (2010), 261--278 (end page inferred).
+
+\bibitem{Will2014}
+C.~M. Will, ``The confrontation between general relativity and experiment,''
+\emph{Living Rev.\ Relativ.} \textbf{17} (2014), 4; arXiv:1403.7377.
+
+\bibitem{deMouraUllrich2021}
+L.~de Moura and S.~Ullrich, ``The Lean 4 theorem prover and programming
+language,'' in \emph{Automated Deduction --- CADE 28}, Lecture Notes in
+Computer Science 12699, Springer, 2021, pp.~625--635.
+
+\bibitem{CompanionCS}
+PRINCIPIA PHYSICA pilot, Topic 1, \emph{Compositional Systems in
+Finite-Dimensional Classical Mechanics},
+\texttt{papers/latex/compositional-systems.tex}, 16 August 2026.
+
+\bibitem{CompanionHR}
+PRINCIPIA PHYSICA pilot, Topic 2, \emph{Hamiltonian Reconstruction as a
+Physical Theory Object},
+\texttt{papers/latex/hamiltonian-reconstruction.tex}, 16 August 2026.
+
+\bibitem{CompanionEL}
+PRINCIPIA PHYSICA pilot, Topic 3, \emph{Empirical Realization, Equivalence,
+and Limits}, \texttt{papers/latex/empirical-limits.tex}, 16 August 2026.
+\end{thebibliography}
 
 \end{document}

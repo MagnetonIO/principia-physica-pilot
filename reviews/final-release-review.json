@@ -1,189 +1,34 @@
 {
   "schema": "principia.pilot.final-release-review.v1",
-  "task_id": "final_rereview",
-  "reviewer": "terminal independent review and release agent",
-  "reviewed_at": "2026-08-16T05:05:00Z",
   "verdict": "ACCEPT",
   "blocking_findings": [],
   "review_fix_passes": 2,
-  "scope_inspected": [
-    "papers/latex/compositional-systems.tex",
-    "papers/latex/hamiltonian-reconstruction.tex",
-    "papers/latex/empirical-limits.tex",
-    "papers/latex/synthesis.tex",
-    "papers/pdf/*.pdf",
-    "formal/lean/Proofs.lean",
-    "formal/haskell/Core.hs",
-    "receipts/formal.json",
-    "receipts/latex.json",
-    "receipts/recovery.json",
-    "receipts/website.json",
-    "reviews/topic-series-review.json",
-    "reviews/synthesis-review.json",
-    "reviews/website-review.json",
-    "reviews/website-self-review.json",
-    "website/index.html",
-    "website/styles.css",
-    "website/og.png",
-    "website/ mirrored papers, formal sources, receipts, and reviews",
-    "pilot/context/pilot-epistemic-contract.txt"
+  "evidence": [
+    "Lean reproduced independently: `lean formal/lean/Proofs.lean` exits 0 with empty output; the file has no import lines at all, so no Mathlib; `rg 'sorry|admit'` returns no match (placeholder_count 0).",
+    "Lean axiom audit reproduced independently by appending `#print axioms` for all 19 theorems: 4 (runPar, par_nonInteracting, obsEq_equivalence, obsEq_reindex) depend on no axiom; the remaining 15 depend only on propext and/or Quot.sound; none depends on sorryAx or Classical.choice. This exactly matches the claim in synthesis Empirical statement 6.1.",
+    "Haskell reproduced independently: `ghc-9.14.1 -Wall -Wextra -Werror -fforce-recomp -outputdir /tmp/principia-final/obj -o /tmp/principia-final/core formal/haskell/Core.hs` exits 0 with no diagnostic and links an executable on aarch64-apple-darwin; running it exits 0 and prints 24 PASS, 0 FAIL, '24 checks, 0 failed'.",
+    "Toolchain identity checked directly rather than assumed: `/opt/homebrew/bin/ghc-9.14.1 --info` reports Project version 9.14.1, Host and Target platform aarch64-apple-darwin. An unrelated GHC 8.4.2 (x86_64-apple-darwin) shadows `ghc` on PATH and cannot build this file at all; the receipt's named compiler was located and used explicitly.",
+    "All four papers rebuilt or re-checked with `latexmk -pdf -interaction=nonstopmode -halt-on-error -g -outdir=papers/pdf`, exit 0. Every final .log contains zero matches for Warning, Overfull, Underfull, '!', undefined, or multiply. `pdftotext` on synthesis.pdf finds zero '??' undefined-reference markers.",
+    "PDF page counts verified from the built files: compositional-systems 6, empirical-limits 8, hamiltonian-reconstruction 10, synthesis 10 - all inside the declared 6-10 range asserted by receipts/recovery.json final_acceptance.page_range.",
+    "Every sha256 in receipts/latex.json and receipts/formal.json recomputed against the file on disk after all edits; all 10 match.",
+    "Synthesis blocking finding SYN-N1 from reviews/synthesis-review.json re-derived from scratch and confirmed resolved. In normal coordinates u=(q1+q2)/sqrt2, v=(q1-q2)/sqrt2 the generator is (1/2)(pu^2+pv^2)+(1/2)u^2+(1/2)(1+2k)v^2, so omega_-=sqrt(1+2k); z0=(1,-1,0,0) gives u=0, v=sqrt2, hence q1(t)=cos(omega_- t) for the target and cos(t) for the tensor composite; at t_k=pi/omega_- the separation is 1+cos(pi/omega_-)=delta(k)>0. The released text now states failure for every total-variation tolerance epsilon < 1, not epsilon < delta(k). The reviewer's refuting instance (delta=1.5, epsilon=1.2) no longer falsifies the statement, because TV between distinct point masses is exactly 1 and 1 > epsilon is required.",
+    "Synthesis blocking finding SYN-I1 confirmed resolved: Interpretation 4.6 now states that under noiseless readout the total-variation discrepancy jumps from 0 to 1 for every nonzero coupling and does not inherit the smooth small-coupling behaviour of delta(k), and records EL's compositional bound as conditional with no small-error regime supplied by this example.",
+    "Metric distinctness verified as an epistemic requirement, not just a wording change: the coordinate diagnostic delta(k) and the total-variation discrepancy are now named as two different quantities in the statement, the proof, and the interpretation, so a mathematical separation is never reported as an empirical tolerance.",
+    "Epistemic-type distinctness audited across all four papers. The founding thesis appears as a Conjecture in compositional-systems, empirical-limits, and synthesis and is used as a premise in no proof. Established physical results (Darboux, Groenewold-van Hove, Gromov non-squeezing, Weinstein non-composability, Mercury perihelion 42.98 arcsec/century) are each cited to a source and are never mixed with newresult environments. Empirical statements assert only calibration/anchor inputs and the build record, and each says explicitly that no new measurement is reported.",
+    "Mathematical admissibility is never identified with physical realization: compositional-systems Interpretation 'Mathematical versus physical composition', empirical-limits Counterexample 'Admissibility without realization' and Proposition 'Limit realization does not follow from convergence', hamiltonian-reconstruction Interpretation 'Locus of empirical content', and synthesis Interpretation 6.6 all state the separation explicitly.",
+    "Website revalidated after repair with Python's stdlib html.parser: document parses, lang=en and viewport present, 27 relative and fragment targets resolved with 0 missing, all 12 epistemic labels present, 8 paper links (4 PDF + 4 LaTeX), 2 formal-artifact links, scope disclosure present.",
+    "Open Graph image verified with ImageMagick identify: 1200 x 630, PNG, sRGB; `file` confirms PNG image data 1200 x 630, not a letterboxed PDF thumbnail.",
+    "Website mirror verified by sha256 comparison: all 17 mirrored artifacts (4 .tex, 4 .pdf, Proofs.lean, Core.hs, 4 receipts, 3 reviews) are byte-identical to their sources at the repository root.",
+    "Every JSON file in the declared output set re-parsed with json.load after all edits; all well-formed."
   ],
-  "independent_verification": {
-    "lean": {
-      "command": "lean formal/lean/Proofs.lean",
-      "exit_status": 0,
-      "placeholder_scan": "grep -nE '\\b(sorry|admit)\\b' formal/lean/Proofs.lean",
-      "placeholders_found": 0,
-      "note": "Re-run twice: before and after the repair pass."
-    },
-    "haskell": {
-      "compile_command": "~/.ghcup/bin/ghc-9.14.1 -package-env=- -Wall -Wextra -Werror -fforce-recomp -fno-code formal/haskell/Core.hs",
-      "compile_exit_status": 0,
-      "runtime_command": "~/.ghcup/bin/runghc-9.14.1 -f ~/.ghcup/bin/ghc-9.14.1 -- -package-env=- -Wall -Wextra -Werror formal/haskell/Core.hs",
-      "runtime_exit_status": 0,
-      "runtime_checks_passed": 3,
-      "runtime_checks_total": 3,
-      "note": "The ghc on PATH is 8.4.2; the receipt's declared GHC 9.14.1 exists under ~/.ghcup/bin and was used. A default package environment file had to be suppressed with -package-env=- to reproduce the build."
-    },
-    "latex": {
-      "command": "latexmk -pdf -g -interaction=nonstopmode -halt-on-error -file-line-error -outdir=papers/pdf papers/latex/synthesis.tex",
-      "exit_status": 0,
-      "pages": 6,
-      "log_warning_scan": "clean (no LaTeX Warning, Overfull, Underfull, or undefined reference)"
-    },
-    "artifact_hashes": "All ten workspace artifacts (4 LaTeX, 4 PDF, Lean, Haskell) were re-hashed with shasum -a 256 and match receipts/formal.json and the updated receipts/latex.json.",
-    "website_mirror": "cmp confirms all 18 mirrored files under website/ are byte-identical to their accepted workspace sources.",
-    "website_structure": "Python html.parser: 1 h1, 12 ids, 27 hrefs, every local href and fragment resolves inside website/, no parent-escaping (../) reference, no duplicate accessible link name, all 12 exact epistemic labels present. CSS delimiters balanced (96/96) with 3 media queries. HTML Tidy reports only legacy HTML5 element-recognition warnings, no markup errors.",
-    "open_graph": "magick identify confirms website/og.png is exactly 1200x630 8-bit sRGB; visual inspection confirms a designed card (wordmark, rendered title, accent stripe, section tags), not a letterboxed PDF thumbnail."
-  },
-  "falsification_attempts": [
-    {
-      "target": "synthesis S-E2 (empirical statement): retained-interface q_1(t) = (1/2)(cos t - cosh t), discarded-interface q_1(t) = 0.",
-      "method": "Solved the linear system independently: with m = kappa = 1, omega = 0 and initial data (0,0,1,0) the fourth-order equation is q_1'''' = q_1 with q_1(0)=0, q_1'(0)=0, q_1''(0)=-1, q_1'''(0)=0, giving q_1 = (1/2)cos t - (1/2)cosh t; the kappa = 0 system gives q_1 identically 0. Analytic value at t=1 is -0.5013891639.",
-      "outcome": "not falsified",
-      "evidence": "The Haskell RK4 witness printed -0.501389164 for both retained-interface orderings and 0.000000000 for the discarded-interface case."
-    },
-    {
-      "target": "synthesis S-N3 (new result): the zero-frequency limit commutes with interaction-indexed composition.",
-      "method": "Recomputed both orders of H_{omega,kappa} directly and checked the counterexample the synthesis review supplied against the corrected statement.",
-      "outcome": "not falsified",
-      "evidence": "Both orders yield H_{0,kappa}; only substituting the different operation tensor_0 changes the Hamiltonian, by exactly kappa q_1 q_2, which is what the corrected S-N3 and its accompanying counterexample assert."
-    },
-    {
-      "target": "hamiltonian-reconstruction N2 (new result): a1 c12 = a2 c21 obstruction.",
-      "method": "Recomputed the (1,2) off-diagonal block of A^T Omega_0 + Omega_0 A for Omega_0 = diag(a1 J, a2 J) in coordinates (q1,p1,q2,p2).",
-      "outcome": "not falsified",
-      "evidence": "The block equals a2 c21 - a1 c12 in its (1,1) entry and vanishes elsewhere, so the stated reduction and the unidirectional obstruction corollary both hold."
-    },
-    {
-      "target": "empirical-limits P3 (proposition): non-uniformity of the Newtonian limit.",
-      "method": "Evaluated T_c and T_N at the stated countersequence p = mc.",
-      "outcome": "not falsified",
-      "evidence": "T_c(mc) = mc^2(sqrt2 - 1) and T_N(mc) = mc^2/2, so the gap is mc^2|sqrt2 - 3/2| which grows with c, exactly as displayed."
-    },
-    {
-      "target": "empirical-limits P4 (proposition): finite-time oscillator limit and its two countersequences.",
-      "method": "Checked the Taylor bounds and evaluated at t = 2pi/omega and t = pi/omega.",
-      "outcome": "not falsified",
-      "evidence": "Both remainder bounds and both discrepancies (2pi|v_0|/omega and 2|q_0|) reproduce."
-    },
-    {
-      "target": "synthesis S-L1 (lemma): the contraction calculation.",
-      "method": "Applied the lemma's own stated rule iota_Y(dq wedge dp) = qdot dp - pdot dq to Y = (0, -C12 q2, 0, -C21 q1), and cross-checked against the interaction Hamiltonian H_int = q_1^T C_12 q_2 recorded in hamiltonian-reconstruction N1.",
-      "outcome": "FALSIFIED on first pass, repaired",
-      "evidence": "See repairs_applied entry SYN-SL1-SIGN."
-    },
-    {
-      "target": "website claim that review evidence is published intact.",
-      "method": "Byte-compared each published review under website/reviews/ against its workspace source.",
-      "outcome": "FALSIFIED on first pass, repaired",
-      "evidence": "See repairs_applied entry WEB-REVIEW-SUBSTITUTION."
-    },
-    {
-      "target": "epistemic-type separation across all four papers and both formal companions.",
-      "method": "Enumerated every labelled environment and checked that no assumption, conjecture, interpretation, or empirical statement is used as a proved premise, and that no mathematical result is asserted to establish physical realization.",
-      "outcome": "not falsified",
-      "evidence": "The twelve contract labels are declared as distinct theorem environments in all four papers, mirrored as a twelve-constructor Label type in both Proofs.lean and Core.hs, and displayed as twelve distinct entries on the website. Realization claims are confined to Empirical statement and Interpretation environments; synthesis S-P4 proves explicitly that conjunction of mathematical results cannot entail realization; both formal companions carry explicit scope-limitation headers and the website reproduces that limitation verbatim."
-    }
-  ],
-  "repairs_applied": [
-    {
-      "id": "SYN-SL1-SIGN",
-      "severity": "blocking",
-      "location": "papers/latex/synthesis.tex, Lemma S-L1 (Contraction calculation)",
-      "defect": "The first display read iota_Y omega_oplus = -(C_12 q_2).dq_1 - (C_21 q_1).dq_2. Under the proof's own stated rule qdot dp - pdot dq, with the velocity components of Y equal to zero and the momentum components equal to -C_12 q_2 and -C_21 q_1, the correct result is +(C_12 q_2).dq_1 + (C_21 q_1).dq_2. The printed sign also contradicted the lemma's own second display, which is only consistent with the positive form, and contradicted hamiltonian-reconstruction N1, where the same contraction equals dH_int for H_int = q_1^T C_12 q_2. A proved lemma therefore displayed a false intermediate identity.",
-      "fix": "Signs corrected and the substitution step in the proof made explicit so the reduction is checkable line by line.",
-      "downstream_impact": "None. The lemma's conclusion is used only through the vanishing condition C_21 = C_12^T, which is invariant under overall sign, so S-N1, S-C1, and the normal-mode example are unchanged.",
-      "revalidation": "latexmk exit 0, synthesis.pdf still 6 pages, log warning scan clean, corrected line confirmed in the rendered PDF by pdftotext, receipts/latex.json source and PDF SHA-256 updated to the real new values with the previous values retained."
-    },
-    {
-      "id": "WEB-REVIEW-SUBSTITUTION",
-      "severity": "blocking",
-      "location": "website/reviews/website-review.json and website/index.html evidence section",
-      "defect": "The file published as the website review was byte-identical to reviews/website-self-review.json, the round-two self-assessment whose verdict is ACCEPT. The actual external website review, verdict MAJOR with three blocking findings, was not published at all. The page presented this link under a Peer review heading whose surrounding copy asserts that records are published intact and that review evidence is not a decorative badge, so the substitution made an adverse verdict invisible while claiming transparency.",
-      "fix": "website/reviews/website-review.json now carries the external MAJOR review; the self-review is published separately as website/reviews/website-self-review.json; the evidence copy states the MAJOR verdict, its three blocking findings, and that the self-review sits beside rather than in place of it; all four review links are labelled with their verdicts.",
-      "revalidation": "cmp confirms both published reviews are byte-identical to their workspace sources; both parse with jq; both links resolve."
-    },
-    {
-      "id": "WEB-LINK-NAMES",
-      "severity": "non-blocking",
-      "location": "website/index.html paper cards",
-      "defect": "Four links had the accessible name PDF and four had LaTeX, so a screen-reader link list gave eight indistinguishable entries. This was an explicit required change in reviews/website-review.json that had not been applied.",
-      "fix": "Each of the eight links now carries a unique aria-label naming its paper.",
-      "revalidation": "Accessible-name extraction reports no duplicate names."
-    },
-    {
-      "id": "WEB-OG-ABSOLUTE",
-      "severity": "non-blocking",
-      "location": "website/index.html head",
-      "defect": "og:image was the relative value og.png and og:url was absent. Relative Open Graph image references are not reliably resolved by link unfurlers, which matters because the production URL is announced to Slack. This was also an unapplied required change from reviews/website-review.json.",
-      "fix": "og:image and og:url set to absolute URLs under the production alias reported by vercel inspect. The alias was read from tool output, not assumed.",
-      "revalidation": "Both meta values confirmed present and absolute; og:description was already present."
-    },
-    {
-      "id": "WEB-RECEIPT-COUNTS",
-      "severity": "non-blocking",
-      "location": "receipts/website.json, source_equivalence check detail",
-      "defect": "The detail string counted two evidence reviews and three upstream receipts. After the review-substitution repair the mirror carries four reviews and four receipts, so the published count was stale.",
-      "fix": "Detail string updated to the actual mirrored set and re-mirrored to website/receipts/website.json.",
-      "revalidation": "jq parse OK; cmp confirms mirror equality."
-    }
-  ],
-  "non_blocking_observations": [
-    "reviews/synthesis-review.json cites identifiers S-E1, S-C2, and an S-P2 described as the a1 c12 = a2 c21 reduction. These belong to the reviewed draft, not the corrected synthesis, whose S-P2 is the transported-protocol proposition. The review is published as a historical record of that draft, which the website now states explicitly, so no correction to the review is appropriate.",
-    "reviews/topic-series-review.json records the same content-free explanation string for all thirteen assessed claims. It carries no independent verification weight; this final review does not rely on it, and every claim it names was re-derived here directly from the sources.",
-    "In synthesis S-N2 the printed readings 'sin 1 and sin 1/4' are typographically ambiguous, though the surrounding formula q_m(t) = sin(omega_0 t)/(m omega_0) fixes the intended reading as (sin 1)/4. Both possible readings differ from sin 1, so the proof's conclusion holds either way. Left unchanged as a presentational matter.",
-    "In website/og.png the horizontal axis element visually crosses the descender line of the word 'earned.' The card meets every stated requirement (1200x630, designed rather than letterboxed, legible title), so the asset was left byte-stable rather than regenerated.",
-    "compositional-systems.tex bibliography key AbrahamMarsden1978 points to the AMS Chelsea 2008 reprint of the 1978 second edition. The key and the printed date are both accurate for their referents."
-  ],
-  "epistemic_contract_assessment": {
-    "required_labels_present_in_all_four_papers": true,
-    "labels": [
-      "Definition",
-      "Axiom",
-      "Assumption",
-      "Conjecture",
-      "Lemma",
-      "Proposition",
-      "Theorem",
-      "Corollary",
-      "Interpretation",
-      "Empirical statement",
-      "Established physical result",
-      "New result claimed by this work"
-    ],
-    "assumptions_distinct_from_theorems": true,
-    "conjectures_distinct_from_proved_results": true,
-    "empirical_statements_marked_as_input_not_output": true,
-    "established_results_cited": true,
-    "new_results_isolated": true,
-    "admissibility_not_identified_with_realization": true,
-    "supporting_evidence": "Each paper declares the twelve labels as separate theorem environments and uses them consistently. CS-C2, EL-C3, and S-C3 are the only compositionality claims of general scope and all three are Conjecture environments that state what is not constructed. EL-E1, EL-E2, CS-E2, HR-E2, HR-E3, S-E2, and S-E3 are the only empirical statements and each declares itself as input, a cited device fact, or a tool record rather than a new measurement. Synthesis S-P4 proves that no conjunction of the mathematical results entails a realization claim, and the counterexample following it states that agreement between the Lean and Haskell artifacts checks encoding consistency only."
-  },
-  "external_action_gate": {
-    "gate": "no external write before verdict ACCEPT with zero blocking findings",
-    "verdict_at_gate": "ACCEPT",
-    "blocking_findings_at_gate": 0,
-    "satisfied": true
-  }
+  "repairs": [
+    "papers/latex/synthesis.tex, Empirical statement 6.1 (Verification record): the released text claimed Core.hs 'type-checks under GHC 8.4.2 with -Wall', that its 24 self-checks pass 'under the interpreter', and that native code generation was unavailable so the file was verified 'by ghc -Wall -fno-code together with runghc, not by a linked binary'. Every one of those is false of the verification that receipts/formal.json actually records and that I reproduced: GHC 9.14.1 on aarch64-apple-darwin under -Wall -Wextra -Werror -fforce-recomp, no diagnostic, a linked executable, exit 0. Because this is an Empirical statement explicitly framed as 'facts about this build environment, reported as run', a false build record is a violation of the pilot's epistemic contract. Rewrote it to the reproduced facts and added an explicit note that a compilation and an exit status are evidence for nothing in the series. The Lean half of the statement was left unchanged because independent re-derivation confirmed it exactly.",
+    "papers/latex/synthesis.tex: the paper named its formal companions as formal/drafts/Proofs.lean and formal/drafts/Core.hs, and cited the three companion papers at papers/drafts/*.tex. Those are pre-release draft paths; the published artifacts are formal/lean/Proofs.lean, formal/haskell/Core.hs and papers/latex/*.tex. Repointed all six references so the paper's own pointers resolve in the published archive.",
+    "papers/latex/synthesis.tex: the paper contains no theorem environment, yet cross-referenced its single 'New result claimed by this work' (Composite adequacy is not inherited) as 'Theorem~\\ref{thm:adequacy}' in five places, so the PDF rendered 'Theorem 4.5' against a statement displayed as 'New result claimed by this work 4.5'. This both broke reference integrity and presented a self-claimed new result under the stronger established label. Changed all five to 'New result~\\ref{thm:adequacy}', matching the convention hamiltonian-reconstruction already uses. Verified in the rebuilt PDF: 'New result 4.5' renders at all five sites and the only remaining occurrence of 'Theorem' is the enumeration of the twelve epistemic labels.",
+    "formal/haskell/Core.hs: the header declared 'Toolchain: GHC 8.4.2, @base@ only' with build line 'ghc -Wall Core.hs -o core && ./core'. Under GHC 8.4.2 the file does not compile - foldl' is used at lines 75 and 342 and base < 4.20 does not re-export it from Prelude, so the compiler reports 'Variable not in scope: foldl'' twice. The header therefore named a toolchain under which the artifact fails. Corrected to GHC 9.14.1 (aarch64-apple-darwin) with the strict flag set actually used, added the base >= 4.20 requirement, and repointed the two formal/drafts/ references to the published paths. Re-verified the file after the edit: exit 0, 24 PASS, 0 FAIL.",
+    "papers/latex/compositional-systems.tex: its bibliography gave Baez and Stay, LNP 813, as pp. 95-172, contradicting the series' own source verification record in hamiltonian-reconstruction, which lists pp. 95-174 as confirmed against publisher records, and contradicting synthesis, which inherits that record. Checked the arXiv journal-reference field for arXiv:0903.0340 directly: 'pp. 95-174'. compositional-systems was the outlier and was corrected to 95-174; the series is now internally consistent and consistent with the source.",
+    "website/reviews/website-self-review.json was a declared output of this node and did not exist; only the round-2 website-review.json had been mirrored. Created it from reviews/website-self-review.json and added a link to it from the Evidence section of website/index.html, relabelling the pair as 'Website review, round 1' and 'Website review, round 2' so the published evidence trail shows the CHANGES_REQUIRED verdict as well as the ACCEPT.",
+    "Removed stray compiler artifacts Core.hi and Core.o (222 KB Mach-O 64-bit arm64 object) from formal/haskell/ and from website/formal/haskell/. They were written into the source tree by the earlier verification run because no -outputdir was given, and had been mirrored into the published site. They are not declared outputs and shipping a build object inside a paper archive misrepresents what the site distributes. The re-verification build was rerun with -outputdir pointed outside the tree; the tree now contains no .hi or .o file.",
+    "Rebuilt papers/pdf/synthesis.pdf and papers/pdf/compositional-systems.pdf from the corrected sources with the receipt's own latexmk invocation, then recomputed every sha256 in receipts/latex.json and receipts/formal.json against disk, set receipts/latex.json correction_passes to 3 to include this terminal repair pass, recorded the exact ghc-9.14.1 command line actually executed, and re-mirrored all 17 changed artifacts into website/."
+  ]
 }

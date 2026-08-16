@@ -1,23 +1,20 @@
 {
-  "schema": "principia.pilot.formal.v1",
-  "status": "ok",
-  "verified": true,
-  "review_fix_passes": 1,
+  "schema": "principia.verification.formal.v1",
   "lean": {
     "tool": "Lean 4.33.0",
     "command": "lean formal/lean/Proofs.lean",
     "exit_status": 0,
-    "placeholder_scan": "rg -n \\\"\\\\b(sorry|admit)\\\\b\\\" formal/lean/Proofs.lean",
-    "placeholder_scan_exit_status": 1,
-    "placeholders_found": 0,
-    "sha256": "971ff409f14086952ac48cf9ca43241e0a5ee0e175b39f1679aafa190508336f"
+    "placeholder_scan": "rg sorry|admit",
+    "placeholder_count": 0,
+    "sha256": "e4c23d6b2a9f36bb61d54d1923ee5222896b3ab705318ebc82a43c8ca4424ae5"
   },
   "haskell": {
     "tool": "GHC 9.14.1",
-    "command": "ghc -Wall -Wextra -Werror -fforce-recomp -fno-code formal/haskell/Core.hs",
-    "exit_status": 0,
-    "runtime_command": "runghc -Wall -Wextra -Werror formal/haskell/Core.hs",
-    "runtime_exit_status": 0,
-    "sha256": "164be0564fe3960fe2478f3780c119a928cfb724e8327c695befa96c49fcb499"
+    "command": "ghc-9.14.1 -Wall -Wextra -Werror -fforce-recomp -outputdir /tmp/principia-final/obj -o /tmp/principia-final/core formal/haskell/Core.hs",
+    "compiler_exit_status": 0,
+    "executable_exit_status": 0,
+    "checks_passed": 24,
+    "checks_failed": 0,
+    "sha256": "fe7c25b8a5cafc600698a920e5990786e2656ed1f56b8b0a177c45904d21b068"
   }
 }

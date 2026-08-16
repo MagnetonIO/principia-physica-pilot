@@ -1,442 +1,1358 @@
-\documentclass[10pt]{article}
-\usepackage[margin=.9in]{geometry}
-\usepackage{amsmath,amssymb,amsthm,mathtools}
-\usepackage[hidelinks]{hyperref}
-\usepackage{microtype}
-\usepackage{multicol}
+% PRINCIPIA PHYSICA -- pilot topic 2
+% Hamiltonian reconstruction as a physical theory object
+% arXiv-style preprint, self-contained (no external .bib required)
+\documentclass[10pt,a4paper]{article}
 
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{newtxtext}
+\usepackage[varvw]{newtxmath}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\titlespacing*{\section}{0pt}{1.4ex plus .2ex}{0.7ex}
+\titlespacing*{\subsection}{0pt}{1.1ex plus .2ex}{0.4ex}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalfont\bfseries}{\thesubsection}{0.6em}{}
+
+% Compact display spacing, reapplied at every size change.
+\makeatletter
+\g@addto@macro\normalsize{%
+  \setlength{\abovedisplayskip}{5pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayskip}{5pt plus 2pt minus 2pt}%
+  \setlength{\abovedisplayshortskip}{2pt plus 1pt}%
+  \setlength{\belowdisplayshortskip}{3pt plus 1pt}}
+\makeatother
+
+% Tighter vertical spacing around the many typed statement environments.
+\makeatletter
+\def\thm@space@setup{\thm@preskip=4pt plus1pt minus1pt
+                     \thm@postskip=4pt plus1pt minus1pt}
+\makeatother
+
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framesep=4pt,
+  xleftmargin=6pt,
+  breaklines=true
+}
+
+% ---------------------------------------------------------------
+% Epistemic environments. Every numbered statement in this paper
+% carries exactly one epistemic type. The types share a counter so
+% that the type of a claim can never be inferred from its number.
+% ---------------------------------------------------------------
+\theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 \newtheorem{axiom}[definition]{Axiom}
 \newtheorem{assumption}[definition]{Assumption}
 \newtheorem{conjecture}[definition]{Conjecture}
+\newtheorem{interpretation}[definition]{Interpretation}
+\newtheorem{empirical}[definition]{Empirical statement}
+\newtheorem{established}[definition]{Established result}
+\newtheorem{newresult}[definition]{New result claimed by this work}
+\newtheorem{example}[definition]{Example}
+\newtheorem{nonexample}[definition]{Non-example}
+\newtheorem{remark}[definition]{Remark}
+
+\theoremstyle{plain}
 \newtheorem{lemma}[definition]{Lemma}
 \newtheorem{proposition}[definition]{Proposition}
 \newtheorem{theorem}[definition]{Theorem}
 \newtheorem{corollary}[definition]{Corollary}
-\newtheorem{interpretation}[definition]{Interpretation}
-\newtheorem{empirical}[definition]{Empirical statement}
-\newtheorem{established}[definition]{Established physical result}
-\newtheorem{newresult}[definition]{New result claimed by this work}
-\newtheorem{counterexample}[definition]{Counterexample}
-\newtheorem{example}[definition]{Example}
 
-\newcommand{\R}{\mathbb R}
-\newcommand{\dd}{\mathrm d}
+\newcommand{\Rr}{\mathbb{R}}
+\newcommand{\Cinf}[1]{C^{\infty}(#1)}
+\newcommand{\Xf}{\mathfrak{X}}
+\newcommand{\Ham}{\mathrm{Ham}}
+\newcommand{\Symp}{\mathrm{Symp}}
+\newcommand{\dR}{\mathrm{dR}}
+\newcommand{\Th}{\mathbb{T}}
+\DeclareMathOperator{\Ker}{ker}
+\DeclareMathOperator{\Imm}{im}
+\DeclareMathOperator{\dive}{div}
+\DeclareMathOperator{\Area}{Area}
 
-\title{Hamiltonian Reconstruction, Reciprocity, and Typed Physical Structure}
-\author{PRINCIPIA PHYSICA Research Worker}
-\date{15 August 2026}
+\title{\bfseries Hamiltonian Reconstruction as a Physical Theory Object\\[2mm]
+\large A typed reconstruction of finite-dimensional Hamiltonian mechanics,\\
+with its composition laws, its empirical interpretation, and its limits}
+
+\author{PRINCIPIA PHYSICA pilot, Topic 2\\
+\small Compositional Foundations of Finite-Dimensional Classical Mechanics}
+
+\date{16 August 2026}
 
 \begin{document}
+\sloppy
+\hbadness=10000
 \maketitle
 
 \begin{abstract}
-We reconstruct Hamiltonian dynamics from an autonomous symplectic flow and identify the cohomological obstruction to a global Hamiltonian. We then study composition through linear interconnections. Preservation of the product symplectic form is equivalent to reciprocity of the coupling matrices. In one degree of freedom per factor, unidirectional coupling admits no invariant symplectic form compatible with the declared split. Examples involving non-Jacobi brackets, torus translations, damped oscillators, and empirically interpreted oscillators delimit the results. Mathematical, interface, and empirical structure remain separately typed throughout.
+We reconstruct finite-dimensional Hamiltonian mechanics as an explicitly
+\emph{typed} object --- a kinematic type, an observable type, a generator, a
+dynamical law, and an empirical interpretation --- under six stated axioms and
+one stated assumption. After proving the standard structural facts within this
+presentation, we use the typing to isolate four results bearing on the
+compositional thesis under test in this pilot. (i) The Cartesian monoidal
+product of Hamiltonian theory objects has image exactly the non-interacting
+composites, so interaction is provably outside the range of $\otimes$. (ii)
+Symplectic morphisms are immersions, so coarse-graining is not a morphism of
+the category and reduction must be a different operation. (iii) A globally
+asymptotically stable dissipative field on a surface is not Hamiltonian for
+\emph{any} symplectic form, not merely for the standard one. (iv) A matched
+pair of counterexamples separates mathematical from empirical equivalence in
+both directions, by an explicit Gr\"onwall bound in one direction and an
+explicit period-function obstruction in the other. We state four structural
+limits --- Darboux triviality, the failure of the symplectic ``category'' to
+be a category, the Groenewold--van Hove obstruction, and symplectic rigidity
+--- and give falsification conditions. We do not claim the compositional
+thesis is established, only that this reconstruction makes it precise enough
+to be attacked. A Haskell appendix renders the type skeleton; it is a typing,
+not a formal proof.
 \end{abstract}
 
-\section{Typed presentation}
+% ===============================================================
+\section{Introduction and epistemic conventions}
+% ===============================================================
 
-\begin{definition}[Typed theory object, D1]
-A theory object is a tuple $T=(K,D,I,E)$. The kinematic layer $K$ contains states, geometric structure, and an observable algebra. The dynamical layer $D$ contains admissible evolution. The interface $I$ lists port observables through which composition or intervention occurs. The empirical layer $E$ contains preparation procedures, measurement assignments, dimensions, and uncertainties.
+\subsection{The thesis under test}
+
+The PRINCIPIA PHYSICA pilot investigates the thesis that \emph{physics is the
+study of empirically realized compositional mathematical structures}. This
+paper does not assume that thesis. It performs one bounded task on which the
+thesis can be tested: it reconstructs finite-dimensional Hamiltonian mechanics
+as a typed object, records exactly which of its features are mathematical and
+which are empirical, and reports where the compositional reading succeeds,
+where it is silent, and where it provably fails.
+
+Three separations organise the paper.
+\textbf{(S1) Structure versus law:} the kinematic type $(M,\omega)$ and the
+dynamical law $\iota_{X_H}\omega = dH$ are logically independent data, and
+Section~\ref{sec:reconstruction} shows what each contributes.
+\textbf{(S2) Mathematical versus physical equivalence:} an isomorphism of the
+underlying mathematical objects is neither necessary nor sufficient for
+empirical indistinguishability, and Section~\ref{sec:empirical} proves both
+non-implications.
+\textbf{(S3) Composition versus interaction:} the monoidal product of
+Hamiltonian systems exists, and Section~\ref{sec:composition} proves that it
+cannot express interaction, so any compositional account of physics must
+supply an interconnection operation that is not $\otimes$.
+
+\subsection{Scope}
+
+Everything below is confined to smooth, finite-dimensional, real classical
+systems. Field theory, infinite-dimensional analysis, general relativity,
+quantum theory, and quantum field theory appear only as \emph{boundary tests}:
+they are named to mark where the present type stops applying, and no result is
+claimed inside them. No new experimental claim is made anywhere in this paper.
+
+\subsection{Epistemic conventions}
+\label{sec:conventions}
+
+Every numbered statement carries exactly one of the following types, and the
+types share a single counter so that a statement's number never encodes its
+epistemic status:
+\emph{Definition}, \emph{Axiom}, \emph{Assumption}, \emph{Conjecture},
+\emph{Lemma}, \emph{Proposition}, \emph{Theorem}, \emph{Corollary},
+\emph{Interpretation}, \emph{Empirical statement}, \emph{Established result},
+\emph{New result claimed by this work}. We use them as follows.
+\emph{Axiom} marks a stipulation constitutive of the object being defined; it
+is not asserted to be true of the world. \emph{Assumption} marks a restriction
+adopted to make a proof go through; assumptions are never upgraded to theorems
+anywhere in this paper, and where one fails we give a non-example.
+\emph{Established result} marks a statement proved elsewhere and cited, not
+reproved here. \emph{New result claimed by this work} marks statements we
+prove here and put forward as the contribution; where a statement is
+elementary and probably folklore we say so in the same breath, and the claim
+is then to the \emph{explicit statement} rather than to mathematical novelty.
+\emph{Empirical statement} marks a claim about measurement outcomes, either
+cited to a measurement or flagged as an input. \emph{Interpretation} marks a
+semantic bridge between formal structure and physical vocabulary;
+interpretations are not derived. All references were checked for bibliographic
+identity before citation, and Appendix~\ref{app:verification} records what was
+confirmed for each and what remains inferred.
+
+% ===============================================================
+\section{The typed object}
+\label{sec:object}
+% ===============================================================
+
+\subsection{Types}
+
+\begin{definition}[Type vocabulary]
+\label{def:types}
+We use five sorts. A \emph{kinematic type} is a pair $(M,\omega)$ with $M$ a
+smooth manifold and $\omega$ a differential $2$-form on $M$. An
+\emph{observable type} over $(M,\omega)$ is the commutative $\Rr$-algebra
+$\mathcal{A}(M) := \Cinf{M,\Rr}$. A \emph{generator} is an element
+$H \in \mathcal{A}(M)$. A \emph{process type} over $(M,\omega)$ is a smooth
+local flow on $M$. An \emph{interpretation} is the data specified in
+Definition~\ref{def:interpretation}.
 \end{definition}
 
-\begin{axiom}[Layer separation, A1]
-The empirical layer is not inferred from $(K,D,I)$. In particular, no purely mathematical derivation establishes that a symbol represents a laboratory quantity.
+\begin{definition}[Hamiltonian theory object]
+\label{def:object}
+A \emph{Hamiltonian theory object} is a tuple
+\[
+  \Th \;=\; \bigl(M,\ \omega,\ \mathcal{A}(M),\ H,\ \Phi,\ \mathcal{I}\bigr)
+\]
+satisfying Axioms \ref{ax:kin}--\ref{ax:interp} below. We write
+$\Th^{\mathrm{math}} = (M,\omega,\mathcal{A}(M),H,\Phi)$ for the
+\emph{bare} object obtained by discarding the interpretation, and
+$U: \Th \mapsto \Th^{\mathrm{math}}$ for that forgetting operation.
+\end{definition}
+
+\subsection{Axioms}
+
+\begin{axiom}[Kinematic type]
+\label{ax:kin}
+$M$ is a smooth, second-countable, Hausdorff manifold of finite dimension
+$\dim M = 2n$ with $n \ge 0$. Every substantive statement below has $n\ge 1$;
+the case $n=0$ is admitted solely so that the one-point object can serve as
+the monoidal unit in Corollary~\ref{cor:secondop}.
 \end{axiom}
 
-\begin{assumption}[Scope, A2]
-Manifolds are finite-dimensional, Hausdorff, second-countable, and smooth. Maps are smooth. Completeness is stated whenever global flows are used. Field theory, general relativity, quantum theory, and infinite-dimensional geometry are outside the proved scope.
+\begin{axiom}[Symplectic structure]
+\label{ax:symp}
+$\omega \in \Omega^2(M)$ satisfies $d\omega = 0$ and is nondegenerate: for
+each $x \in M$ the map
+$\omega^{\flat}_x : T_xM \to T^{*}_xM$, $v \mapsto \omega_x(v,\cdot\,)$,
+is a linear isomorphism.
+\end{axiom}
+
+\begin{axiom}[Observable type]
+\label{ax:obs}
+The observables are $\mathcal{A}(M) = \Cinf{M,\Rr}$ with pointwise
+operations. Physical quantities are elements of $\mathcal{A}(M)$; the value of
+the quantity $f$ in the state $x$ is the real number $f(x)$.
+\end{axiom}
+
+\begin{axiom}[Generator]
+\label{ax:gen}
+A distinguished element $H \in \mathcal{A}(M)$ is given.
+\end{axiom}
+
+\begin{axiom}[Dynamical law]
+\label{ax:law}
+The evolution $\Phi$ is the maximal local flow of the unique vector field
+$X_H$ determined by $\iota_{X_H}\omega = dH$, and evolution is autonomous:
+$\Phi_{t+s} = \Phi_t \circ \Phi_s$ wherever both sides are defined.
+\end{axiom}
+
+\begin{axiom}[Interpretation]
+\label{ax:interp}
+An interpretation $\mathcal{I}$ in the sense of
+Definition~\ref{def:interpretation} is given.
+\end{axiom}
+
+Axioms~\ref{ax:kin}--\ref{ax:interp} are stipulations. Nothing in this paper
+asserts that any physical system satisfies them; Section~\ref{sec:empirical}
+addresses when the assertion is warranted and Section~\ref{sec:nonexamples}
+exhibits systems for which each of Axioms~\ref{ax:kin}, \ref{ax:symp} and
+\ref{ax:law} fails.
+
+\begin{assumption}[Completeness]
+\label{as:complete}
+Where a statement quantifies over all $t \in \Rr$ we assume $X_H$ is complete,
+so that $\Phi$ is a global $\Rr$-action. This assumption is used only where
+stated.
 \end{assumption}
 
-\begin{interpretation}[Founding thesis, I1]
-The founding thesis is read as a methodological proposal: physics studies mathematical structures only together with empirically warranted realization data. Axiom A1 enforces the non-conflation part of that proposal but does not prove the proposal exhaustive or unique.
-\end{interpretation}
+Assumption~\ref{as:complete} is a genuine restriction, not a technicality.
 
-\section{Symplectic reconstruction}
+\begin{nonexample}[Incompleteness]
+\label{nex:incomplete}
+On $(\Rr^2,\ \omega_0 = dq\wedge dp)$ take $H(q,p)=\tfrac12 p^2 - q^4$. On the
+level set $H = E$ one has $\dot q = p = \pm\sqrt{2(E+q^4)}$ along the branch
+$p>0$, so the time to reach $q = +\infty$ from $q_0$ with $E + q_0^4 > 0$ is
+\[
+  \int_{q_0}^{\infty}\frac{dq}{\sqrt{2\,(E+q^4)}} \;<\; \infty ,
+\]
+because the integrand is $O(q^{-2})$ as $q \to \infty$. Hence $X_H$ is
+incomplete: the solution leaves every compact set in finite time. This object
+satisfies Axioms~\ref{ax:kin}--\ref{ax:law} and violates
+Assumption~\ref{as:complete}.
+\end{nonexample}
 
-\begin{definition}[Symplectic system, D2]
-A symplectic manifold is a pair $(M,\omega)$ with $d\omega=0$ and with $\omega^\flat:TM\to T^*M$, $v\mapsto\omega(v,\cdot)$, a bundle isomorphism. For $H\in C^\infty(M)$, define $X_H$ by $\iota_{X_H}\omega=dH$ and define $\{f,g\}=\omega(X_f,X_g)$.
+\subsection{The interpretation}
+
+\begin{definition}[Interpretation, empirical model]
+\label{def:interpretation}
+An \emph{interpretation} of a bare object $\Th^{\mathrm{math}}$ is a tuple
+$\mathcal{I} = (P,\ \mu,\ \mathcal{U},\ \varepsilon,\ T)$ where
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item $P \subseteq M$ is the set of \emph{preparable} states, the image of a
+      laboratory preparation procedure;
+\item $\mu : M \to \Rr^{k}$ is a smooth \emph{readout map}, the composite of
+      the quantities actually recorded by the apparatus;
+\item $\mathcal{U}$ assigns a physical dimension and unit to each component of
+      $\mu$ and to $H$;
+\item $\varepsilon > 0$ is the readout resolution and $T > 0$ the accessible
+      time window.
+\end{itemize}
+The \emph{empirical model} of $\Th$ is
+\[
+  \mathrm{Emp}(\Th)\;=\;
+  \bigl\{\,(z,t,\mu(\Phi_t z)) \;:\; z \in P,\ t\in[0,T] \,\bigr\}
+  \ \subseteq\ P\times[0,T]\times\Rr^{k},
+\]
+recorded together with $\mathcal{U}$ and read to precision $\varepsilon$.
 \end{definition}
 
-\begin{lemma}[Existence and uniqueness, L1]
-For every smooth $H$, there is exactly one smooth vector field $X_H$ satisfying $\iota_{X_H}\omega=dH$.
+\begin{interpretation}[Locus of empirical content]
+\label{int:locus}
+The empirical content of $\Th$ resides in $\mathrm{Emp}(\Th)$, not in
+$\Th^{\mathrm{math}}$. Two consequences are used below: (i) any feature of
+$(M,\omega,H)$ invisible to $\mu$ on $P$ within $\varepsilon$ over $[0,T]$ is,
+for that interpretation, empirically idle; (ii) $\mathcal{I}$ is not
+recoverable from $\Th^{\mathrm{math}}$, because $U$ discards it, which is what
+Proposition~\ref{prop:isonotphys} makes precise.
+\end{interpretation}
+
+% ===============================================================
+\section{Reconstruction: what the axioms generate}
+\label{sec:reconstruction}
+% ===============================================================
+
+\subsection{The dynamical law is well posed}
+
+\begin{lemma}[Existence and uniqueness of $X_H$]
+\label{lem:XH}
+Under Axioms~\ref{ax:kin}--\ref{ax:gen} there is exactly one smooth vector
+field $X_H$ on $M$ with $\iota_{X_H}\omega = dH$.
 \end{lemma}
+
 \begin{proof}
-Set $X_H=(\omega^\flat)^{-1}(dH)$. Smoothness follows because the inverse of a smooth vector-bundle isomorphism is smooth. Injectivity of $\omega^\flat$ gives uniqueness.
+By Axiom~\ref{ax:symp} the bundle map
+$\omega^{\flat}:TM \to T^{*}M$ is a fibrewise linear isomorphism, and it is
+smooth because $\omega$ is. A smooth bundle isomorphism has a smooth inverse
+$(\omega^{\flat})^{-1}$. Setting $X_H := (\omega^{\flat})^{-1}(dH)$ gives a
+smooth vector field with $\iota_{X_H}\omega = dH$. If $X$ and $X'$ both
+satisfy the equation then $\iota_{X-X'}\omega = 0$, and nondegeneracy forces
+$X = X'$ pointwise.
 \end{proof}
 
-\begin{lemma}[Pointwise generation, L2]
-For every $x\in M$ and $v\in T_xM$, there is $f\in C^\infty(M)$ such that $X_f(x)=v$.
-\end{lemma}
-\begin{proof}
-The covector $\omega_x(v,\cdot)$ is the differential at $x$ of a local linear coordinate function. Multiply that function by a bump function equal to one near $x$ and extend it by zero. The resulting $f$ satisfies $df_x=\omega_x(v,\cdot)$, so L1 gives $X_f(x)=v$.
-\end{proof}
+\begin{definition}[Poisson bracket]
+\label{def:bracket}
+For $f,g \in \mathcal{A}(M)$ set $\{f,g\} := \omega(X_f,X_g)$.
+\end{definition}
 
-\begin{proposition}[Closedness and Jacobi, P1]
-With the convention of D2,
+\begin{lemma}[Bracket identities]
+\label{lem:poisson}
+For all $f,g,h \in \mathcal{A}(M)$:
+\begin{enumerate}[label=(\roman*),leftmargin=*,itemsep=1pt]
+\item $\{f,g\} = X_g(f) = -\{g,f\}$;
+\item $\{fg,h\} = f\{g,h\} + g\{f,h\}$ (Leibniz rule);
+\item $\iota_{[X,Y]}\omega = d\bigl(\omega(Y,X)\bigr)$ for all
+      $X,Y$ with $\mathcal{L}_X\omega = \mathcal{L}_Y\omega = 0$;
+\item $[X_f,X_g] = -X_{\{f,g\}}$;
+\item $\{f,\{g,h\}\}+\{g,\{h,f\}\}+\{h,\{f,g\}\} = 0$.
+\end{enumerate}
+Hence $(\mathcal{A}(M),\cdot,\{\cdot,\cdot\})$ is a Poisson algebra.
+\end{lemma}
+
+\begin{proof}
+(i) $\omega(X_f,X_g) = (\iota_{X_f}\omega)(X_g) = df(X_g) = X_g(f)$, and
+antisymmetry is that of $\omega$.
+(ii) $X_h$ is a derivation of $\mathcal{A}(M)$ and $\{f,h\} = X_h(f)$ by (i).
+(iii) Cartan's formula gives
+$\mathcal{L}_X = d\iota_X + \iota_X d$; with $d\omega = 0$ this yields
+$\mathcal{L}_X\omega = d\iota_X\omega$, so $\iota_X\omega$ and $\iota_Y\omega$
+are closed. Using
+$\iota_{[X,Y]} = \mathcal{L}_X\iota_Y - \iota_Y\mathcal{L}_X$ on $\omega$,
 \[
- d\omega(X_f,X_g,X_h)=2\operatorname{Jac}(f,g,h).
+\iota_{[X,Y]}\omega
+= \mathcal{L}_X(\iota_Y\omega) - \iota_Y(\mathcal{L}_X\omega)
+= \bigl(d\iota_X + \iota_X d\bigr)(\iota_Y\omega) - 0
+= d\bigl(\iota_X\iota_Y\omega\bigr)
+= d\bigl(\omega(Y,X)\bigr),
 \]
-Consequently, a nondegenerate two-form is closed if and only if its induced bracket satisfies Jacobi.
-\end{proposition}
-\begin{proof}
-Insert $X_f,X_g,X_h$ into the intrinsic formula for $d\omega$, replace each derivative of $\omega(X_a,X_b)$ by a derivative of $\{a,b\}$, and use $X_{\{a,b\}}=-[X_a,X_b]$. Antisymmetry collects the six terms into twice the cyclic Jacobiator. If $d\omega=0$, Jacobi follows. Conversely, L2 lets any three tangent vectors at a point be written as values of Hamiltonian vector fields, so vanishing Jacobi implies $d\omega=0$ pointwise.
+where $d(\iota_Y\omega)=0$ was used.
+(iv) Every $X_f$ satisfies $\mathcal{L}_{X_f}\omega = d\,df = 0$, so (iii)
+applies and gives
+$\iota_{[X_f,X_g]}\omega = d(\omega(X_g,X_f)) = d\{g,f\} = -d\{f,g\}
+= -\iota_{X_{\{f,g\}}}\omega$; nondegeneracy gives the identity.
+(v) Using (i) and (iv),
+\[
+\{f,\{g,h\}\} = X_{\{g,h\}}(f) = -[X_g,X_h](f)
+ = -X_g\bigl(X_h(f)\bigr) + X_h\bigl(X_g(f)\bigr)
+ = -\{\{f,h\},g\} + \{\{f,g\},h\}.
+\]
+Antisymmetry, applied twice on the left factor and once on the right, gives
+$\{\{f,h\},g\} = -\{g,\{f,h\}\} = \{g,\{h,f\}\}$ and
+$\{\{f,g\},h\} = -\{h,\{f,g\}\}$. Substituting,
+$\{f,\{g,h\}\} = -\{g,\{h,f\}\} - \{h,\{f,g\}\}$, which is (v).
 \end{proof}
 
-\begin{counterexample}[Leibniz does not imply Jacobi]
-On $\R^3$, prescribe $\{x_1,x_2\}=x_1$, $\{x_2,x_3\}=x_3$, and $\{x_3,x_1\}=x_1$, extending by a bivector and the Leibniz rule. Its Jacobiator on $(x_1,x_2,x_3)$ equals $x_1$. Bilinearity, antisymmetry, and Leibniz therefore do not imply Jacobi.
-\end{counterexample}
+\begin{remark}[Sign conventions are part of the type]
+\label{rem:signs}
+Item (iv) carries a minus sign under the conventions
+$\iota_{X_H}\omega = dH$ and $\{f,g\}=\omega(X_f,X_g)$ fixed above, so
+$f \mapsto X_f$ is a Lie algebra \emph{anti}-homomorphism and $f\mapsto -X_f$
+is a homomorphism. A check on $(\Rr^2,dq\wedge dp)$ with $f=\tfrac12 q^2$,
+$g=\tfrac12 p^2$ gives $X_f = -q\partial_p$, $X_g = p\partial_q$,
+$[X_f,X_g] = -q\partial_q + p\partial_p$, and $\{f,g\}=qp$ with
+$X_{qp} = q\partial_q - p\partial_p$. A compositional reading that treats
+$f\mapsto X_f$ as a functor must carry this sign in the data.
+\end{remark}
 
-\begin{established}[Darboux theorem, E1]
-Every symplectic manifold has local coordinates in which $\omega=\sum_i dq^i\wedge dp_i$~\cite{AbrahamMarsden,McDuffSalamon}. This established theorem shows that local symplectic kinematics has no invariant beyond dimension; it does not identify local coordinates with measured quantities.
+\begin{proposition}[Coordinate form; conservation; Liouville]
+\label{prop:coords}
+Let $(q^1,\dots,q^n,p_1,\dots,p_n)$ be local coordinates in which
+$\omega = \sum_i dq^i\wedge dp_i$. Then
+\[
+  X_H = \sum_{i=1}^{n}\Bigl(\frac{\partial H}{\partial p_i}\,
+  \frac{\partial}{\partial q^i}
+  -\frac{\partial H}{\partial q^i}\,\frac{\partial}{\partial p_i}\Bigr),
+  \qquad
+  \dot q^{\,i} = \frac{\partial H}{\partial p_i},\quad
+  \dot p_i = -\frac{\partial H}{\partial q^i},
+\]
+$\{f,g\} = \sum_i\bigl(\partial_{q^i}f\,\partial_{p_i}g -
+\partial_{p_i}f\,\partial_{q^i}g\bigr)$, and moreover
+$X_H(H)=0$ and $\mathcal{L}_{X_H}\omega = 0$, hence
+$\mathcal{L}_{X_H}\omega^{\wedge n} = 0$.
+\end{proposition}
+
+\begin{proof}
+Write $X = \sum_i (A^i\partial_{q^i} + B_i\partial_{p_i})$. Then
+$\iota_X\omega = \sum_i (A^i\,dp_i - B_i\,dq^i)$. Equating with
+$dH = \sum_i(\partial_{q^i}H\,dq^i + \partial_{p_i}H\,dp_i)$ gives
+$A^i = \partial_{p_i}H$ and $B_i = -\partial_{q^i}H$, which is the displayed
+field and, applied to a curve, Hamilton's equations. The bracket formula is
+Lemma~\ref{lem:poisson}(i) in these coordinates.
+$X_H(H) = dH(X_H) = \omega(X_H,X_H) = 0$ by antisymmetry.
+$\mathcal{L}_{X_H}\omega = d\iota_{X_H}\omega + \iota_{X_H}d\omega
+= d\,dH + 0 = 0$, and the Lie derivative is a derivation of the wedge
+product, so the volume form $\omega^{\wedge n}$ is preserved.
+\end{proof}
+
+\begin{established}[Darboux]
+\label{est:darboux}
+Under Axioms~\ref{ax:kin}--\ref{ax:symp}, every point of $M$ has a
+neighbourhood carrying coordinates in which
+$\omega = \sum_{i=1}^{n} dq^i\wedge dp_i$
+\textup{\cite[Ch.~3]{AbrahamMarsden1978}}, \textup{\cite[\S43]{Arnold1989}}.
 \end{established}
 
-\begin{assumption}[Dynamical hypotheses, A3]
-The dynamics is an autonomous smooth $\R$-action $\phi_t$ and each $\phi_t$ preserves $\omega$.
-\end{assumption}
-
-\begin{theorem}[Hamiltonian reconstruction, T1]
-Let $X$ generate a flow satisfying A3. Then $\iota_X\omega$ is closed; $X$ is locally Hamiltonian; and if $H^1_{\mathrm{dR}}(M)=0$, then $X=X_H$ globally for a smooth $H$, unique up to an additive constant on each connected component.
+\begin{theorem}[Local reconstruction]
+\label{thm:reconstruction}
+Let $\Th$ satisfy Axioms~\ref{ax:kin}--\ref{ax:law}. Then every point of $M$
+has a neighbourhood $V$ and coordinates on $V$ in which the observable type is
+$\Cinf{V,\Rr}$ with the canonical Poisson bracket, the dynamical law is
+Hamilton's equations for $H|_V$, and the flow preserves the canonical volume.
+Conversely, any system of first-order ODEs on an open $V\subseteq\Rr^{2n}$
+that takes the form $\dot q = \partial_p H$, $\dot p = -\partial_q H$ for some
+$H \in \Cinf{V,\Rr}$ arises from the object
+$(V, \sum_i dq^i\wedge dp_i, \Cinf{V,\Rr}, H, \Phi)$ satisfying
+Axioms~\ref{ax:kin}--\ref{ax:law}.
 \end{theorem}
+
 \begin{proof}
-Differentiate $\phi_t^*\omega=\omega$ at $t=0$ to obtain $\mathcal L_X\omega=0$. Cartan's formula and $d\omega=0$ give $d(\iota_X\omega)=0$. The Poincaré lemma makes this one-form locally exact. If $H^1_{\mathrm{dR}}(M)=0$, it is globally exact, so $\iota_X\omega=dH$ and L1 gives $X=X_H$. If $dH=dH'$, then $H-H'$ is locally constant and hence constant on each connected component.
+The forward direction combines Established result~\ref{est:darboux} with
+Proposition~\ref{prop:coords}. For the converse, $\omega_0 =
+\sum_i dq^i\wedge dp_i$ is closed (constant coefficients) and nondegenerate
+(its matrix in the frame $\partial_{q},\partial_p$ is the standard symplectic
+matrix, which is invertible), so Axioms~\ref{ax:kin}--\ref{ax:symp} hold;
+Axiom~\ref{ax:obs} is a definition; $H$ supplies Axiom~\ref{ax:gen}; and the
+computation in Proposition~\ref{prop:coords}, read backwards, identifies the
+given ODE with the flow equation of $X_H$, giving Axiom~\ref{ax:law}.
 \end{proof}
 
-\begin{counterexample}[Global obstruction]
-On $T^2$ with $\omega=d\theta_1\wedge d\theta_2$, the complete field $X=\partial_{\theta_1}$ generates symplectic translations, but $\iota_X\omega=d\theta_2$ has nonzero integral around a generating loop. It is closed but not exact, so no global real-valued Hamiltonian exists.
-\end{counterexample}
+\begin{remark}[What Theorem~\ref{thm:reconstruction} does \emph{not} say]
+\label{rem:notsay}
+It is a statement about local normal form. It does not assert that a physical
+system is described by such an object, and it supplies no criterion for
+deciding whether a given empirical dynamics admits a Hamiltonian
+presentation. That decision problem is the inverse problem of the calculus of
+variations, solved for two-dimensional second-order systems by Douglas
+\cite{Douglas1941} and open in general.
+\end{remark}
 
-\begin{corollary}[Liouville volume, C1]
-A flow satisfying A3 preserves $\omega^n/n!$.
+\subsection{How much of \texorpdfstring{$H$}{H} the dynamics determines}
+
+\begin{theorem}[Exact sequence of the kinematic type]
+\label{thm:exact}
+Let $\Xf_{\Symp}(M) := \{X : \mathcal{L}_X\omega = 0\}$ and
+$\Xf_{\Ham}(M) := \{X_f : f\in\mathcal{A}(M)\}$. Then
+\[
+0 \longrightarrow H^{0}_{\dR}(M)
+  \longrightarrow \mathcal{A}(M)
+  \stackrel{f\mapsto X_f}{\longrightarrow} \Xf_{\Symp}(M)
+  \stackrel{X\mapsto[\iota_X\omega]}{\longrightarrow} H^{1}_{\dR}(M)
+  \longrightarrow 0
+\]
+is an exact sequence of real vector spaces. Moreover $\Xf_{\Ham}(M)$ is a Lie
+ideal in $\Xf_{\Symp}(M)$ and
+$[\Xf_{\Symp}(M),\Xf_{\Symp}(M)] \subseteq \Xf_{\Ham}(M)$.
+\end{theorem}
+
+\begin{proof}
+$H^0_{\dR}(M)$ is the space of locally constant functions. If $X_f = 0$ then
+$df = \iota_{X_f}\omega = 0$, so $f$ is locally constant; conversely a locally
+constant $f$ has $df=0$, hence $X_f=0$ by Lemma~\ref{lem:XH}. This gives
+exactness at $H^0_{\dR}(M)$ and at $\mathcal{A}(M)$.
+Every $X_f$ satisfies $\mathcal{L}_{X_f}\omega = d\,df = 0$, so the second map
+lands in $\Xf_{\Symp}(M)$. For $X \in \Xf_{\Symp}(M)$, Cartan's formula and
+$d\omega=0$ give $d(\iota_X\omega) = \mathcal{L}_X\omega = 0$, so
+$[\iota_X\omega]$ is defined. The class vanishes exactly when
+$\iota_X\omega = df$ for some $f$, that is exactly when $X = X_f$; this is
+exactness at $\Xf_{\Symp}(M)$. For surjectivity onto $H^1_{\dR}(M)$: given a
+closed $1$-form $\alpha$, put $X := (\omega^{\flat})^{-1}\alpha$; then
+$\iota_X\omega=\alpha$ is closed, so $\mathcal{L}_X\omega = d\alpha = 0$ and
+$X\in\Xf_{\Symp}(M)$ with $[\iota_X\omega]=[\alpha]$.
+The last claim is Lemma~\ref{lem:poisson}(iii): for
+$X,Y \in \Xf_{\Symp}(M)$ the form $\iota_{[X,Y]}\omega = d(\omega(Y,X))$ is
+exact, so $[X,Y] = X_{g}$ with $g := \omega(Y,X)$ by Lemma~\ref{lem:XH}; in
+particular $[X,Y]\in\Xf_{\Ham}(M)$, and taking $Y \in \Xf_{\Ham}(M)$ shows
+$\Xf_{\Ham}(M)$ is an ideal.
+\end{proof}
+
+\begin{corollary}[Underdetermination of the generator]
+\label{cor:underdet}
+If $M$ is connected, the flow $\Phi$ determines $H$ up to one additive real
+constant. If $H^{1}_{\dR}(M)\neq 0$, there exist $\omega$-preserving flows
+that are generated by no global $H$ whatsoever.
 \end{corollary}
+
 \begin{proof}
-Pullback preserves wedge products, so $\phi_t^*(\omega^n)=(\phi_t^*\omega)^n=\omega^n$.
+The first claim is exactness at $\mathcal{A}(M)$ together with
+$H^0_{\dR}(M)\cong\Rr$ for connected $M$: two generators of the same field
+differ by a locally constant, hence constant, function. The second is
+exactness at $\Xf_{\Symp}(M)$: any $X$ with $[\iota_X\omega]\neq 0$ preserves
+$\omega$ and is not of the form $X_f$.
 \end{proof}
 
-The cohomology hypothesis in T1 is sufficient but stronger than necessary for
-a particular flow.  The exact obstruction is the class
-$[\iota_X\omega]\in H^1_{\mathrm{dR}}(M)$.  It vanishes precisely when that
-flow has a global real-valued Hamiltonian.  This distinction matters on
-multiply connected spaces: nonzero first cohomology permits non-Hamiltonian
-symplectic fields, but it does not force every symplectic field to be
-non-Hamiltonian.
+\begin{nonexample}[Symplectic but not Hamiltonian]
+\label{nex:torus}
+Let $M = \mathbb{T}^2 = \Rr^2/(2\pi\mathbb{Z})^2$ with angle coordinates
+$(\theta^1,\theta^2)$ and $\omega = d\theta^1\wedge d\theta^2$, which is
+closed and nondegenerate. Let $X = \partial_{\theta^1}$. Then
+$\iota_X\omega = d\theta^2$, which is closed but not exact, since
+$\int_{\gamma} d\theta^2 = 2\pi \neq 0$ for $\gamma$ the second generating
+circle whereas the integral of an exact form over a loop vanishes. Hence $X$
+preserves $\omega$ and the Liouville area, its flow is a one-parameter group
+of symplectomorphisms, and by Corollary~\ref{cor:underdet} no
+$H\in\Cinf{\mathbb{T}^2}$ has $X = X_H$. Axiom~\ref{ax:law} therefore excludes
+a dynamics that satisfies every conservation property usually cited as the
+physical content of Hamiltonian mechanics.
+\end{nonexample}
 
-\begin{proposition}[Period criterion, P4]
-For a symplectic vector field $X$ on a connected manifold, the following are
-equivalent: (i) $X=X_H$ for a global smooth real-valued $H$; (ii) every
-piecewise smooth closed curve $\gamma$ satisfies
-$\int_\gamma\iota_X\omega=0$.
+\begin{interpretation}[Reading of Corollary~\ref{cor:underdet}]
+\label{int:zeroenergy}
+The additive constant in $H$ is invisible to $\mathrm{Emp}(\Th)$ whenever the
+readout $\mu$ is built from the flow, because $H$ and $H+c$ generate the same
+$X_H$ by Lemma~\ref{lem:XH}. Within the scope of this paper, an absolute zero
+of energy is therefore not an empirically realized element of the theory
+object. That classical gravitation and general relativity change this
+situation is noted as a boundary fact and is out of scope.
+\end{interpretation}
+
+\subsection{Symmetry}
+
+\begin{proposition}[Hamiltonian reciprocity, and conservation]
+\label{prop:noether}
+For $F,H\in\mathcal{A}(M)$ the following are equivalent:
+\textup{(a)} $\{F,H\}=0$;
+\textup{(b)} $F$ is constant along the flow of $X_H$;
+\textup{(c)} $H$ is constant along the flow of $X_F$.
 \end{proposition}
+
 \begin{proof}
-If $\iota_X\omega=dH$, every period vanishes by the fundamental theorem for
-line integrals.  Conversely, fix $x_0$ and define
-$H(x)=\int_{\gamma_x}\iota_X\omega$ along any path from $x_0$ to $x$.
-Connected manifolds are path connected, and the vanishing-period hypothesis
-makes this definition independent of the chosen path.  On a coordinate ball,
-comparison with a fixed incoming path shows that $H$ differs by a constant
-from a local primitive of the closed one-form.  Therefore $H$ is smooth and
-$dH=\iota_X\omega$.
+By Lemma~\ref{lem:poisson}(i), $\frac{d}{dt}\bigl(F\circ\Phi^{H}_t\bigr)
+= X_H(F)\circ\Phi^H_t = \{F,H\}\circ\Phi^H_t$, giving (a)$\Leftrightarrow$(b)
+because a smooth function on a connected time interval is constant exactly
+when its derivative vanishes identically. Likewise
+$\frac{d}{dt}(H\circ\Phi^F_t) = \{H,F\}\circ\Phi^F_t$, and
+$\{H,F\} = -\{F,H\}$, giving (a)$\Leftrightarrow$(c).
 \end{proof}
 
-\begin{example}[Reading the torus obstruction]
-For the translation counterexample, integrate $d\theta_2$ around the
-$\theta_2$ circle.  The period is $2\pi$ under the usual angular
-normalization, so P4 forbids a real-valued Hamiltonian.  On the universal
-cover $\R^2$, however, the lifted form is $d\theta_2$ with primitive
-$H=\theta_2$.  The obstruction is global topology, not a failure of the local
-Hamiltonian equation.
+The group-theoretic strengthening --- for a Lie group $G$ acting by
+symplectomorphisms with an $\mathrm{Ad}^{*}$-equivariant momentum map
+$J:M\to\mathfrak{g}^{*}$ and $G$-invariant $H$, each component of $J$ is
+conserved --- is an established result we use only by citation
+\cite[Chs.~11--13]{MarsdenRatiu1999}, \cite[Ch.~4]{AbrahamMarsden1978}.
+
+% ===============================================================
+\section{Composition, and what composition cannot do}
+\label{sec:composition}
+% ===============================================================
+
+\subsection{Morphisms}
+
+\begin{definition}[Morphism, isomorphism]
+\label{def:morphism}
+A \emph{morphism} $\varphi : (M,\omega,H) \to (M',\omega',H')$ of bare objects
+is a smooth map $\varphi: M\to M'$ with
+$\varphi^{*}\omega' = \omega$ and $H = H'\circ\varphi + c$ for some constant
+$c\in\Rr$. It is an \emph{isomorphism} when $\varphi$ is in addition a
+diffeomorphism. An \emph{isomorphism of theory objects} is an isomorphism of
+bare objects together with a bijection of interpretations
+$\mathcal{I}\to\mathcal{I}'$ intertwining $P,\mu,\mathcal{U}$.
+\end{definition}
+
+\begin{lemma}[Symplectic maps are immersions]
+\label{lem:immersion}
+If $\varphi^{*}\omega' = \omega$ with $\omega$ nondegenerate, then
+$d\varphi_x$ is injective for every $x\in M$.
+\end{lemma}
+
+\begin{proof}
+Suppose $d\varphi_x(v) = 0$. For every $w \in T_xM$,
+$\omega_x(v,w) = (\varphi^{*}\omega')_x(v,w)
+= \omega'_{\varphi(x)}\bigl(d\varphi_x v,\,d\varphi_x w\bigr) = 0$.
+Nondegeneracy of $\omega_x$ gives $v = 0$.
+\end{proof}
+
+\begin{newresult}[No symplectic coarse-graining]
+\label{new:coarse}
+There is no morphism $\varphi:(M,\omega,H)\to(M',\omega',H')$ in the sense of
+Definition~\ref{def:morphism} with $\dim M > \dim M'$. In particular,
+projecting a many-degree-of-freedom object onto a few-degree-of-freedom
+object is never a morphism of Hamiltonian theory objects.
+\end{newresult}
+
+\begin{proof}
+By Lemma~\ref{lem:immersion}, $d\varphi_x$ is injective, so
+$\dim M = \dim T_xM \le \dim T_{\varphi(x)}M' = \dim M'$.
+\end{proof}
+
+\begin{remark}
+\label{rem:coarsefolklore}
+Lemma~\ref{lem:immersion} is standard and New result~\ref{new:coarse} is
+elementary, so we expect the latter is folklore; the claim here is to its
+\emph{explicit statement in the typed setting}, because it settles a question
+a compositional account must answer. Coarse-graining, thermodynamic reduction
+and effective-model extraction are \emph{not} morphisms in this category. They
+are quotient constructions --- symplectic reduction
+\cite{MarsdenRatiu1999} --- so a compositional framework that wants
+them must carry a second class of arrows, or work in a double category or a
+category of spans.
+\end{remark}
+
+\begin{lemma}[Isomorphisms intertwine flows]
+\label{lem:intertwine}
+If $\varphi$ is an isomorphism then $d\varphi\circ X_H = X_{H'}\circ\varphi$
+and $\varphi\circ\Phi_t = \Phi'_t\circ\varphi$ on the common domain of
+definition.
+\end{lemma}
+
+\begin{proof}
+For $w\in T_xM$,
+$\omega'_{\varphi(x)}(d\varphi\, X_H,\ d\varphi\, w)
+= (\varphi^{*}\omega')_x(X_H,w) = \omega_x(X_H,w) = dH_x(w)
+= d(H'\circ\varphi)_x(w) = dH'_{\varphi(x)}(d\varphi\,w)$.
+As $\varphi$ is a diffeomorphism, $d\varphi_x$ is onto $T_{\varphi(x)}M'$, so
+$\iota_{d\varphi X_H}\omega' = dH'$ at $\varphi(x)$, and
+Lemma~\ref{lem:XH} gives $d\varphi\,X_H = X_{H'}\circ\varphi$. Two vector
+fields that are $\varphi$-related have $\varphi$-related flows.
+\end{proof}
+
+\subsection{The monoidal product and its exact range}
+
+\begin{definition}[Cartesian product of objects]
+\label{def:product}
+For bare objects $\Th_i^{\mathrm{math}} = (M_i,\omega_i,\mathcal{A}(M_i),H_i,\Phi^i)$,
+$i=1,2$, set
+\[
+  \Th_1^{\mathrm{math}}\otimes\Th_2^{\mathrm{math}}
+  := \bigl(M_1\times M_2,\ \pi_1^{*}\omega_1+\pi_2^{*}\omega_2,\
+  \mathcal{A}(M_1\times M_2),\ H_1\circ\pi_1 + H_2\circ\pi_2,\ \Phi\bigr).
+\]
+\end{definition}
+
+\begin{proposition}[$\otimes$ is well typed and non-interacting]
+\label{prop:productwelltyped}
+$\omega := \pi_1^{*}\omega_1+\pi_2^{*}\omega_2$ satisfies
+Axiom~\ref{ax:symp} on $M_1\times M_2$, and with
+$H_\oplus := H_1\circ\pi_1 + H_2\circ\pi_2$ one has
+$X_{H_\oplus} = X_{H_1}\oplus X_{H_2}$ and
+$\Phi_t = \Phi^1_t\times\Phi^2_t$.
+\end{proposition}
+
+\begin{proof}
+$d\omega = \pi_1^{*}d\omega_1 + \pi_2^{*}d\omega_2 = 0$.
+Under the canonical splitting
+$T_{(x_1,x_2)}(M_1\times M_2)\cong T_{x_1}M_1\oplus T_{x_2}M_2$ the form
+$\omega$ is the block-diagonal pairing $\omega_1\oplus\omega_2$, and a
+block-diagonal bilinear form with nondegenerate blocks is nondegenerate:
+if $\omega((v_1,v_2),(w_1,w_2)) = \omega_1(v_1,w_1)+\omega_2(v_2,w_2)$
+vanishes for all $(w_1,w_2)$, then taking $w_2=0$ gives $v_1 = 0$ and taking
+$w_1=0$ gives $v_2=0$. For the vector field, with
+$X := X_{H_1}\oplus X_{H_2}$,
+$\iota_X\omega = \pi_1^{*}(\iota_{X_{H_1}}\omega_1)
++ \pi_2^{*}(\iota_{X_{H_2}}\omega_2)
+= \pi_1^{*}dH_1 + \pi_2^{*}dH_2 = dH_\oplus$,
+and Lemma~\ref{lem:XH} identifies $X = X_{H_\oplus}$. The flow of a direct-sum
+field on a product is the product of the flows.
+\end{proof}
+
+\begin{newresult}[Interaction is outside the range of $\otimes$]
+\label{new:interaction}
+Let $M = M_1\times M_2$ carry $\omega$ and $H_\oplus$ as above and let
+$H = H_\oplus + V$ with $V \in \mathcal{A}(M)$. Then the following are
+equivalent:
+\begin{enumerate}[label=(\alph*),leftmargin=*,itemsep=1pt]
+\item $\Phi^{H}_t = \Phi^{1}_t\times\Phi^{2}_t$ for all $t$ in a neighbourhood
+      of $0$ and all points of $M$;
+\item $X_V = 0$;
+\item $V$ is locally constant.
+\end{enumerate}
+Consequently the image of $\otimes$ inside the class of objects on
+$M_1\times M_2$ with the split symplectic form consists exactly of the
+composites whose factor dynamics are independent; no choice of factors makes
+$\otimes$ produce an interacting composite.
+\end{newresult}
+
+\begin{proof}
+(c)$\Rightarrow$(b): $dV=0$ gives $X_V = (\omega^{\flat})^{-1}(0) = 0$.
+(b)$\Rightarrow$(a): $X_H = X_{H_\oplus} + X_V$ by linearity of
+$f\mapsto X_f$ (Lemma~\ref{lem:XH} and linearity of $d$ and of
+$(\omega^{\flat})^{-1}$); with $X_V=0$,
+Proposition~\ref{prop:productwelltyped} gives the product flow.
+(a)$\Rightarrow$(b): differentiating $\Phi^H_t(x)$ and
+$(\Phi^1_t\times\Phi^2_t)(x)$ at $t=0$ gives
+$X_H(x) = (X_{H_1}\oplus X_{H_2})(x) = X_{H_\oplus}(x)$ for every $x$, hence
+$X_V = X_H - X_{H_\oplus} = 0$.
+(b)$\Rightarrow$(c): $X_V = 0$ gives $\iota_{X_V}\omega = dV = 0$ by
+Lemma~\ref{lem:XH}, so $V$ is locally constant.
+For the final sentence: an object on $(M_1\times M_2,\omega)$ with generator
+$H$ lies in the image of $\otimes$ exactly when $H - H_\oplus$ is locally
+constant for some $H_1,H_2$, which by the equivalence is exactly when its flow
+splits.
+\end{proof}
+
+\begin{corollary}[A compositional account needs a second operation]
+\label{cor:secondop}
+Under Definition~\ref{def:product}, the assignment
+$(\Th_1,\Th_2)\mapsto\Th_1\otimes\Th_2$ is a symmetric monoidal product on
+bare objects with unit the one-point object $(\{*\},0,\Rr,0)$, and by
+New result~\ref{new:interaction} every interacting system on
+$M_1\times M_2$ is outside its range. Hence no account of physical
+composition that uses only $\otimes$ can express interaction.
+\end{corollary}
+
+\begin{proof}
+Symmetry and associativity up to the canonical diffeomorphisms of products are
+inherited from the Cartesian product of manifolds; each canonical
+diffeomorphism pulls back the split form to the split form and matches the
+generators, so it is an isomorphism in the sense of
+Definition~\ref{def:morphism}. Degeneracy of $\omega$ is not an issue for the
+unit because $\dim\{*\} = 0$ and the empty pairing is vacuously
+nondegenerate. The second sentence is
+New result~\ref{new:interaction}. Combining gives the conclusion.
+\end{proof}
+
+\begin{remark}[Relation to the applied-category-theory literature]
+\label{rem:act}
+Corollary~\ref{cor:secondop} is the precise form of a widely acknowledged
+point: interconnection is modelled by cospans, decorated cospans, or
+relations, not by monoidal product alone
+\cite{Fong2015,BaezStay2011,MacLane1998}. Our contribution here is only the
+sharp ``if and only if'' of New result~\ref{new:interaction} inside the typed
+Hamiltonian setting, which converts a methodological preference into a
+theorem about what $\otimes$ can represent.
+\end{remark}
+
+\subsection{The natural repair fails to be a category}
+
+\begin{established}[The symplectic ``category'' is not a category]
+\label{est:weinstein}
+Take symplectic manifolds as objects and Lagrangian submanifolds of
+$M_1^{-}\times M_2$ (canonical relations) as arrows. The set-theoretic
+composite of two canonical relations need not be a submanifold, and when it
+is, need not be Lagrangian; composability requires transversality and
+clean-intersection hypotheses. Consequently this data does not form a
+category without further work; see Weinstein \cite{Weinstein2010} for the
+statement of the difficulty and for the standard repairs.
+\end{established}
+
+\begin{interpretation}[Cost of Established result~\ref{est:weinstein}]
+\label{int:weinstein}
+The natural candidate for a composition rich enough to carry interaction ---
+composition of canonical relations --- is only \emph{partially} defined. A
+compositional foundation for classical mechanics must therefore accept a
+partial composition, pass to a completion, or restrict to a subclass on which
+transversality is guaranteed. This is a structural limit on the thesis under
+test, not a gap in exposition.
+\end{interpretation}
+
+% ===============================================================
+\section{Empirical realization, equivalence, and limits}
+\label{sec:empirical}
+% ===============================================================
+
+\subsection{Two directions of a single separation}
+
+\begin{definition}[$\varepsilon$-empirical equivalence]
+\label{def:eeq}
+Let $\Th,\Th'$ be theory objects with the same $M$, the same preparable set
+$P$, the same readout $\mu$ and units, resolution $\varepsilon$, and window
+$[0,T]$. They are \emph{$\varepsilon$-empirically equivalent on $(P,T)$} when
+\[
+  \sup_{z\in P}\ \sup_{t\in[0,T]}\
+  \bigl\|\mu(\Phi_t z) - \mu(\Phi'_t z)\bigr\| \;\le\; \varepsilon .
+\]
+For objects on different manifolds the comparison requires an explicit
+translation of preparations and readouts; we do not use that case.
+\end{definition}
+
+\begin{proposition}[Empirically equivalent, mathematically non-isomorphic]
+\label{prop:eqnotiso}
+Fix $m,k>0$, $R>0$, $T>0$, and on $(\Rr^2,\omega_0=dq\wedge dp)$ set
+\[
+  H_0 = \frac{p^2}{2m}+\frac{k}{2}q^2, \qquad
+  H_\lambda = H_0 + \lambda q^4 \quad (0<\lambda\le 1),
+  \qquad P = \{z : \|z\|\le R\}.
+\]
+Then:
+\begin{enumerate}[label=(\roman*),leftmargin=*,itemsep=1pt]
+\item there is $C = C(m,k,R,T)<\infty$, independent of $\lambda$, with
+      $\sup_{z\in P}\sup_{t\in[0,T]}\|\Phi^{\lambda}_t z - \Phi^{0}_t z\|
+      \le C\lambda$; hence for every $\varepsilon>0$ and every $1$-Lipschitz
+      readout $\mu$ there is $\lambda>0$ making $\Th_0$ and $\Th_\lambda$
+      $\varepsilon$-empirically equivalent on $(P,T)$;
+\item for every $\lambda>0$ the bare objects $(\Rr^2,\omega_0,H_0)$ and
+      $(\Rr^2,\omega_0,H_\lambda)$ are not isomorphic in the sense of
+      Definition~\ref{def:morphism}.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) Put $E_R := \sup_{\|z\|\le R} H_1(z) < \infty$. For $\lambda\in(0,1]$ and
+$z\in P$ one has $H_\lambda(z)\le H_1(z)\le E_R$, and $H_\lambda$ is conserved
+along $\Phi^\lambda$ by Proposition~\ref{prop:coords}. Since
+$H_0 \le H_\lambda$ pointwise, the trajectory satisfies
+$H_0(\Phi^\lambda_t z) \le E_R$, so it remains in the compact set
+$K := \{H_0\le E_R\}$; the same bound holds for $\lambda = 0$. Set
+$q_{\max} := \sqrt{2E_R/k}$ and $A_R := 4q_{\max}^3$, an upper bound on
+$\|X_{q^4}\|$ on $K$ (indeed $X_{q^4} = -4q^3\partial_p$). The field
+$X_{H_0}(q,p) = (p/m,\,-kq)$ is linear, hence globally Lipschitz with some
+constant $L>0$. Writing $u(t) := \Phi^{\lambda}_t z - \Phi^{0}_t z$,
+\[
+  \dot u = \bigl[X_{H_0}(\Phi^\lambda_t z)-X_{H_0}(\Phi^0_t z)\bigr]
+          + \lambda X_{q^4}(\Phi^\lambda_t z),
+  \qquad \|\dot u\| \le L\|u\| + \lambda A_R,\quad u(0)=0 .
+\]
+Gr\"onwall's inequality gives
+$\|u(t)\| \le (\lambda A_R/L)(e^{Lt}-1)$, so
+$C := (A_R/L)(e^{LT}-1)$ works. A $1$-Lipschitz $\mu$ transports the bound,
+and $\lambda < \varepsilon/C$ gives the equivalence.
+
+(ii) For $\lambda \ge 0$ the potential $V_\lambda(q)=\tfrac k2 q^2+\lambda q^4$
+is smooth, even, strictly increasing on $[0,\infty)$ with
+$V_\lambda(q)\to\infty$, and $V'_\lambda(q)= kq+4\lambda q^3$ vanishes only at
+$q=0$. Hence for every $E>0$ the level set $\{H_\lambda = E\}$ is a regular,
+compact, connected curve, and the orbit on it is periodic with period
+$T_\lambda(E)$. Let $A_\lambda(E)$ be the area enclosed. The classical
+relation $T_\lambda(E) = A_\lambda'(E)$ for one-degree-of-freedom systems with
+regular compact level sets \cite[Ch.~10]{Arnold1989} is used.
+
+For $\lambda = 0$ the level set is the ellipse with semi-axes
+$\sqrt{2E/k}$ and $\sqrt{2mE}$, so $A_0(E) = 2\pi E\sqrt{m/k}$ and
+$T_0(E) = 2\pi\sqrt{m/k}$ for every $E>0$: the period function is constant.
+
+For $\lambda>0$ suppose, for contradiction, that
+$T_\lambda \equiv c$ on $(0,\infty)$ for some $c>0$. Since $A_\lambda$ is
+continuous with $A_\lambda(0)=0$ and $A_\lambda' = T_\lambda$, integration
+gives $A_\lambda(E) = cE$ for all $E \ge 0$. On the other hand
+$H_\lambda \ge \frac{p^2}{2m}+\lambda q^4$ pointwise, so
+$\{H_\lambda\le E\}\subseteq\{\frac{p^2}{2m}+\lambda q^4\le E\}$ and
+\[
+  A_\lambda(E) \;\le\;
+  \int_{-\sqrt{2mE}}^{\sqrt{2mE}}
+  2\Bigl(\frac{E-\frac{p^2}{2m}}{\lambda}\Bigr)^{1/4} dp
+  \;=\; 2\lambda^{-1/4}\sqrt{2mE}\;E^{1/4}\!\!\int_{-1}^{1}\!(1-u^2)^{1/4}du
+  \;=\; \kappa\,\sqrt{m}\,\lambda^{-1/4}E^{3/4},
+\]
+with $\kappa := 2\sqrt{2}\int_{-1}^{1}(1-u^2)^{1/4}du \in (0,\infty)$, using
+the substitution $p=\sqrt{2mE}\,u$. Combining,
+$cE \le \kappa\sqrt m\,\lambda^{-1/4}E^{3/4}$, i.e.
+$E^{1/4}\le \kappa\sqrt m/(c\lambda^{1/4})$ for all $E>0$, which fails for
+$E$ large. Hence $T_\lambda$ is not constant.
+
+Now suppose $\varphi$ were an isomorphism $(\Rr^2,\omega_0,H_0)\to
+(\Rr^2,\omega_0,H_\lambda)$. By Lemma~\ref{lem:intertwine} it carries orbits
+of $\Phi^0$ to orbits of $\Phi^{\lambda}$ preserving the time parameter, so
+it carries periodic orbits to periodic orbits of the same period, and it is
+onto. Every periodic orbit of $\Phi^{\lambda}$ with energy $E>0$ is therefore
+the image of a periodic orbit of $\Phi^0$, whose period is
+$2\pi\sqrt{m/k}$. That makes $T_\lambda$ constant on $(0,\infty)$, contrary to
+the previous paragraph.
+\end{proof}
+
+\begin{proposition}[Mathematically isomorphic, physically distinct]
+\label{prop:isonotphys}
+There exist theory objects $\Th,\Th'$ with $U\Th \cong U\Th'$ as bare objects
+whose empirical models differ, and no isomorphism of bare objects induces a
+map $\mathrm{Emp}(\Th)\to\mathrm{Emp}(\Th')$.
+\end{proposition}
+
+\begin{proof}
+Take $\Th$ the mass--spring object on $(\Rr^2,dq\wedge dp)$ with
+$H = p^2/2m + kq^2/2$, readout $\mu(q,p)=q$ with $\mathcal{U}(\mu)$ the metre
+and $\mathcal{U}(H)$ the joule, and $P$ the states reachable by displacing the
+mass. Take $\Th'$ the ideal $LC$ circuit on $(\Rr^2,dQ\wedge d\Phi_{\!f})$
+with $H' = \Phi_{\!f}^2/2L + Q^2/2C$, readout $\mu'(Q,\Phi_{\!f})=Q$ with
+$\mathcal{U}(\mu')$ the coulomb, and $P'$ the states reachable by charging the
+capacitor. Choosing $m = L$ and $k = 1/C$, the identity map of $\Rr^2$ is an
+isomorphism of bare objects: it pulls back the form to the form and matches
+the generators exactly.
+
+The empirical models differ as sets-with-units:
+$\mathrm{Emp}(\Th)$ is a set of position records in metres and
+$\mathrm{Emp}(\Th')$ a set of charge records in coulombs, and
+$\mathcal{U}$ is part of the data of an interpretation by
+Definition~\ref{def:interpretation}. A bare isomorphism is a map of manifolds
+and carries no component acting on $\mathcal{U}$, because $U$ deletes
+$\mathcal{U}$; hence it induces no map of empirical models. Two further
+differences are recorded as empirical inputs rather than derived here: the
+admissible interventions differ (one may clamp the spring; one may open the
+circuit), and the failure modes differ (plastic deformation; dielectric
+breakdown).
+\end{proof}
+
+\begin{interpretation}[The separation, stated]
+\label{int:separation}
+Propositions~\ref{prop:eqnotiso} and \ref{prop:isonotphys} together show that
+mathematical isomorphism of bare Hamiltonian objects is neither sufficient
+(\ref{prop:isonotphys}) nor necessary (\ref{prop:eqnotiso}) for empirical
+indistinguishability. Any claim of the form ``these two theories are the same
+physics because the mathematics is the same'' therefore requires a separate
+empirical argument about $P$, $\mu$, $\mathcal{U}$, $\varepsilon$ and $T$. We
+adopt this as a working discipline rather than as a discovery: the pair of
+counterexamples is what makes the discipline enforceable.
+\end{interpretation}
+
+\subsection{Limiting relations}
+
+\begin{example}[Small-oscillation limit is not an isomorphism]
+\label{ex:pendulum}
+Let $\Th^{\mathrm{pend}}$ be the planar pendulum on
+$T^{*}S^{1}$ with $H^{\mathrm{pend}}(\theta,p_\theta)=
+\frac{p_\theta^2}{2m\ell^2}+mg\ell(1-\cos\theta)$, and let
+$\Th^{\mathrm{ho}}$ be the harmonic object on $T^{*}\Rr$ with
+$H^{\mathrm{ho}}=\frac{p^2}{2m\ell^2}+\frac{1}{2}mg\ell\,\theta^2$. Since
+$1-\cos\theta = \tfrac12\theta^2 + O(\theta^4)$, on
+$\{|\theta|\le\delta,\ |p_\theta|\le\delta\}$ the two generators differ by
+$O(\delta^4)$ and a Gr\"onwall estimate of the form used in
+Proposition~\ref{prop:eqnotiso}(i) bounds the trajectory difference on
+$[0,T]$ by $C(T)\delta^4$. The two objects are not isomorphic: the pendulum
+has a non-constant period function and, unlike the harmonic object, has
+unbounded ($\theta$-circulating) orbits and a separatrix. The relation
+between them is an \emph{asymptotic} one, indexed by $\delta$, not an
+isomorphism of theory objects.
 \end{example}
 
-\section{Composition and reciprocity}
+\begin{interpretation}[Reading of Example~\ref{ex:pendulum}]
+\label{int:limits}
+Limiting relations between theory objects are relations between
+\emph{interpreted} objects at stated resolution and time window; they are not
+recovered by any operation on bare objects alone, because the statement
+``$C(T)\delta^4 \le \varepsilon$'' quantifies over $\varepsilon$ and $T$,
+which live in $\mathcal{I}$.
+\end{interpretation}
 
-\begin{proposition}[Free composite, P2]
-For symplectic manifolds $(M_i,\omega_i)$, the form $\omega_\oplus=\pi_1^*\omega_1+\pi_2^*\omega_2$ is symplectic on $M_1\times M_2$. Pullbacks of observables from different factors Poisson-commute.
-\end{proposition}
-\begin{proof}
-Closedness follows from $d\omega_i=0$. If $(u,v)$ lies in the kernel, pairing with $(u',0)$ and then $(0,v')$ gives $u=v=0$. For $f\in C^\infty(M_1)$ and $g\in C^\infty(M_2)$, their Hamiltonian vector fields occupy complementary tangent factors, so their product-form pairing vanishes.
-\end{proof}
+\subsection{An empirical anchor and an empirical refutation}
 
-Consider canonical coordinates $(q_i,p_i)$ and an interconnection field
-\[
- Y=(0,-C_{12}q_2,0,-C_{21}q_1).
-\]
-The uncoupled Hamiltonian fields may be added without changing the following criterion.
-
-\begin{newresult}[Reciprocity criterion, N1]
-The coupled flow preserves $\omega_\oplus$ if and only if $C_{21}=C_{12}^{T}$. In that case it is Hamiltonian with interaction $H_{\rm int}=q_1^TC_{12}q_2$.
-\end{newresult}
-\begin{proof}
-A direct contraction gives a one-form whose exterior derivative is
-\[
- d(\iota_Y\omega_\oplus)=\sum_{a,b}\big((C_{21})_{ba}-(C_{12})_{ab}\big)dq_{1a}\wedge dq_{2b}.
-\]
-The coordinate two-forms are linearly independent, so this vanishes exactly when $C_{21}=C_{12}^T$. Under that condition the contraction equals $dH_{\rm int}$ with the declared sign convention.
-\end{proof}
-
-\begin{proposition}[Volume preservation is weaker, P3]
-The linear field $Y$ has zero divergence for arbitrary $C_{12},C_{21}$. Hence it preserves Lebesgue volume even when it fails to preserve $\omega_\oplus$.
-\end{proposition}
-\begin{proof}
-Every diagonal entry of the Jacobian of $Y$ is zero, so its trace and divergence vanish. N1 supplies non-reciprocal choices that fail symplectic preservation.
-\end{proof}
-
-\begin{newresult}[Split obstruction, N2]
-For one degree of freedom per factor, with scalar couplings $c_{12},c_{21}$ and a fixed point at the origin, an invariant symplectic form respecting the tangent-space split can exist near the origin only if $c_{12}=0$ exactly when $c_{21}=0$. If both are nonzero, the constant form $c_{21}\omega_1+c_{12}\omega_2$ is invariant.
-\end{newresult}
-\begin{proof}
-At the fixed point a split-respecting skew form has matrix $\Omega_0=\operatorname{diag}(a_1J,a_2J)$ with $a_1a_2\ne0$. Infinitesimal invariance is $A^T\Omega_0+\Omega_0A=0$, which reduces to $a_1c_{12}=a_2c_{21}$. If exactly one coupling vanishes this contradicts $a_1a_2\ne0$. If both are nonzero, choosing $(a_1,a_2)=(c_{21},c_{12})$ satisfies the equation and gives the displayed invariant constant form.
-\end{proof}
-
-\begin{corollary}[Unidirectional obstruction, C2]
-A unidirectional coupling of two one-degree-of-freedom Hamiltonian factors is not Hamiltonian relative to any symplectic form compatible with the declared split.
-\end{corollary}
-\begin{proof}
-Unidirectional means exactly one of $c_{12},c_{21}$ vanishes, which N2 excludes.
-\end{proof}
-
-\subsection{Matrix form and a worked reciprocal pair}
-
-For canonical coordinates ordered as $(q_1,p_1,q_2,p_2)$, infinitesimal
-symplectic preservation of a linear field $\dot z=Az$ is the matrix identity
-$A^TJ_\oplus+J_\oplus A=0$.  The off-diagonal blocks of this identity are
-exactly the transpose relation in N1.  This is a statement about preservation
-of the declared product form; changing the form changes the compatibility
-question and must be recorded in $K$.
-
-\begin{example}[Two reciprocal oscillators]
-Take scalar coupling $c$ and
-\[
- H=\frac{p_1^2+p_2^2}{2m}
-   +\frac{m\omega^2}{2}(q_1^2+q_2^2)+cq_1q_2.
-\]
-Hamilton's equations give
-$\dot p_1=-m\omega^2q_1-cq_2$ and
-$\dot p_2=-m\omega^2q_2-cq_1$.  With normal coordinates
-$q_\pm=(q_1\pm q_2)/\sqrt2$ and similarly for momenta, the Hamiltonian splits
-into modes with squared frequencies $\omega^2\pm c/m$.  Reciprocity therefore
-does not mean absence of interaction: it permits a symplectic coupled system
-whose collective modes differ from the original subsystem modes.  Stability
-additionally requires the relevant quadratic form to be positive, for example
-$|c|<m\omega^2$ in this symmetric case.
-\end{example}
-
-\begin{counterexample}[Reciprocity does not imply stability]
-Choose $c>m\omega^2$ in the preceding reciprocal system.  The minus-mode
-squared frequency is negative, so generic solutions grow exponentially even
-though the flow is Hamiltonian and preserves symplectic volume.  Geometric
-admissibility, energetic stability, and empirical adequacy are distinct
-conditions.
-\end{counterexample}
-
-\begin{empirical}[Non-reciprocal devices, E2]
-Servo feedback, optical isolators, circulators, and engineered mechanical media instantiate non-reciprocal response in laboratory practice. This is an empirical statement about existing devices, not a consequence of N1 or a new measurement reported here.
+\begin{empirical}[Anchor]
+\label{emp:anchor}
+For laboratory mass--spring and $LC$ systems in regimes where damping,
+nonlinearity and drift are below the readout resolution, the object of
+Proposition~\ref{prop:isonotphys} reproduces the recorded time series within
+$\varepsilon$ over $[0,T]$. This is taken as an empirical input to the pilot;
+no new measurement is reported in this paper.
 \end{empirical}
 
-\section{Non-conflation and boundary cases}
+\begin{established}[Refutation of a specific Hamiltonian object]
+\label{est:mercury}
+The two-body Newtonian gravitational object on $T^{*}(\Rr^3\setminus\{0\})$
+with $H = \frac{\|\mathbf{p}\|^2}{2\mu}-\frac{GM\mu}{\|\mathbf{q}\|}$
+predicts a closed, non-precessing ellipse. The observed perihelion advance of
+Mercury exceeds the Newtonian $N$-body accounting by an amount matched by the
+general-relativistic prediction of $42.98''$ per century
+\cite{Will2014}. The Hamiltonian object above is therefore empirically false
+at that precision.
+\end{established}
 
-\begin{newresult}[Port-sensitive non-conflation, N3]
-For $H_m=p^2/(2m)+m\omega_0^2q^2/2$, all positive masses give isomorphic closed symplectic dynamical systems after rescaling $(q,p)$, but they are not isomorphic as objects whose fixed port is $q$ unless the masses agree.
-\end{newresult}
-\begin{proof}
-The map $(q,p)\mapsto(\alpha q,\alpha^{-1}p)$ with $\alpha=\sqrt{m/m'}$ is symplectic and transports $H_m$ to $H_{m'}$. If a symplectomorphism preserves the port $q$, it has the form $(q,p)\mapsto(q,p+h(q))$. Comparing the coefficients of $p^2$ after Hamiltonian transport forces $m=m'$.
-\end{proof}
-
-\begin{interpretation}[Empirical distinction]
-A calibrated periodic force produces an off-resonance response proportional to $1/m$. Thus the port and its calibration can distinguish masses that the closed-system isomorphism forgets. The mathematical calculation does not itself establish a particular experimental calibration.
+\begin{interpretation}[Reading of Established result~\ref{est:mercury}]
+\label{int:mercury}
+Established result~\ref{est:mercury} refutes one \emph{object}, not the
+\emph{type}: the first post-Newtonian correction is itself standardly
+presented by a Hamiltonian on a finite-dimensional phase space, so the failure
+was of the generator $H$ and not of Axioms~\ref{ax:kin}--\ref{ax:law}. This
+distinction --- refuting a member versus refuting a type --- is what the typed
+presentation is for; Section~\ref{sec:falsification} states what would refute
+the type.
 \end{interpretation}
 
-\begin{proposition}[Damped oscillator obstruction, P4]
-For $\gamma>0$, the field $\dot q=p/m$, $\dot p=-m\omega^2q-2\gamma p$ on $\R^2$ admits no invariant symplectic form.
-\end{proposition}
-\begin{proof}
-At the fixed point, the derivative of the flow has determinant $e^{-2\gamma t}$. An invariant nondegenerate two-form would have a nonzero density $\rho(0)$ satisfying $\rho(0)e^{-2\gamma t}=\rho(0)$ for every $t$, a contradiction.
-\end{proof}
+% ===============================================================
+\section{Non-examples: where each axiom bites}
+\label{sec:nonexamples}
+% ===============================================================
 
-\begin{proposition}[Energy conservation, P5]
-For an autonomous Hamiltonian system, $H$ is constant along every integral
-curve of $X_H$ on its interval of existence.
-\end{proposition}
-\begin{proof}
-If $\gamma$ is such a curve, then
+\begin{nonexample}[Odd dimension: Axiom~\ref{ax:kin} bites]
+\label{nex:odd}
+No manifold of odd dimension admits a nondegenerate $2$-form. If
+$\dim V = d$ is odd and $\beta$ is an alternating bilinear form on $V$, its
+matrix $B$ in any basis satisfies $B^{\!\top} = -B$, so
+$\det B = \det(-B^{\!\top}) = (-1)^{d}\det B = -\det B$, giving $\det B = 0$
+and hence a nonzero $v$ with $\beta(v,\cdot)=0$. Systems whose natural state
+space is odd-dimensional --- for instance a state space carrying a contact
+structure, or a thermodynamic state space with an extra scalar --- fall
+outside Axiom~\ref{ax:kin} and require a different kinematic type.
+\end{nonexample}
+
+\begin{nonexample}[Degenerate bracket: Axiom~\ref{ax:symp} bites]
+\label{nex:rigidbody}
+On $\mathfrak{so}(3)^{*}\cong\Rr^3$ the Lie--Poisson bracket
+$\{f,g\}(\mathbf{x}) = -\,\mathbf{x}\cdot(\nabla f\times\nabla g)$ is a
+Poisson bracket for which the free rigid body,
+$H(\mathbf{x}) = \tfrac12\sum_i x_i^2/I_i$, generates Euler's equations
+\cite{MarsdenRatiu1999}. The associated bivector has rank $2$
+at $\mathbf{x}\neq 0$ and rank $0$ at the origin, so it is not induced by any
+nondegenerate $2$-form; the function $\|\mathbf{x}\|^2$ is a Casimir, i.e.
+$\{\|\mathbf{x}\|^2,\cdot\} = 0$, which is impossible for a nonconstant
+function under Axiom~\ref{ax:symp} because $\{f,\cdot\}=0$ with
+$\{f,g\} = X_g(f) = -X_f(g)$ for all $g$ forces $X_f = 0$, hence $df=0$. The
+object is Poisson but not symplectic; the theory type must be widened, and
+widening it changes which statements of Section~\ref{sec:reconstruction}
+survive.
+\end{nonexample}
+
+\begin{newresult}[Dissipation: Axiom~\ref{ax:law} bites, for every $\omega$]
+\label{new:damped}
+Let $\gamma>0$, $\omega_0^2>0$ and let $X$ be the damped-oscillator field on
+$\Rr^2$,
 \[
- \frac{d}{dt}H(\gamma(t))=dH(X_H)
- =\omega(X_H,X_H)=0
+  X(x,v) \;=\; \bigl(v,\ -\omega_0^2 x-\gamma v\bigr).
 \]
-by antisymmetry.  The statement is local in time and does not assert
-completeness of $X_H$.
-\end{proof}
+Then there is \emph{no} symplectic form $\sigma$ on $\Rr^2$ and no
+$H\in\Cinf{\Rr^2}$ with $\iota_X\sigma = dH$. In particular the obstruction is
+not an artefact of the standard form $dx\wedge dv$.
+\end{newresult}
 
-\begin{counterexample}[Conservation does not imply completeness]
-On $(\R^2,dq\wedge dp)$ take $H=q^2p$.  Hamilton's equations include
-$\dot q=q^2$, so for $q(0)=q_0>0$ one has
-$q(t)=q_0/(1-q_0t)$ and the solution leaves every compact set at
-$t=1/q_0$.  P5 still holds on the maximal interval.  A conserved Hamiltonian
-need not be proper, and conservation alone does not provide global flow.
-\end{counterexample}
-
-\begin{proposition}[Proper energy gives a completeness criterion, P6]
-If $M$ is connected, $H:M\to\R$ is proper, and $X_H$ is smooth, then $X_H$
-is complete.
-\end{proposition}
 \begin{proof}
-An integral curve starting at $x$ remains in the level set $H^{-1}(H(x))$ by
-P5.  Properness makes that level set compact.  A maximal integral curve of a
-smooth vector field that remains in a compact subset cannot terminate at a
-finite endpoint: cover the compact set by finitely many coordinate
-neighborhoods on which the usual local existence theorem supplies a common
-positive extension time.  Repeating at either endpoint extends the curve for
-all real time.
+The linear part of $X$ has matrix
+$\left(\begin{smallmatrix} 0 & 1\\ -\omega_0^2 & -\gamma\end{smallmatrix}\right)$
+with characteristic polynomial $s^2+\gamma s+\omega_0^2$, whose roots have
+real part $-\gamma/2 < 0$ (for real roots, both are negative because their sum
+is $-\gamma<0$ and product $\omega_0^2>0$). As $X$ is linear, every solution
+is a combination of $e^{s_\pm t}$ modes, so $\Phi_t(z)\to 0$ as $t\to+\infty$
+for every $z\in\Rr^2$.
+
+Suppose $\iota_X\sigma = dH$ for some symplectic $\sigma$ and some smooth $H$.
+Then $X(H) = dH(X) = \sigma(X,X) = 0$ by antisymmetry, so $H$ is constant
+along every trajectory: $H(\Phi_t z) = H(z)$ for all $t\ge 0$. Letting
+$t\to+\infty$ and using continuity of $H$ gives $H(z) = H(0)$ for every
+$z\in\Rr^2$. Hence $dH \equiv 0$, so $\iota_X\sigma \equiv 0$, and
+nondegeneracy of $\sigma$ gives $X\equiv 0$. This contradicts
+$X(1,0) = (0,-\omega_0^2)\neq 0$.
 \end{proof}
 
-The hypotheses of P6 are sufficient, not necessary.  Free-particle motion on
-$T^*\R$ is complete although its standard Hamiltonian $p^2/(2m)$ is not proper
-because every energy level contains an unbounded position direction.  This
-contrast is another reason to state completeness separately in A2 and A3.
+\begin{remark}[Precision of New result~\ref{new:damped}]
+\label{rem:damped}
+Three qualifications keep the statement honest.
+(a) The proof uses global asymptotic stability, hence $\gamma>0$,
+$\omega_0^2>0$ and the global domain $\Rr^2$; on a proper subdomain avoiding
+the attractor, or with a \emph{time-dependent} structure, Hamiltonian
+presentations of damped systems exist and are standard.
+(b) Being Hamiltonian is thus a property of the pair $(X,\sigma)$ together
+with the domain, not of $X$ alone; which second-order systems admit a
+variational or Hamiltonian presentation is the inverse problem of the calculus
+of variations \cite{Douglas1941}.
+(c) The result is elementary and the argument is likely known; the claim is to
+the explicit form-independent statement, which the typed setting requires and
+which is stronger than the usual divergence argument --- the latter excludes
+only the standard $\omega_0$, since $\dive X = -\gamma \neq 0$.
+\end{remark}
 
-\begin{counterexample}[Kinematic exclusions]
-Odd-dimensional manifolds admit no nondegenerate two-form because odd-dimensional skew matrices are singular. Moreover, $S^6$ admits nondegenerate two-forms but no symplectic form: $H^2_{\mathrm{dR}}(S^6)=0$, whereas a closed symplectic form on a compact $2n$-manifold has nonzero cohomology class because $\int_M\omega^n\ne0$.
-\end{counterexample}
+\begin{established}[No functorial quantization: the type does not extend]
+\label{est:gvh}
+There is no map from the Poisson algebra of polynomials on $\Rr^{2n}$ to
+self-adjoint operators on a Hilbert space that is linear, sends $1$ to the
+identity, sends $\{f,g\}$ to $\frac{1}{i\hbar}[\hat f,\hat g]$, and acts
+irreducibly on the linear polynomials. This is the Groenewold--van Hove
+obstruction; statements, proofs, and the analogous results for $S^2$ and
+$T^{*}S^1$ are collected by Gotay \cite{Gotay1998}.
+\end{established}
 
-\subsection{Relation to port-Hamiltonian descriptions}
-
-The interface layer in D1 is deliberately less specific than a complete
-port-Hamiltonian formalism.  In that literature, power-conjugate effort and
-flow variables, interconnection structure, storage, and dissipation are typed
-explicitly~\cite{PortHamiltonian}.  N1 isolates only the closed conservative
-linear coupling represented on a product symplectic manifold.  It neither
-classifies open systems nor turns a dissipative device into a closed
-Hamiltonian system by terminology.
-
-\begin{interpretation}[Reciprocity and physical response]
-Onsager reciprocity concerns phenomenological response coefficients under
-specific near-equilibrium and microscopic-reversibility hypotheses
-\cite{Onsager}.  The transpose equality in N1 is an algebraic criterion for
-one declared interconnection field.  Their formal resemblance does not make
-N1 a derivation of Onsager's empirical result, nor does a violation of the N1
-criterion by a controlled device contradict Onsager's scoped hypotheses.
+\begin{interpretation}[Reading of Established result~\ref{est:gvh}]
+\label{int:gvh}
+A compositional programme that seeks a functor from classical theory objects
+to quantum theory objects preserving the full observable algebra structure
+cannot succeed on $\Rr^{2n}$: the obstruction is a theorem, not a missing
+construction. Quantum mechanics is a boundary test for this paper, and we
+claim nothing inside it; we record the obstruction only because it bounds
+what the reconstruction can be extended to.
 \end{interpretation}
 
-\begin{conjecture}[Nonlinear local reciprocity]
-For a fixed decomposition into port pairs, suitable reciprocity of the full linear response at a nondegenerate equilibrium may imply a local invariant split-respecting symplectic form. N2 proves only the stated two-factor linear family; the general claim remains open.
+\begin{established}[Symplectic rigidity]
+\label{est:gromov}
+If $r>R$ there is no symplectic embedding of the ball
+$B^{2n}(r)$ into the cylinder $B^{2}(R)\times\Rr^{2n-2}$, although a
+volume-preserving embedding exists for all $r,R>0$ when $n\ge 2$
+\cite{Gromov1985}.
+\end{established}
+
+\begin{interpretation}[Reading of Established result~\ref{est:gromov}]
+\label{int:gromov}
+Axiom~\ref{ax:symp} is strictly stronger than ``the flow preserves phase
+volume''. The kinematic type therefore carries information that the measure
+type does not, and the choice between them is in principle a substantive
+choice rather than a notational one.
+\end{interpretation}
+
+\begin{conjecture}[Empirical bite of rigidity]
+\label{conj:rigidity}
+There exist a finite-dimensional classical laboratory system, an
+interpretation $\mathcal{I}=(P,\mu,\mathcal{U},\varepsilon,T)$, and a pair of
+candidate objects agreeing on all volume-theoretic predictions within
+$\varepsilon$ on $(P,T)$ whose predictions for $\mu$ differ by more than
+$\varepsilon$ solely as a consequence of Established
+result~\ref{est:gromov}. We know of no such realization and do not assert that
+one exists.
 \end{conjecture}
 
-\subsection{What reconstruction determines}
-
-When T1 produces a Hamiltonian, it determines it only up to an additive
-constant on each connected component.  This ambiguity leaves $dH$, the vector
-field, and the classical trajectories unchanged.  It does not license an
-arbitrary monotone reparameterization: replacing $H$ by $f(H)$ gives
-$X_{f(H)}=f'(H)X_H$, which generally changes the speed along trajectories and
-can change it differently on distinct energy levels.
-
-\begin{proposition}[Generator fixes energy differences, P7]
-On a connected symplectic manifold, if $X_H=X_G$, then $H-G$ is constant.
-Consequently the common autonomous generator fixes every difference
-$H(x)-H(y)$, although assigning measured energy units remains empirical
-structure in $E$.
-\end{proposition}
-\begin{proof}
-Equality of vector fields gives
-$dH=\iota_{X_H}\omega=\iota_{X_G}\omega=dG$.  Hence $d(H-G)=0$, and a smooth
-function with zero differential on a connected manifold is constant.
-\end{proof}
-
-\begin{interpretation}[Time and energy calibration]
-Reconstructing $X$ presupposes a parameterized flow $\phi_t$, not merely its
-unparameterized orbits.  Rescaling the laboratory time unit rescales the
-generator and the reconstructed Hamiltonian.  Thus T1 is a theorem about the
-mathematical data in A3; identifying its parameter with calibrated seconds and
-$H$ with energy in joules belongs to the empirical layer of D1.
+\begin{interpretation}[Reading of Established result~\ref{est:darboux}]
+\label{int:darboux}
+Established result~\ref{est:darboux} entails that symplectic manifolds of
+equal dimension have no local invariants: any two are locally isomorphic.
+Hence all local empirical content of a Hamiltonian theory object resides in $H$ and
+in $\mathcal{I}$, never in $(M,\omega)$; the kinematic type contributes only
+global information (topology of $M$, cohomology classes as in
+Theorem~\ref{thm:exact} and Non-example~\ref{nex:torus}) and the dimension
+count. A compositional account that locates physical content in the kinematic
+type must therefore locate it globally, or the content is empty.
 \end{interpretation}
 
-\subsection{Local primitives and transition constants}
+% ===============================================================
+\section{Falsification conditions and status of the thesis}
+\label{sec:falsification}
+% ===============================================================
 
-The local conclusion of T1 can be made explicit on a good coordinate cover.
-Choose contractible open sets $U_i$ and primitives $H_i$ satisfying
-$dH_i=\iota_X\omega$ on $U_i$.  On every connected component of an overlap
-$U_i\cap U_j$, the difference $H_i-H_j$ is constant.  These constants encode
-the obstruction to selecting the primitives so that they agree globally.
-Changing $H_i$ by a constant changes the overlap constants by a coboundary but
-does not change the vector field.  This is the elementary local form of the
-de Rham class used in T1.
+\begin{definition}[What would refute the type]
+\label{def:refute}
+We say the Hamiltonian type is \emph{refuted for a domain} $D$ of physical
+systems when there is a system in $D$, an interpretation $\mathcal{I}$, and
+recorded data $\mathcal{D}$ such that no object satisfying
+Axioms~\ref{ax:kin}--\ref{ax:law} on any finite-dimensional $M$ has
+$\mathcal{D}\subseteq_{\varepsilon}\mathrm{Emp}(\Th)$.
+\end{definition}
 
-\begin{proposition}[Simply connected criterion, P8]
-If $M$ is connected and simply connected, every symplectic vector field is
-globally Hamiltonian.
-\end{proposition}
-\begin{proof}
-For a symplectic vector field, Cartan's formula gives that
-$\alpha=\iota_X\omega$ is closed.  The integral of a closed one-form is
-invariant under endpoint-preserving homotopy of paths.  Every closed curve on
-a simply connected manifold is homotopic to a constant curve, whose integral
-is zero.  The period criterion P4 now supplies a global primitive $H$ and
-hence $X=X_H$.
-\end{proof}
+Three concrete refuting observations, each of which is currently unavailable
+and each of which is stated as a target rather than a claim:
 
-\begin{counterexample}[Connectedness matters for one constant]
-Let $M$ be the disjoint union of two symplectic planes and take $X=0$.
-Both $H=0$ and the function $G$ equal to zero on the first component and one
-on the second generate $X$.  Their difference is locally constant but not a
-single constant on all of $M$.  This is why T1 states uniqueness component by
-component.
-\end{counterexample}
+\begin{enumerate}[label=(F\arabic*),leftmargin=*,itemsep=2pt]
+\item \textbf{Bracket failure.} Measured response functions for a closed
+      finite-dimensional system whose induced bracket on the measured
+      observables violates the Jacobi identity beyond $\varepsilon$. By
+      Lemma~\ref{lem:poisson}(v) this refutes $d\omega=0$, hence
+      Axiom~\ref{ax:symp}, for that system.
+\item \textbf{Global generator failure.} A closed finite-dimensional system
+      whose measured evolution preserves $\omega$ but for which the class
+      $[\iota_X\omega]\in H^1_{\dR}(M)$ is measurably nonzero. By
+      Corollary~\ref{cor:underdet} and Non-example~\ref{nex:torus} this
+      refutes Axiom~\ref{ax:law} while leaving Axioms~\ref{ax:kin}--\ref{ax:obs}
+      intact --- a discriminating rather than a global refutation.
+\item \textbf{Irreducible dissipation.} A system that is closed under the
+      operative notion of isolation, is finite-dimensional, and exhibits
+      global asymptotic stability of an equilibrium. By
+      New result~\ref{new:damped} this refutes Axiom~\ref{ax:law} for that
+      system under \emph{every} symplectic form on its state space.
+\end{enumerate}
 
-\begin{example}[Exact symplectic translation on the plane]
-On $\R^2$ with $\omega=dq\wedge dp$, the constant field
-$X=a\partial_q+b\partial_p$ satisfies
-$\iota_X\omega=a\,dp-b\,dq=d(ap-bq)$.  Its translation flow is therefore
-Hamiltonian with $H=ap-bq$.  Passing to a torus can destroy single-valuedness
-of this primitive even though the same local calculation survives in every
-chart.  The plane and torus examples separate local differential structure
-from global topology without changing the infinitesimal formula.
-\end{example}
-
-\subsection{Empirical typing of reconstructed quantities}
-
-The reconstruction theorem begins with an exact smooth action and an exact
-invariant two-form.  Experimental data instead arrive as finite records with
-uncertainty.  Inferring $X$, testing $\phi_t^*\omega=\omega$, and selecting a
-topology for the state space are inverse problems that lie in layer $E$ until
-a particular statistical and calibration procedure is declared.  T1 says
-what follows if those mathematical hypotheses hold; it supplies no test that
-they hold for a device.
-
-\begin{empirical}[Finite reconstruction data, E3]
-A finite collection of sampled trajectories cannot by itself verify equality
-$\phi_t^*\omega=\omega$ at every state and time, nor can it determine a unique
-smooth generator without model restrictions.  Any laboratory reconstruction
-therefore depends on specified interpolation, uncertainty, and model-class
-assumptions.  This is an epistemic limitation statement, not a report of a new
-experiment.
-\end{empirical}
-
-\begin{counterexample}[A preserved sample is not a preserved form]
-The map $F(q,p)=(2q,p)$ preserves the $p$-axis and fixes the origin, so data
-sampled only at the origin or only through the proposition ``$q=0$'' may show
-no change.  Nevertheless
-$F^*(dq\wedge dp)=2dq\wedge dp$.  Agreement on an impoverished set of
-preparations and readouts does not establish symplectic preservation.
-\end{counterexample}
-
-\begin{interpretation}[Role of the interface]
-Ports make some observables available for intervention while leaving others
-internal.  Two closed presentations may be symplectically isomorphic yet
-differ once a port observable and its dimensions are held fixed, as N3 shows.
-Conversely, transporting the full interface and empirical calibration can
-turn a coordinate change into a representational equivalence.  The choice
-between these readings is not settled by the existence of the diffeomorphism
-alone.
+\begin{interpretation}[Status of the pilot thesis after this paper]
+\label{int:status}
+The reconstruction supports the following bounded report, and nothing
+stronger.
+\emph{Precision:} the thesis can be stated precisely for this domain, by
+Definition~\ref{def:object}, Axioms~\ref{ax:kin}--\ref{ax:interp} and
+Definition~\ref{def:interpretation}.
+\emph{Internal coherence:} the object is consistent and generates the standard
+formalism (Theorems~\ref{thm:reconstruction} and \ref{thm:exact}).
+\emph{Compatibility:} it reproduces the established structural results cited
+here without modification.
+\emph{Usefulness:} the typing did work --- it produced
+New results~\ref{new:coarse}, \ref{new:interaction} and \ref{new:damped}, and
+forced the two-directional separation of
+Interpretation~\ref{int:separation}.
+\emph{Costs:} the compositional reading is incomplete in a specific, provable
+way. $\otimes$ cannot express interaction
+(New result~\ref{new:interaction}); the natural richer composition is only
+partial (Established result~\ref{est:weinstein}); the category has no
+coarse-graining arrows (New result~\ref{new:coarse}); and the type does not
+extend functorially to quantum theory (Established result~\ref{est:gvh}).
+We therefore do not report the thesis as established. We report that, for
+finite-dimensional Hamiltonian mechanics, it is precise, non-trivial, and
+partially falsifiable, with four named structural deficits.
 \end{interpretation}
 
-\section{Conclusion}
+\begin{conjecture}[Interconnection completeness]
+\label{conj:interconnection}
+There is a symmetric monoidal double category whose loose arrows are
+partially-defined canonical relations and whose tight arrows are
+symplectomorphisms, in which every object
+$(M_1\times M_2,\ \omega_1\oplus\omega_2,\ H_1\oplus H_2 + V)$ arises as a
+composite of $\Th_1,\Th_2$ and one arrow determined by $V$. Decorated cospans
+\cite{Fong2015} and the monoidal apparatus of
+\cite{MacLane1998,BaezStay2011} are the natural tools; the obstruction to a
+naive construction is Established result~\ref{est:weinstein}.
+\end{conjecture}
 
-T1 reconstructs Hamiltonian dynamics only from explicit dynamical and topological hypotheses. N1 and N2 show that composability is typed by the selected subsystem forms and ports: strict product-form composition requires reciprocity, while unidirectional coupling is obstructed even after split-respecting rescaling in the stated dimension. Axiom A1 prevents these mathematical results from being redescribed as empirical realization claims.
+% ===============================================================
+\appendix
 
-\begin{thebibliography}{9}
-\bibitem{AbrahamMarsden} R. Abraham and J. E. Marsden, \emph{Foundations of Mechanics}, 2nd ed., 1978.
-\bibitem{MarsdenRatiu} J. E. Marsden and T. S. Ratiu, \emph{Introduction to Mechanics and Symmetry}, 2nd ed., Springer, 1999.
-\bibitem{McDuffSalamon} D. McDuff and D. Salamon, \emph{Introduction to Symplectic Topology}, 3rd ed., Oxford University Press, 2017.
-\bibitem{Onsager} L. Onsager, ``Reciprocal Relations in Irreversible Processes I,'' \emph{Physical Review} 37 (1931), 405--426.
-\bibitem{PortHamiltonian} A. van der Schaft and D. Jeltsema, ``Port-Hamiltonian Systems Theory,'' \emph{Foundations and Trends in Systems and Control} 1 (2014), 173--378.
+\section{Type skeleton in Haskell}
+\label{app:haskell}
+
+The following is a rendering of Definitions~\ref{def:types},
+\ref{def:object}, \ref{def:interpretation} and \ref{def:morphism} as
+types. It is a \emph{typing}, not a formal proof: it makes the arities and
+dependencies of the theory object machine-checkable, and it makes
+New result~\ref{new:interaction} expressible as a property, but nothing here
+verifies any theorem of this paper. No claim of formal verification is made.
+
+\begin{lstlisting}[language=Haskell]
+module Principia.Hamiltonian where
+type Tangent = [Double];  type Bilinear = (Tangent, Tangent) -> Double
+type Observable m = m -> Double            -- observable type
+type Flow m = Double -> m -> Maybe m       -- Maybe encodes the partiality
+
+-- Kinematic type (kinematic + symplectic axioms); 'm' = points of M.
+data Kinematic m = Kinematic { dimHalf :: Int, symplForm :: m -> Bilinear }
+newtype Generator m = Generator (Observable m)
+
+-- Interpretation. Units are DATA, not derivable from the bare object;
+-- that is exactly what the "isomorphic but distinct" result turns on.
+data Unit = Metre | Coulomb | Joule | Second | Other String deriving (Eq, Show)
+data Interp m = Interp { preparable :: m -> Bool, readout :: m -> [Double]
+                       , units :: [Unit], resolution, window :: Double }
+
+data BareObject m   = BareObject (Kinematic m) (Generator m) (Flow m)
+data TheoryObject m = TheoryObject (BareObject m) (Interp m)
+forget :: TheoryObject m -> BareObject m               -- the operation U
+forget (TheoryObject b _) = b
+
+-- Cartesian monoidal product: block-diagonal form, summed generator,
+-- paired flow.  'split' evaluates omega_1 (+) omega_2 in the splitting.
+tensor :: BareObject a -> BareObject b -> BareObject (a, b)
+tensor (BareObject ka (Generator ha) fa) (BareObject kb (Generator hb) fb) =
+  BareObject (Kinematic (dimHalf ka + dimHalf kb) split)
+             (Generator (\(x,y) -> ha x + hb y))
+             (\t (x,y) -> (,) <$> fa t x <*> fb t y)
+  where split (x,y) (v,w) = let n = 2 * dimHalf ka
+                                (v1,v2) = splitAt n v; (w1,w2) = splitAt n w
+                            in symplForm ka x (v1,w1) + symplForm kb y (v2,w2)
+
+-- The non-interaction result as a sampled PREDICATE, not a theorem: a
+-- coupling is non-interacting exactly when its differential vanishes.
+-- This names the criterion; it does not prove the equivalence.
+newtype Coupling m = Coupling (Observable m)
+isNonInteracting :: (Observable m -> m -> [Double]) -> Coupling m -> [m] -> Bool
+isNonInteracting grad (Coupling v) zs = all (all ((< 1e-12) . abs) . grad v) zs
+
+-- Morphisms: the type records the data, it does not enforce the
+-- immersion lemma, which is proved in the text and not here.
+data Morphism a b = Morphism { mapPoints :: a -> b, shiftConst :: Double }
+\end{lstlisting}
+
+\section{Source verification record}
+\label{app:verification}
+
+\footnotesize
+Author list, title, year, and venue were matched against publisher or
+repository records for every cited item before citation. Confirmed without
+material residual uncertainty: \cite{BaezStay2011} (LNP 813, 2011,
+pp.~95--174), \cite{Douglas1941} (Trans.\ AMS \textbf{50}, 1941, 71--128),
+\cite{Fong2015} (TAC \textbf{30}, 2015, no.~33, 1096--1120),
+\cite{Gromov1985} (Invent.\ Math.\ \textbf{82}, 1985, 307--347, DOI
+10.1007/BF01388806), \cite{MacLane1998} (Springer GTM 5, 2nd ed., 1998),
+\cite{Will2014} (Living Rev.\ Relativ.\ \textbf{17}, 2014, 4;
+arXiv:1403.7377, where the figure $42.98''$/century appears).
+Confirmed with a stated residual: \cite{AbrahamMarsden1978}
+(Benjamin/Cummings, 2nd ed., 1978, ISBN 978-0-8053-0102-1 --- chapter
+pointers are to that edition and no page numbers are asserted);
+\cite{Arnold1989} (Springer GTM 60, 2nd ed., 1989, trans.\ Vogtmann \&
+Weinstein --- the pointers $\S43$ and Ch.~10 were not independently
+re-paginated); \cite{MarsdenRatiu1999} (Springer TAM 17, 2nd ed., 1999, ISBN
+978-0-387-98643-2 --- chapter pointers to that edition);
+\cite{Gotay1998} (arXiv:math-ph/9809011, 1998 --- the preprint is cited
+because the published-volume pagination was not confirmed);
+\cite{Weinstein2010} (Port.\ Math.\ \textbf{67}, 2010, start page 261
+confirmed --- the end page 278 is inferred and not confirmed).
+
+\footnotesize
+\begin{thebibliography}{99}
+\setlength{\itemsep}{0pt}
+
+\bibitem{AbrahamMarsden1978}
+R.~Abraham and J.~E. Marsden,
+\emph{Foundations of Mechanics}, 2nd ed., revised, enlarged and reset, with
+the assistance of T.~Ratiu and R.~Cushman,
+Benjamin/Cummings, Reading, MA, 1978.
+
+\bibitem{Arnold1989}
+V.~I. Arnold,
+\emph{Mathematical Methods of Classical Mechanics}, 2nd ed.,
+translated by K.~Vogtmann and A.~Weinstein,
+Graduate Texts in Mathematics 60, Springer, New York, 1989.
+
+\bibitem{BaezStay2011}
+J.~C. Baez and M.~Stay,
+\emph{Physics, topology, logic and computation: a Rosetta Stone}, in
+B.~Coecke (ed.), New Structures for Physics,
+Lecture Notes in Physics 813, Springer, Berlin, 2011, pp.~95--174;
+arXiv:0903.0340.
+
+\bibitem{Douglas1941}
+J.~Douglas,
+\emph{Solution of the inverse problem of the calculus of variations},
+Trans.\ Amer.\ Math.\ Soc.\ \textbf{50} (1941), 71--128.
+
+\bibitem{Fong2015}
+B.~Fong,
+\emph{Decorated cospans},
+Theory Appl.\ Categ.\ \textbf{30} (2015), no.~33, 1096--1120;
+arXiv:1502.00872.
+
+\bibitem{Gotay1998}
+M.~J. Gotay,
+\emph{Obstructions to quantization},
+arXiv:math-ph/9809011 (1998).
+
+\bibitem{Gromov1985}
+M.~Gromov,
+\emph{Pseudo holomorphic curves in symplectic manifolds},
+Invent.\ Math.\ \textbf{82} (1985), 307--347.
+
+\bibitem{MacLane1998}
+S.~Mac~Lane,
+\emph{Categories for the Working Mathematician}, 2nd ed.,
+Graduate Texts in Mathematics 5, Springer, New York, 1998.
+
+\bibitem{MarsdenRatiu1999}
+J.~E. Marsden and T.~S. Ratiu,
+\emph{Introduction to Mechanics and Symmetry: A Basic Exposition of Classical
+Mechanical Systems}, 2nd ed.,
+Texts in Applied Mathematics 17, Springer, New York, 1999.
+
+\bibitem{Weinstein2010}
+A.~Weinstein,
+\emph{Symplectic categories},
+Port.\ Math.\ \textbf{67} (2010), 261--278.
+
+\bibitem{Will2014}
+C.~M. Will,
+\emph{The confrontation between general relativity and experiment},
+Living Rev.\ Relativ.\ \textbf{17} (2014), 4; arXiv:1403.7377.
+
 \end{thebibliography}
+
 \end{document}

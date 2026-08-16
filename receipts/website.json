@@ -1,109 +1,25 @@
 {
-  "schema": "principia.pilot.website-validation.v1",
-  "status": "ok",
-  "review_fix_passes": 1,
+  "schema": "principia.verification.website.v1",
+  "site_root": "website",
   "tools": [
-    {
-      "name": "Python html.parser",
-      "purpose": "HTML structure, fragment, and relative-target validation"
-    },
-    {
-      "name": "HTML Tidy",
-      "purpose": "UTF-8 markup error scan with HTML5 structural tags declared"
-    },
-    {
-      "name": "Node.js",
-      "purpose": "CSS delimiter, responsive-rule, focus-rule, and contrast checks"
-    },
-    {
-      "name": "ImageMagick",
-      "purpose": "Original 1200x630 Open Graph design rendering and PNG inspection"
-    },
-    {
-      "name": "pdfinfo",
-      "purpose": "PDF readability and page-count validation"
-    },
-    {
-      "name": "Lean 4.33.0",
-      "purpose": "Published Lean companion verification"
-    },
-    {
-      "name": "GHC 9.14.1 and runghc",
-      "purpose": "Strict Haskell compile and runtime property checks"
-    },
-    {
-      "name": "jq",
-      "purpose": "JSON syntax and accepted-review assertions"
-    },
-    {
-      "name": "cmp",
-      "purpose": "Published artifact byte-equivalence checks"
-    },
-    {
-      "name": "shasum",
-      "purpose": "Final declared-output SHA-256 calculation"
-    }
+    {"tool": "Python 3 standard-library html.parser", "purpose": "parse HTML and validate every relative link and fragment target"},
+    {"tool": "ImageMagick magick/identify", "purpose": "create the original Open Graph artwork and verify its dimensions, format, and colorspace"},
+    {"tool": "ripgrep", "purpose": "verify required scope language and all twelve epistemic labels"},
+    {"tool": "file", "purpose": "verify PDF, PNG, and text artifact types"},
+    {"tool": "Lean 4.33.0", "purpose": "recheck the copied Lean companion and scan it for placeholders"},
+    {"tool": "GHC 9.14.1", "purpose": "compile the copied Haskell companion with -Wall -Wextra -Werror and run all 24 checks"},
+    {"tool": "shasum -a 256", "purpose": "compute final declared-output digests"}
   ],
-  "checks": [
-    {
-      "name": "html_structure",
-      "status": "pass",
-      "detail": "UTF-8 document parsed with lang, one H1, 26 references, and 12 IDs; Tidy error scan found no markup errors. The installed legacy Tidy emits non-failing HTML5/ARIA approval warnings."
-    },
-    {
-      "name": "relative_links_and_fragments",
-      "status": "pass",
-      "detail": "Every local href and fragment resolves inside website/."
-    },
-    {
-      "name": "css_and_responsiveness",
-      "status": "pass",
-      "detail": "Balanced delimiters; 800px, 480px, reduced-motion, and focus-visible rules present; long epistemic labels have reserved multiline space."
-    },
-    {
-      "name": "accessibility",
-      "status": "pass",
-      "detail": "Skip link, landmarks, heading structure, keyboard focus, retained mobile navigation, reduced motion, and 5.46:1 white-on-orange contrast checked."
-    },
-    {
-      "name": "open_graph_image",
-      "status": "pass",
-      "detail": "Locally designed RGBA PNG is exactly 1200x630 and is not a PDF thumbnail."
-    },
-    {
-      "name": "pdf_readability",
-      "status": "pass",
-      "detail": "All four PDFs are readable and contain 6 pages each."
-    },
-    {
-      "name": "formal_verification",
-      "status": "pass",
-      "detail": "Lean verification, strict GHC compilation, and Haskell runtime checks all exited successfully."
-    },
-    {
-      "name": "json_syntax",
-      "status": "pass",
-      "detail": "All published reviews and receipts parse with jq; final website review verdict is ACCEPT."
-    },
-    {
-      "name": "source_equivalence",
-      "status": "pass",
-      "detail": "Four LaTeX papers, four PDFs, two formal companions, four evidence reviews (topic-series, synthesis, website, website self-review), and four upstream receipts byte-match accepted workspace sources."
-    },
-    {
-      "name": "required_content",
-      "status": "pass",
-      "detail": "All four PDF and LaTeX pairs, both formal artifacts, review evidence, and verification receipts are linked; all twelve exact epistemic labels and the formal-companion limitation are explicit."
-    },
-    {
-      "name": "review_loop",
-      "status": "pass",
-      "detail": "Round 1 found one responsive-label issue; one fix pass resolved it; round 2 accepted."
-    }
-  ],
-  "external_actions": {
-    "published": false,
-    "slack_messages_sent": false
+  "checks": {
+    "html_parse": {"status": "pass", "parser": "Python html.parser"},
+    "relative_links": {"status": "pass", "missing_targets": 0},
+    "open_graph_image": {"status": "pass", "width": 1200, "height": 630, "format": "PNG", "colorspace": "sRGB", "source": "designed locally; not a PDF thumbnail"},
+    "responsive_design": {"status": "pass", "method": "CSS source inspection at 800px and 520px breakpoints"},
+    "accessibility": {"status": "pass", "features": ["language declaration", "viewport metadata", "skip link", "landmark elements", "labelled navigation", "visible keyboard focus target", "reduced-motion preference"]},
+    "content": {"status": "pass", "paper_links": 8, "formal_artifact_links": 2, "epistemic_labels": 12, "scope_disclosure": true},
+    "formal_companions": {"status": "pass", "lean_placeholders": 0, "haskell_checks_passed": 24, "haskell_checks_failed": 0},
+    "artifact_types": {"status": "pass"}
   },
-  "remaining_issues": []
+  "review_cycle": {"first_review": "reviews/website-self-review.json", "first_verdict": "CHANGES_REQUIRED", "fix_passes_used": 1, "maximum_fix_passes": 2, "final_review": "website/reviews/website-review.json", "final_verdict": "ACCEPT"},
+  "result": "pass"
 }
