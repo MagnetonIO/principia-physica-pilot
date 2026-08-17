@@ -25,9 +25,9 @@ A static, self-contained site presenting the whole bundle:
 - [`website/styles.css`](website/styles.css)
 - [`website/og.png`](website/og.png) — 1200×630 social card drawn for this bundle.
 
-The production URL is **not recorded here**. This bundle contains no deployment URL and no
-machine-specific absolute paths; the release step adds the verified production URL after
-deployment.
+**Production URL — <https://principia-physica-pilot.vercel.app> —** deployed to the existing Vercel
+project `principia-physica-pilot` and read back from that origin before this line was written.
+The bundle contains no machine-specific absolute paths.
 
 ## The four papers
 
