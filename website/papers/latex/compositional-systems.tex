@@ -1,149 +1,543 @@
-\documentclass[12pt]{article}
-\usepackage[a4paper,margin=1.65in]{geometry}
-\setlength{\parskip}{0.35em}
-\setlength{\emergencystretch}{3em}
-\linespread{1.25}
-\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,hyperref,microtype}
+% !TEX program = pdflatex
+% PRINCIPIA PHYSICA pilot --- topic series, paper I of 3.
+% Self-contained arXiv-style preprint; no external .bib, no non-standard packages.
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathrsfs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+%---------------------------------------------------------------
+% Twelve epistemic classes of the pilot contract, plus example,
+% counterexample and remark, all on one shared counter so that the
+% type of every numbered claim is visible at the point of use.
+%---------------------------------------------------------------
+\theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 \newtheorem{axiom}[definition]{Axiom}
 \newtheorem{assumption}[definition]{Assumption}
+\newtheorem{conjecture}[definition]{Conjecture}
+\theoremstyle{plain}
 \newtheorem{lemma}[definition]{Lemma}
 \newtheorem{proposition}[definition]{Proposition}
 \newtheorem{theorem}[definition]{Theorem}
 \newtheorem{corollary}[definition]{Corollary}
-\newtheorem{conjecture}[definition]{Conjecture}
-\theoremstyle{definition}
-\newtheorem{example}[definition]{Example}
-\newtheorem{counterexample}[definition]{Counterexample}
+\newtheoremstyle{commentary}{3pt}{3pt}{\small}{}{\bfseries}{.}{.5em}{}
+\theoremstyle{commentary}
 \newtheorem{interpretation}[definition]{Interpretation}
 \newtheorem{empirical}[definition]{Empirical statement}
-\title{Compositional Systems: Mathematical Structure and Empirical Realization}
-\author{PRINCIPIA PHYSICA}
-\date{}
+\newtheorem{established}[definition]{Established physical result}
+\newtheorem{newresult}[definition]{New result claimed by this work}
+\newtheorem{counterexample}[definition]{Counterexample}
+\newtheorem{example}[definition]{Example}
+\newtheorem{remark}[definition]{Remark}
+
+% preprint density
+\makeatletter
+\def\thm@space@setup{\thm@preskip=3pt plus 1pt minus 1pt
+                     \thm@postskip=3pt plus 1pt minus 1pt}
+\makeatother
+\setlength{\abovedisplayskip}{4pt plus 1pt minus 1pt}
+\setlength{\belowdisplayskip}{4pt plus 1pt minus 1pt}
+\setlength{\abovedisplayshortskip}{2pt}
+\setlength{\belowdisplayshortskip}{2pt}
+\allowdisplaybreaks
+
+%--------------- shared series notation (identical in all three) --
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Cinf}{C^{\infty}}
+\newcommand{\FinSymp}{\mathsf{FinSymp}}
+\newcommand{\SympRel}{\mathsf{SympRel}}
+\newcommand{\CompSys}{\mathsf{CompSys}}
+\newcommand{\HamSys}{\mathsf{HamSys}}
+\newcommand{\Oc}{\mathcal{O}}
+\newcommand{\Mc}{\mathcal{M}}
+\newcommand{\Dsf}{\mathsf{D}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\pt}{\mathbf{1}}
+\newcommand{\graph}{\operatorname{graph}}
+\newcommand{\dive}{\operatorname{div}}
+
+%--------------- paper-specific macros (Paper I only) ------------
+\newcommand{\Cbb}{\mathbb{C}}
+\newcommand{\prm}{\mathrm{pr}}
+\newcommand{\Ac}{\mathcal{A}}
+\newcommand{\Sp}{\mathit{Sp}}
+
+\title{\bf Compositional Systems in Finite-Dimensional Classical Mechanics:\\
+A Typed Reconstruction and Its Failure Modes}
+\author{PRINCIPIA PHYSICA Pilot --- Topic 1}
+\date{16 August 2026}
+
 \begin{document}
 \maketitle
 \begin{abstract}
-We formulate compositional physical modelling as a typed relation between experimental interfaces and mathematical systems. Symmetric monoidal categories encode sequential and parallel composition; symmetric monoidal functors encode models. We prove the resulting substitution and congruence principles, distinguish structural equivalence from physical sameness, and exhibit counterexamples to the inference from mathematical admissibility to empirical realization. Every physical assertion is isolated as an empirical statement or an explicit assumption.
+\noindent
+We give a typed reconstruction of \emph{system}, \emph{state}, \emph{observable},
+\emph{process} and \emph{composition} for finite-dimensional classical mechanics, testing ---
+not assuming --- the thesis that \emph{physics is the study of empirically realized
+compositional mathematical structures}. The symplectic product is monoidal but not cartesian:
+no projection, no diagonal. Centrally, ``these two subsystems interact'' is \emph{not} an
+invariant of $(M,\omega,H)$, so compositional structure is additional data fixed empirically
+by what an apparatus reads. And the symplectic Hamiltonian systems are not closed under the
+operations physicists call composition, the closed class being the Dirac / port-Hamiltonian
+one. Every claim carrying epistemic status is typed by one of twelve labels, which share a
+counter with the Counterexample and Remark environments.
 \end{abstract}
 
-\section{Scope and epistemic discipline}
-The thesis motivating this paper is that physics studies empirically realized compositional mathematical structures. The expression has two logically independent parts. Composition is a mathematical constraint. Realization is an empirical relation between a model and interventions, preparations, or observations. No categorical theorem can establish the latter without empirical premises.
+\section{Scope and epistemic conventions}
 
-\begin{definition}[Interface theory]
-An \emph{interface theory} is a symmetric monoidal category $(\mathcal E,\otimes,I,\sigma)$. Objects are experimental interface types; morphisms $e:X\to Y$ are admissible experimental processes; composition represents sequential connection; and $\otimes$ represents parallel juxtaposition.
+This paper does not presuppose the pilot thesis, ``\emph{physics is the study of empirically
+realized compositional mathematical structures}''; it builds the smallest compositional
+apparatus adequate to finite-dimensional classical mechanics, then attacks it. Field theory,
+general relativity and quantum theory appear only as \emph{boundary tests}. It is
+Paper~I of three, with Paper~II, \emph{Hamiltonian Reconstruction as a Physical Theory
+Object} \cite{PrincipiaII}, and Paper~III, \emph{Empirical Realization, Observational
+Equivalence, and the Limits of Finite-Dimensional Classical Models} \cite{PrincipiaIII}.
+Twelve labels are kept strictly distinct: Definition, Axiom, Assumption, Conjecture, Lemma,
+Proposition, Theorem, Corollary, Interpretation, Empirical statement, Established physical
+result, New result claimed by this work. Three rules govern them, verbatim from the pilot
+contract: (i) an assumption is never converted into a theorem; (ii) every substantial claim is
+proved, cited, empirical, or explicitly conjectural; (iii) mathematical equivalence is never
+identified with physical equivalence without an empirical argument.\footnote{\emph{Hedges,
+retained rather than tidied away.} Residually \emph{uncertain}, flagged not asserted: the
+final page of Meyer 1973 (272 vs.\ 273). The journal data for Weinstein's 2009 survey was
+subsequently confirmed --- it appeared as Port.\ Math.\ \textbf{67} (2010), 261--278, the form
+cited in Papers~III and~IV of this pilot --- but the arXiv preprint is retained here as the
+citation of record for the version consulted.}
+
+\section{Systems, states, observables}
+
+\begin{definition}[System, observables, states]\label{def:system}
+A \emph{finite-dimensional classical system} is a triple $(M,\omega,H)$: $M$ smooth,
+second-countable, $\dim M=2n$; $\omega\in\Omega^{2}(M)$ closed and nondegenerate;
+$H\in\Cinf(M)$; write $M^{-}:=(M,-\omega)$. An \emph{observable} is $f\in\Oc:=\Cinf(M,\R)$;
+with $\iota_{X_f}\omega=df$ and $\{f,g\}:=\omega(X_f,X_g)$, $(\Oc,\{\cdot,\cdot\})$ is a
+Poisson algebra \cite{Arnold1989}. A \emph{point state} is $x\in M$; a \emph{statistical
+state} is a Borel probability measure, the point states being its Dirac measures. Unless
+stated otherwise $M$ is connected and $X_H$ complete --- neither automatic, since a particle
+escaping to infinity in finite time violates completeness.
 \end{definition}
 
-\begin{definition}[Mathematical system theory]
-A \emph{system theory} is a symmetric monoidal category $(\mathcal M,\boxtimes,\mathbf 1)$. Its objects are mathematical state or boundary types and its morphisms are mathematical processes.
-\end{definition}
+\begin{axiom}[Hamiltonian kinematics and dynamics]\label{ax:ham}
+The state space of an isolated finite-dimensional classical system is a symplectic manifold,
+its observables the smooth real functions on it, and its evolution the flow $\Phi^{t}_{H}$ of
+$X_H$, so $\dot f=\{f,H\}$ \cite{AbrahamMarsden1978,Arnold1989}. Labelled an \emph{axiom},
+not a theorem: nothing here derives it, and Section~\ref{sec:interconnection} exhibits
+ordinary mechanical systems violating it.
+\end{axiom}
 
-\begin{definition}[Compositional model]
-A compositional model is a strong symmetric monoidal functor
-\[
-F:\mathcal E\longrightarrow\mathcal M,
-\]
-with coherent isomorphisms $F(X)\boxtimes F(Y)\cong F(X\otimes Y)$ and $\mathbf 1\cong F(I)$.
-\end{definition}
-
-These are definitions, not empirical claims. They specify a class of possible representations.
-
-\begin{assumption}[Typed experimental composition]
-For the domain under study, laboratory procedures admit repeatable interface types, and the connections represented by composition and tensor product are operationally implementable to stated tolerances.
+\begin{assumption}[Observables]\label{asm:obs}
+Every $f\in\Cinf(M)$ is a physical observable.
 \end{assumption}
 
-\begin{empirical}[Realization input]
-Whether a particular laboratory domain satisfies the preceding assumption, and whether a proposed $F$ predicts its observed statistics within uncertainty, must be decided from calibration and outcome data.
-\end{empirical}
+\begin{assumption}[Point states]\label{asm:points}
+The physically realized states are the point states.
+\end{assumption}
 
-\section{Consequences of functorial modelling}
-\begin{lemma}[Substitution]
-Let $F:\mathcal E\to\mathcal M$ be a functor. If $e=e':X\to Y$, then for all composable $a:W\to X$ and $b:Y\to Z$,
+Both are false about laboratory practice (Empirical statement~\ref{emp:units}); both remain
+assumptions here, and are never converted into theorems.
+
+\section{Processes; partial composition}
+
+\begin{definition}[Processes and the two categories]\label{def:process}
+Four strata: (a) the flow $\Phi^{t}_{H}$; (b) a \emph{symplectomorphism} $\psi:M_1\to M_2$,
+$\psi^{*}\omega_2=\omega_1$; (c) a \emph{canonical relation} $L:M_1\rightsquigarrow M_2$, a
+closed Lagrangian submanifold $L\subset M_1^{-}\times M_2$, so $\dim L=n_1+n_2$ and
+$(-\omega_1\boxplus\omega_2)|_L=0$ \cite{Weinstein1982}; (d) a \emph{Dirac relation},
+dropping nondegeneracy \cite{Courant1990}. $\FinSymp$ has symplectic manifolds as objects and
+symplectomorphisms as morphisms; $\SympRel$ the same objects with canonical relations as
+candidate morphisms, composed by $L_2\circ L_1=\pi_{13}(F)$,
+$F:=(L_1\times L_2)\cap(M_1\times\Delta_{M_2}\times M_3)$ --- a canonical relation only when
+$F$ is a clean intersection and $\pi_{13}|_F$ is proper and injective.
+\end{definition}
+
+\begin{established}[$\SympRel$ is not a category]\label{estab:notcat}
+Weinstein states the failure himself: canonical relations ``compose well when a transversality
+condition is satisfied, but the failure of the most general compositions to be smooth
+manifolds means that the canonical relations do not comprise the morphisms of a category''
+\cite{Weinstein2009}.
+\end{established}
+
+\begin{counterexample}[Composition that is not a submanifold]\label{cex:compose}
+Take $M_1=\pt$ (the one-point symplectic manifold), $M_2=\R^{4}$ with
+$\omega=dq_1\wedge dp_1+dq_2\wedge dp_2$, $M_3=\R^{2}(q_1,p_1)$. Let
+$S(q_1,q_2)=\tfrac{1}{4}q_2^{4}-\tfrac{1}{2}q_1q_2^{2}$ and
+$L_1:=\graph(dS)=\{(q_1,q_2,-\tfrac{1}{2}q_2^{2},\,q_2^{3}-q_1q_2)\}$, a closed embedded
+Lagrangian submanifold of dimension $2=0+2$. Let $W=\{p_2=0\}$, a hypersurface, hence
+coisotropic, with null distribution spanned by $X_{p_2}=\partial/\partial q_2$, and
+$R:M_2\rightsquigarrow M_3$ its reduction relation $\{((q_1,q_2,p_1,0),(q_1,p_1))\}$, of
+dimension $3=2+1$, with $-\omega_2\boxplus\omega_3$ pulling back to
+$-dq_1\wedge dp_1+dq_1\wedge dp_1=0$. Then $L_1\cap W=\{q_2(q_2^{2}-q_1)=0\}$ is the union of
+the line $\{q_2=0\}$ and the parabola $\{q_1=q_2^{2}\}$, meeting transversally at the origin
+--- \emph{not} a submanifold, so the intersection is not clean. Since
+$\partial S/\partial q_1=-\tfrac{1}{2}q_2^{2}$,
 \[
-F(b\circ e\circ a)=F(b\circ e'\circ a).
+ R\circ L_1 = \{(q_1,0):q_1\in\R\}\ \cup\ \{(q_1,-\tfrac{1}{2}q_1): q_1\ge 0\},
 \]
+a line with a half-ray attached at the origin: not a one-dimensional submanifold of $\R^{2}$,
+so $R\circ L_1$ is not a canonical relation. \hfill$\square$
+\end{counterexample}
+
+\section{Composition I: monoidal, not cartesian}
+
+The \emph{direct product} of $(M_1,\omega_1,H_1)$ and $(M_2,\omega_2,H_2)$ is
+$(M_1\times M_2,\ \prm_1^{*}\omega_1+\prm_2^{*}\omega_2,\ H_1\circ\prm_1+H_2\circ\prm_2)$,
+with unit $\pt$.
+
+\begin{proposition}[No projections]\label{prop:noproj}
+Let $\dim M=2n$, $\dim N=2m$, $m\ge1$. The graph $\Gamma=\{((x,y),x)\}\subset
+(M\times N)^{-}\times M$ of $\prm_M$ is \emph{not} a canonical relation.
+\end{proposition}
+
+\begin{proof}
+Lagrangian submanifolds of $(M\times N)^{-}\times M$ have dimension
+$\bigl((2n+2m)+2n\bigr)/2=2n+m$, while $\dim\Gamma=2n+2m$; these agree only if $m=0$.
+Independently, the pullback of $-(\omega_M\boxplus\omega_N)\boxplus\omega_M$ along
+$(x,y)\mapsto((x,y),x)$ is $-\omega_M-\omega_N+\omega_M=-\omega_N\neq0$, so $\Gamma$ is not
+even isotropic.
+\end{proof}
+
+\begin{theorem}[No diagonal]\label{thm:nodiag}
+Let $\dim M=2n\ge2$. The graph $\Gamma_\delta=\{(x,(x,x)):x\in M\}$ of the set-theoretic
+diagonal is not a canonical relation $M\rightsquigarrow M\times M$.
+\end{theorem}
+
+\begin{proof}
+$M^{-}\times(M\times M)$ has dimension $6n$, so its Lagrangian submanifolds have dimension
+$3n$, whereas $\dim\Gamma_\delta=2n$, and $3n\ne2n$ for $n\ge1$. The stronger,
+convention-independent obstruction is isotropy: the pullback of
+$(-\omega)\boxplus\omega\boxplus\omega$ along $x\mapsto(x,x,x)$ is
+$-\omega+\omega+\omega=\omega$, nondegenerate. So $\Gamma_\delta$ is a \emph{symplectic}
+submanifold --- maximally far from isotropic.
+\end{proof}
+
+\begin{corollary}[Not cartesian]\label{cor:noncart}
+No \emph{copy relation} --- a canonical relation graphing $x\mapsto(x,x)$ --- exists,
+$\Gamma_\delta$ being the only candidate. By the characterization of cartesian structure
+through natural diagonals and projections (Fox's theorem \cite{Fox1976}; for the monoidal
+background see \cite{MacLane1998}),
+$(\SympRel,\times,\pt)$ is symmetric monoidal but not cartesian. This is \emph{not} a
+classical no-cloning theorem: statistical states can be copied by preparing two systems
+identically, and the obstruction is internal to a chosen morphism class. Reading it as a
+physical impossibility would be the mathematical-for-physical substitution the contract
+forbids.
+\end{corollary}
+
+\section{Composition II: decomposition is not intrinsic}\label{sec:decomp}
+
+\begin{lemma}[Non-interaction equals product flow]\label{lem:prodflow}
+For a symplectic splitting $M\cong M_1\times M_2$ with $M_1,M_2$ connected,
+$H=H_1\circ\prm_1+H_2\circ\prm_2$ up to a constant \emph{iff} $X_H=(X_{H_1},X_{H_2})$.
 \end{lemma}
 \begin{proof}
-Equality in a category is a congruence for composition, so $b\circ e\circ a=b\circ e'\circ a$. Applying the function that $F$ assigns to the hom-set $\mathcal E(W,Z)$ gives equal images. Functoriality then rewrites these images as $F(b)\circ F(e)\circ F(a)$ and $F(b)\circ F(e')\circ F(a)$.
+Write $X_H=(V(x),W(y))$. Then $dH=\iota_V\omega_1+\iota_W\omega_2$ splits by
+bidegree, so $\partial^{2}H/\partial x\,\partial y=0$ and
+$H(x,y)=H(x,y_0)+H(x_0,y)-H(x_0,y_0)$; the converse is the same computation backwards.
 \end{proof}
 
-\begin{theorem}[Preservation of generated process equations]
-Let $F:\mathcal E\to\mathcal M$ be a strong symmetric monoidal functor. Every equation between morphism expressions generated from identities, composition, tensor product, symmetries, and a fixed collection of equations in $\mathcal E$ is mapped to an equation in $\mathcal M$.
-\end{theorem}
-\begin{proof}
-Proceed by induction on the derivation of an equation. Reflexivity, symmetry, and transitivity are preserved because each hom-set map is a function. The composition-congruence step is preserved by functoriality. The tensor-congruence step is preserved after conjugating by the monoidal coherence isomorphisms. Equations for identities and composition are the functor axioms. Equations involving associators, unitors, and symmetries are preserved by the coherence diagrams for a strong symmetric monoidal functor. Thus every generating rule and every inference rule has an equal image.
-\end{proof}
-
-\begin{corollary}[Contextual invariance]
-If two experimental processes are equated in $\mathcal E$, no compositional context constructed from sequential or parallel connection distinguishes their images under $F$.
-\end{corollary}
-\begin{proof}
-A context is a morphism expression with one hole. Insert the two equal morphisms. The resulting equation is generated by composition and tensor congruence, so the theorem applies.
-\end{proof}
-
-\begin{interpretation}
-The corollary is a theorem about the chosen formalization. Treating its premise $e=e'$ as a claim about physical indistinguishability requires experimental evidence that the selected contexts include the interventions relevant to the intended claim.
-\end{interpretation}
-
-\section{States, effects, and probabilities}
-\begin{definition}
-In a monoidal category, a \emph{state} of $X$ is a morphism $s:I\to X$, an \emph{effect} is $p:X\to I$, and the closed experiment $p\circ s:I\to I$ is a scalar.
-\end{definition}
-
-\begin{assumption}[Probabilistic interpretation]
-There is a map $\nu:\mathcal M(\mathbf 1,\mathbf 1)\to[0,1]$ such that the scalars assigned to the mutually exclusive outcomes of each specified measurement sum to one.
-\end{assumption}
-
-\begin{proposition}[Compositional prediction]
-Given a state $s:I\to X$, a process $e:X\to Y$, and an effect $p:Y\to I$, a compositional model assigns the scalar
+\begin{newresult}[Interaction is not an invariant of $(M,\omega,H)$]\label{thm:twodecomp}
+Let $M=\R^{4}$ with $\omega=dq_1\wedge dp_1+dq_2\wedge dp_2$ and
 \[
-F(p\circ e\circ s)=F(p)\circ F(e)\circ F(s).
+ H=\frac{p_1^{2}+p_2^{2}}{2m}+\frac{k}{2}\bigl(q_1^{2}+q_2^{2}\bigr)
+ +\frac{c}{2}\bigl(q_1-q_2\bigr)^{2},\qquad m>0,\ k>0,\ c\neq0,\ k+2c>0 .
 \]
-Under the probabilistic-interpretation assumption, its predicted outcome probability is $\nu(F(p\circ e\circ s))$.
-\end{proposition}
-\begin{proof}
-The scalar identity is the composition axiom for $F$, applied twice. The probability statement is the content of the stated assumption, not a consequence of category theory.
-\end{proof}
-
-\begin{example}[Finite stochastic systems]
-Let objects be finite sets and morphisms column-stochastic matrices. Matrix multiplication is sequential composition and the Kronecker product is parallel composition. A probability vector is a state and a row vector selecting an event is an effect. Normalization supplies the probabilistic interpretation. The categorical equations reduce to associativity of matrix multiplication and its compatibility with Kronecker products.
-\end{example}
-
-\section{Limits of structural reasoning}
-\begin{counterexample}[Admissibility is not realization]
-Let $\mathcal E$ be the free symmetric monoidal category on one process $g:X\to X$. Both assignments $F(g)=\mathrm{id}_{\mathbb R}$ and $G(g)=-\mathrm{id}_{\mathbb R}$ extend to strong symmetric monoidal functors into finite-dimensional real vector spaces. Hence both are mathematically admissible. If an experiment prepares $1$ and measures the sign after one use of $g$, the two models make different predictions. Category-theoretic admissibility alone selects neither model.
-\end{counterexample}
-
-\begin{counterexample}[Agreement on a restricted context]
-Two smooth functions $f,g:\mathbb R\to\mathbb R$ can agree on all calibrated inputs $x\in[-1,1]$ while differing outside that interval; take $f(x)=0$ and a smooth $g$ vanishing on $[-1,1]$ but nonzero for $x>1$. Agreement in the tested subcategory does not entail global physical equivalence.
-\end{counterexample}
-
-\begin{definition}[Empirical realization relative to a test family]
-Fix experiments $T$, observed estimates $\widehat q_t$, uncertainties $\epsilon_t$, and model predictions $q_t(F)$. The model $F$ is \emph{$(T,\epsilon)$-realized} when
+Then $(M,\omega)$ admits two symplectic direct-product decompositions
 \[
-|q_t(F)-\widehat q_t|\leq \epsilon_t\qquad(t\in T).
+ \textbf{A}:\ M\cong \R^{2}(q_1,p_1)\times\R^{2}(q_2,p_2),\qquad
+ \textbf{B}:\ M\cong \R^{2}(Q_+,P_+)\times\R^{2}(Q_-,P_-),
 \]
-\end{definition}
+$Q_\pm=(q_1\pm q_2)/\sqrt2$, $P_\pm=(p_1\pm p_2)/\sqrt2$, such that $H$ is interacting with
+respect to $\textbf{A}$ and non-interacting with respect to $\textbf{B}$. Hence ``is
+composite'' and ``its parts interact'' are properties not of $(M,\omega,H)$ but of the pair
+$\bigl((M,\omega,H),\text{decomposition}\bigr)$ --- of the system with a choice of which
+mutually commutant Poisson subalgebras count as local. \emph{Priority hedge:} the computation
+is elementary and we expect it is folklore; our audit located no published statement of the
+\emph{classical} case, only the quantum tensor-product results of Zanardi and of Zanardi,
+Lidar and Lloyd \cite{Zanardi2001,ZanardiLidarLloyd2004}, outside scope and a boundary test
+only. We claim the result while disclaiming novelty of the computation.
+\end{newresult}
 
-\begin{proposition}[Monotonicity of realization]
-If $F$ is $(T,\epsilon)$-realized, $T'\subseteq T$, and $\epsilon'_t\geq\epsilon_t$ for $t\in T'$, then $F$ is $(T',\epsilon')$-realized.
-\end{proposition}
 \begin{proof}
-For each $t\in T'$, realization gives $|q_t(F)-\widehat q_t|\leq\epsilon_t$. The assumed inequality yields $|q_t(F)-\widehat q_t|\leq\epsilon'_t$.
+\emph{$\textbf{B}$ is symplectic.} $dQ_+\wedge dP_+ + dQ_-\wedge dP_-
+=\tfrac12[(dq_1+dq_2)\wedge(dp_1+dp_2)+(dq_1-dq_2)\wedge(dp_1-dp_2)]=\omega$. In matrix form
+the transformation is $T=\mathrm{diag}(S,S)$ on $(q,p)$ with
+$S=2^{-1/2}\left(\begin{smallmatrix}1&1\\1&-1\end{smallmatrix}\right)\in O(2)$, and
+$T^{\mathsf T}JT=J$ because $S^{\mathsf T}S=I$; so $T\in \Sp(4,\R)$.
+
+\emph{$H$ decouples in $\textbf{B}$.} Orthogonality of $S$ gives
+$p_1^{2}+p_2^{2}=P_+^{2}+P_-^{2}$, $q_1^{2}+q_2^{2}=Q_+^{2}+Q_-^{2}$, $q_1-q_2=\sqrt2\,Q_-$,
+so $H=\bigl[P_+^{2}/2m+\tfrac{k}{2}Q_+^{2}\bigr]+\bigl[P_-^{2}/2m+\tfrac{k+2c}{2}Q_-^{2}
+\bigr]$, uncoupled oscillators of frequencies $\sqrt{k/m}$, $\sqrt{(k+2c)/m}$.
+
+\emph{$H$ does not decouple in $\textbf{A}$.} If $H=a(q_1,p_1)+b(q_2,p_2)$ then
+$\partial^{2}H/\partial q_1\partial q_2=0$; but $\partial H/\partial q_1=kq_1+c(q_1-q_2)$, so
+$\partial^{2}H/\partial q_1\partial q_2=-c\neq0$.
 \end{proof}
 
-\begin{conjecture}[Modular identifiability]
-For experimentally important system classes, identifiability of components plus an empirically validated independence condition can be promoted to identifiability of their monoidal composite. The conjecture is false without restrictions on hidden shared causes and interface completeness.
+The ambiguity is large: $\Sp(4,\R)$ acts transitively on ordered linear symplectic splittings
+of $\R^{4}$ with stabilizer $\Sp(2,\R)\times\Sp(2,\R)$, a $4$-parameter family already.
+
+\begin{conjecture}[Generic non-decomposability]\label{conj:generic}
+For generic $H$ on a compact symplectic manifold of dimension $\ge4$, no global symplectic
+product decomposition makes $H$ non-interacting. We have no proof: by
+Lemma~\ref{lem:prodflow} it would force an invariant foliation of codimension $n$, which
+KAM-type genericity should obstruct. \emph{Conjecture, not theorem.}
 \end{conjecture}
 
-\section{Dependency ledger and conclusion}
-The mathematical results depend on the definitions of category, symmetric monoidal category, and strong symmetric monoidal functor, together with ordinary equality logic. Their application depends additionally on typed experimental composition, a probabilistic interpretation when probabilities are used, calibration data, and a specified test family. The theorem establishes compositional consistency; it does not establish realization.
+\begin{definition}[Compositional system]\label{def:compsys}
+A \emph{compositional system} is $(M,\omega,H,\Ac_1,\Ac_2)$ with $\Ac_1,\Ac_2\subset\Cinf(M)$
+Poisson subalgebras that are each other's commutants and generate a dense subalgebra;
+equivalently an integrable symplectic-orthogonal splitting $TM=V_1\oplus V_2$. Write
+$\CompSys$ for the category, $\HamSys$ for that of systems $(M,\omega,H)$ with $H$-preserving
+symplectomorphisms, $U:\CompSys\to\HamSys$ for the forgetful functor.
+\end{definition}
 
-\paragraph{Bibliographic note.}
-Mac Lane supplies the coherence results underlying symmetric monoidal notation \cite{MacLane}. Categorical formulations of processes in physics are surveyed by Baez and Stay \cite{BaezStay}; operational-probabilistic frameworks are developed by Chiribella, D'Ariano, and Perinotti \cite{CDP}. These sources support established mathematical frameworks, not the empirical realization of any particular model.
+\begin{corollary}\label{cor:forget}
+$U$ is not injective on isomorphism classes over a fixed $(M,\omega,H)$:
+Theorem~\ref{thm:twodecomp} gives two objects with the same image disagreeing on the
+interaction predicate. Compositional structure is \emph{strictly additional data}.
+\end{corollary}
 
-\begin{thebibliography}{9}
-\bibitem{MacLane} S. Mac Lane, \emph{Categories for the Working Mathematician}, 2nd ed., Springer, 1998.
-\bibitem{BaezStay} J. C. Baez and M. Stay, Physics, topology, logic and computation: a Rosetta Stone, in \emph{New Structures for Physics}, Springer, 2010.
-\bibitem{CDP} G. Chiribella, G. M. D'Ariano, and P. Perinotti, Probabilistic theories with purification, \emph{Phys. Rev. A} 81, 062348 (2010).
+\begin{empirical}[Units, finite resolution, correlations]\label{emp:units}
+$q+p$ is smooth and dimensionally meaningless; every reading has finite precision $\eps>0$;
+on a constraint surface only gauge-invariant functions are measured; the decomposition is
+fixed in practice by spatial separation. So Assumption~\ref{asm:obs} is false about laboratory
+observables, and locality of apparatus is an empirical input, not a consequence of
+Axiom~\ref{ax:ham}. Assumption~\ref{asm:points} fails too: a joint measure on
+$M_1\times M_2$ is \emph{not} determined by its marginals, and for chaotic systems a point
+state is not realizable at precision $\eps$ over a horizon $T$.
+\end{empirical}
+
+\begin{newresult}[Status of the founding thesis in this scope]\label{new:thesis}
+The strong reading of the pilot thesis --- that compositional structure is determined by the
+mathematics of a physical system --- is \emph{false} here, by Theorem~\ref{thm:twodecomp} and
+Corollary~\ref{cor:forget}. Only the weak reading survives, ``empirically realized'' carrying
+the load: the decomposition datum is what a measurement arrangement supplies (reading $q_1$
+needs an apparatus coupled to particle~1 alone, $Q_+$ one coupled to both). That is an
+interpretive correspondence, not a theorem, and it can fail --- an apparatus may couple to a
+non-integrable family of observables, for which no $\Ac_i$ exists.
+\end{newresult}
+
+\section{Composition III: interconnection is not composition}\label{sec:interconnection}
+
+\begin{remark}[A correction to the usual framing]\label{rem:notcomposition}
+It is often said that ``composition fails to preserve Hamiltonian structure''. That is
+mis-stated: under the cleanness and properness conditions of Definition~\ref{def:process},
+composition of canonical relations succeeds. What fails is a family of \emph{different}
+operations also called composition --- restriction to a nonintegrable distribution, addition
+of a non-Hamiltonian field, restriction to a non-constant-rank constraint set, quotient by a
+non-free action --- items (a)--(d).
+\end{remark}
+
+\begin{lemma}[Trace and spectrum obstructions]\label{lem:trace}
+(i) If $X=X_H$ for some symplectic form near an equilibrium $p$, then in Darboux coordinates
+$DX(p)=\left(\begin{smallmatrix}H_{qp}&H_{pp}\\-H_{qq}&-H_{pq}\end{smallmatrix}\right)$, so
+$\operatorname{tr}DX(p)=0$, a diffeomorphism invariant. (ii) A linear Hamiltonian field is
+$A=JS$, $S=S^{\mathsf T}$, so $\operatorname{spec}(A)=-\operatorname{spec}(A)$. Either
+violation certifies non-Hamiltonicity for \emph{every} symplectic form near $p$.
+\end{lemma}
+
+\begin{established}[(a) Nonholonomic: almost-Poisson brackets]\label{estab:nonholo}
+For a constraint distribution $D\subset TQ$, d'Alembert's principle induces an
+\emph{almost-Poisson} bracket on the constrained phase space whose Jacobiator vanishes
+identically \emph{iff} $D$ is integrable, i.e.\ iff the constraints are holonomic
+\cite{vanderSchaftMaschke1994,KoonMarsden1997}; Koon and Marsden state it as failure of the
+reduced two-form to be closed. The vertical rolling disk is the standard witness, its
+distribution being bracket-generating.
+\end{established}
+
+\begin{proposition}[Chaplygin sleigh: energy conserved, dynamics not Hamiltonian]
+\label{prop:sleigh}
+The reduced sleigh equations on $\R^{2}(v,\varpi)$ are $\dot v=a\varpi^{2}$,
+$\dot\varpi=-\nu v\varpi$, $\nu=ma/(I+ma^{2})>0$, with
+$E=\tfrac12 mv^{2}+\tfrac12(I+ma^{2})\varpi^{2}$ conserved:
+$\dot E=mav\varpi^{2}-(I+ma^{2})\nu v\varpi^{2}=0$. Yet at each equilibrium $(v_0,0)$,
+$v_0\neq0$, the Jacobian
+$\left(\begin{smallmatrix}0&0\\0&-\nu v_0\end{smallmatrix}\right)$ has trace $-\nu v_0\ne0$,
+so by Lemma~\ref{lem:trace}(i) no symplectic structure near $(v_0,0)$ makes the flow
+Hamiltonian. On $\{\pm\varpi>0\}$ the flow \emph{is} Hamiltonian for $E$ with respect to
+$\Omega=\bigl((I+ma^{2})/(a\varpi)\bigr)dv\wedge d\varpi$, which blows up across
+$\{\varpi=0\}$ and admits no smooth extension.
+\end{proposition}
+
+\begin{proposition}[(b) Dissipative coupling leaves the class]\label{prop:damper}
+Couple two identical oscillators by a relative-velocity damper: $\dot q_i=p_i/m$,
+$\dot p_1=-kq_1-(\gamma/m)(p_1-p_2)$, $\dot p_2=-kq_2-(\gamma/m)(p_2-p_1)$, $\gamma>0$. In the
+normal-mode coordinates of Theorem~\ref{thm:twodecomp} the $+$ mode is undamped with spectrum
+$\pm i\sqrt{k/m}$, while the $-$ mode obeys $\lambda^{2}+(2\gamma/m)\lambda+k/m=0$, both roots
+in the open left half-plane. The spectrum is not closed under $\lambda\mapsto-\lambda$ and the
+trace at the origin is $-2\gamma/m\ne0$; by Lemma~\ref{lem:trace} the interconnection is not
+Hamiltonian near the origin, although both factors are.
+\end{proposition}
+
+\begin{counterexample}[(c) Non-constant rank: no smooth reduced space]\label{cex:rank}
+In $\R^{4}$ with $\omega=dq_1\wedge dp_1+dq_2\wedge dp_2$ let $C=\{p_1=0,\ p_2=q_1^{2}/2\}$, a
+surface parametrized by $(u,v)\mapsto(u,v,0,u^{2}/2)$. Then
+$\iota^{*}\omega=dv\wedge(u\,du)=-u\,du\wedge dv$, of rank $2$ on $\{q_1\ne0\}$ and $0$ on
+$\{q_1=0\}$. The characteristic distribution is not a distribution, so $C/\ker$ carries no
+smooth manifold structure and the Gotay--Nester--Hinds algorithm \cite{GotayNesterHinds1978}
+does not terminate in a reduced symplectic manifold. Equivalently, with
+$\Phi=(p_1,\ p_2-q_1^{2}/2)$ one computes $\{\Phi_1,\Phi_2\}=q_1$, so the Dirac matrix has
+determinant $q_1^{2}$: the constraints are second class off $\{q_1=0\}$ and first class on it.
+The \emph{class} of the constraints is not constant, which is exactly what breaks the Dirac
+bracket. \hfill$\square$
+\end{counterexample}
+
+\begin{counterexample}[(d) Singular reduction leaves the manifolds]\label{cex:singular}
+Reduction of a Hamiltonian $G$-space at a regular value of the momentum map, with the
+$G_\mu$-action free and proper, yields a symplectic manifold $J^{-1}(\mu)/G_\mu$
+\cite{MarsdenWeinstein1974,Meyer1973}; both hypotheses are essential. Let $M=\Cbb^{2}$ with its
+standard form and let $S^{1}$ act with weights $(1,-1)$, the $1{:}{-1}$ resonance. The
+momentum map is $J=\tfrac12(|z_1|^{2}-|z_2|^{2})$; the action is free off the origin and has
+full isotropy at $0$, so $\mu=0$ is the unique singular value. The invariant ring is generated
+by
+$\sigma_1=|z_1|^{2}$, $\sigma_2=|z_2|^{2}$, $\sigma_3=\mathrm{Re}(z_1z_2)$,
+$\sigma_4=\mathrm{Im}(z_1z_2)$ subject to $\sigma_3^{2}+\sigma_4^{2}=\sigma_1\sigma_2$, and on
+$J^{-1}(0)$ we have $\sigma_1=\sigma_2=:s\ge0$, whence
+\[
+ M_0=J^{-1}(0)/S^{1}\;\cong\;\{(s,\sigma_3,\sigma_4)\in\R^{3}:\
+ \sigma_3^{2}+\sigma_4^{2}=s^{2},\ s\ge0\},
+\]
+a cone, singular at the apex: homeomorphic to $\R^{2}$ but not a smooth symplectic manifold.
+It is a symplectic \emph{stratified} space in the sense of Sjamaar and Lerman
+\cite{SjamaarLerman1991}. \hfill$\square$
+\end{counterexample}
+
+\begin{established}[The compositionally closed class is Dirac, not symplectic]
+\label{estab:dirac}
+The composition of two Dirac structures is again a Dirac structure
+\cite{Courant1990,Cerveraetal2007}, so port-Hamiltonian systems built on them are closed under
+power-conserving interconnection \cite{vanderSchaftJeltsema2014}. Symplectic and Poisson
+structures lack that closure, as (a)--(d) show; closure requires enlarging the objects (to
+Dirac / port-Hamiltonian systems, or for dissipation contact systems
+\cite{Bravettietal2017}) or accepting a partial composition. Cervera, van der Schaft and
+Ba\~nos note that even Dirac composition can fail in infinite dimensions.
+\end{established}
+
+\section{Empirical realization, and a no-go}
+
+\begin{established}[No-interaction theorem: Currie--Jordan--Sudarshan; Leutwyler]
+\label{estab:cjs}
+Assume: (H1) finitely many point particles, $N\ge2$, on a finite-dimensional phase space with
+the canonical Poisson bracket; (H2) a canonical realization of the Poincar\'e algebra by
+phase-space functions, $H$ generating time evolution (Dirac's instant form \cite{Dirac1949});
+(H3) the particle positions at a common time are half of a canonical system of variables,
+transforming under the Euclidean subgroup canonically and geometrically in the same way;
+(H4) the world-line condition, that the set of world lines is frame-independent;
+(H5) nondegeneracy. Then the only compatible evolution is \emph{free}: all
+accelerations vanish. Proved for $N=2$ by Currie, Jordan and Sudarshan \cite{CJS1963}, for
+arbitrary $N$ by Leutwyler \cite{Leutwyler1965}.
+\end{established}
+
+\begin{interpretation}\label{interp:cjs}
+There is no compositional theory of \emph{interacting relativistic subsystems} in this scope.
+Each escape damages a different part of the picture: dropping finite-dimensionality imports
+field degrees of freedom; dropping canonical positions means subsystem identity is no longer
+read off the phase space; dropping the world-line condition makes ``which subsystem is where''
+frame-dependent. This interprets a theorem; it does not extend one.
+\end{interpretation}
+
+\subsection*{Hidden assumptions, made explicit and separately falsifiable}
+
+\begin{assumption}[Monoidal composition]\label{asm:monoidal}
+$A\otimes B$ is determined by $A$ and $B$ up to canonical isomorphism. \emph{Status: refuted
+as stated.} For $H=H_1+H_2+V(q_1,q_2)$ the factors do not determine $H$ --- two masses joined
+by springs of stiffness $k\ne k'$ are different composites of the same parts --- so no
+bifunctor on pairs (phase space, Hamiltonian) produces interacting composites: the interaction
+term is irreducibly extra data. Independently, for pair potentials decaying as $r^{-\alpha}$,
+$\alpha\le d$, energy is not additive at all, which underlies ensemble inequivalence
+\cite{CampaDauxoisRuffo2009} and covers gravitational and unscreened Coulomb systems.
+\end{assumption}
+
+\begin{assumption}[Intrinsic subsystems]\label{asm:intrinsic}
+A composite determines its decomposition into parts. \emph{Status: refuted} by
+Theorem~\ref{thm:twodecomp} and Corollary~\ref{cor:forget}. Adversarially: ask the framework
+how many particles $(M,\omega,H)$ has. It cannot say; particle number is not a symplectic
+invariant.
+\end{assumption}
+
+\begin{assumption}[Isomorphism implies physical equivalence]\label{asm:iso}
+Symplectomorphic systems with conjugate Hamiltonians are physically equivalent.
+\emph{Status: refuted, and forbidden by the pilot contract.} A pendulum near equilibrium, a
+mass--spring and an $LC$ circuit are conjugate at leading order but differ in units,
+measurement procedure, domain of validity and failure mode (separatrix, yield point, breakdown
+voltage); and since $H$ is defined only up to a constant and a symplectomorphism, ``energy''
+is not an invariant of the isomorphism class.
+\end{assumption}
+
+\begin{assumption}[Closure under interconnection]\label{asm:closure}
+The finite-dimensional symplectic Hamiltonian systems are closed under composition.
+\emph{Status: refuted four independent ways} --- Established result~\ref{estab:nonholo} with
+Proposition~\ref{prop:sleigh}; Proposition~\ref{prop:damper}; Counterexample~\ref{cex:rank};
+Counterexample~\ref{cex:singular} --- the class-level repair being Established
+result~\ref{estab:dirac}.
+\end{assumption}
+
+\begin{assumption}[Compositional realization]\label{asm:realization}
+The interpretation map commutes with composition. \emph{Status: refuted for long-range forces}
+(non-additivity, Assumption~\ref{asm:monoidal}); an unexamined isolation/screening assumption
+otherwise. This is what the founding thesis most effectively conceals: ``empirically realized
+compositional structure'' presumes realization respects composition --- a claim about
+interaction ranges, not a mathematical fact.
+\end{assumption}
+
+\begin{assumption}[Autonomy]\label{asm:autonomy}
+A realized system is an autonomous Hamiltonian system on a symplectic manifold.
+\emph{Status: refuted} by Liouville's theorem \cite[\S16]{Arnold1989}: any system with a
+volume-contracting attractor --- every real mechanical system with friction --- is not one.
+Precision matters: a damped oscillator does admit a time-dependent Lagrangian of
+Caldirola--Kanai type, so ``not Hamiltonian'' is false while ``not autonomous symplectic, and
+its Hamiltonian is not the energy'' is true.
+\end{assumption}
+
+\section{Unresolved tensions, and conclusion}\label{sec:unresolved}
+
+\textbf{U1, totality versus expressiveness:} the direct product is total but expresses only
+\emph{non}-interacting composites, while interconnection is expressive but partial. No
+finite-dimensional construction known to us is both, and Established result~\ref{estab:notcat}
+records that $\SympRel$, the attempt, fails. \textbf{U2, reduction destroys compositeness:}
+the two-body Kepler problem, reduced by translations --- mandatory, absolute position not
+being observable --- becomes a one-body problem. A composite reduces to a non-composite; we
+regard this as the sharpest single tension. \textbf{U3, exact unit, approximate isolation:}
+$A\otimes\pt\cong A$ holds on the nose, whereas physical isolation is an approximation that
+fails outright for long-range forces (Assumption~\ref{asm:realization}). We know of no
+monoidal category coherent only up to $\eps$.
+
+The thesis is neither confirmed nor idle here; it is \emph{corrected}. Physics, in this scope,
+is the study of mathematical structures \emph{together with} an empirically supplied
+compositional datum that the mathematics does not determine.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{AbrahamMarsden1978} R.~Abraham, J.~E. Marsden, \emph{Foundations of Mechanics}, 2nd ed., 1978.
+\bibitem{Arnold1989} V.~I. Arnold, \emph{Mathematical Methods of Classical Mechanics}, 2nd ed., 1989.
+\bibitem{Bravettietal2017} A.~Bravetti, H.~Cruz, D.~Tapias, Contact Hamiltonian mechanics, \emph{Ann. Physics} \textbf{376} (2017), 17--39.
+\bibitem{CampaDauxoisRuffo2009} A.~Campa, T.~Dauxois, S.~Ruffo, Statistical mechanics of solvable models with long-range interactions, \emph{Phys. Rep.} \textbf{480} (2009), 57--159.
+\bibitem{Cerveraetal2007} J.~Cervera, A.~J. van der Schaft, A.~Ba\~nos, Interconnection of port-Hamiltonian systems and composition of Dirac structures, \emph{Automatica} \textbf{43} (2007), 212--225.
+\bibitem{Courant1990} T.~J. Courant, Dirac manifolds, \emph{Trans. Amer. Math. Soc.} \textbf{319} (1990), 631--661.
+\bibitem{CJS1963} D.~G. Currie, T.~F. Jordan, E.~C.~G. Sudarshan, Relativistic invariance and Hamiltonian theories of interacting particles, \emph{Rev. Modern Phys.} \textbf{35} (1963), 350--375; erratum ibid.\ \textbf{35}, 1032.
+\bibitem{Dirac1949} P.~A.~M. Dirac, Forms of relativistic dynamics, \emph{Rev. Modern Phys.} \textbf{21} (1949), 392--399.
+\bibitem{GotayNesterHinds1978} M.~J. Gotay, J.~M. Nester, G.~Hinds, Presymplectic manifolds and the Dirac--Bergmann theory of constraints, \emph{J. Math. Phys.} \textbf{19} (1978), 2388--2399.
+\bibitem{KoonMarsden1997} W.~S. Koon, J.~E. Marsden, The Hamiltonian and Lagrangian approaches to the dynamics of nonholonomic systems, \emph{Rep. Math. Phys.} \textbf{40} (1997), 21--62.
+\bibitem{Leutwyler1965} H.~Leutwyler, A no-interaction theorem in classical relativistic Hamiltonian particle mechanics, \emph{Nuovo Cimento} \textbf{37} (1965), 556--567.
+\bibitem{Fox1976} T.~Fox, Coalgebras and cartesian categories, \emph{Comm. Algebra} \textbf{4} (1976), 665--667.
+\bibitem{MacLane1998} S.~Mac~Lane, \emph{Categories for the Working Mathematician}, 2nd ed., 1998.
+\bibitem{MarsdenWeinstein1974} J.~E. Marsden, A.~Weinstein, Reduction of symplectic manifolds with symmetry, \emph{Rep. Math. Phys.} \textbf{5} (1974), 121--130.
+\bibitem{Meyer1973} K.~R. Meyer, Symmetries and integrals in mechanics, \emph{Dynamical Systems} (1973), 259--272.
+\bibitem{SjamaarLerman1991} R.~Sjamaar, E.~Lerman, Stratified symplectic spaces and reduction, \emph{Ann. of Math.} \textbf{134} (1991), 375--422.
+\bibitem{vanderSchaftJeltsema2014} A.~J. van der Schaft, D.~Jeltsema, Port-Hamiltonian systems theory: an introductory overview, \emph{Found. Trends Systems Control} \textbf{1} (2014), 173--378.
+\bibitem{vanderSchaftMaschke1994} A.~J. van der Schaft, B.~M. Maschke, On the Hamiltonian formulation of nonholonomic mechanical systems, \emph{Rep. Math. Phys.} \textbf{34} (1994), 225--233.
+\bibitem{Weinstein1982} A.~Weinstein, The symplectic ``category'', \emph{Diff. Geom. Methods in Math. Phys.} (1982), 45--51.
+\bibitem{Weinstein2009} A.~Weinstein, Symplectic categories, arXiv:0911.4133 (2009).
+\bibitem{Zanardi2001} P.~Zanardi, Virtual quantum subsystems, \emph{Phys. Rev. Lett.} \textbf{87} (2001), 077901. \emph{Boundary test only.}
+\bibitem{ZanardiLidarLloyd2004} P.~Zanardi, D.~A. Lidar, S.~Lloyd, Quantum tensor product structures are observable induced, \emph{Phys. Rev. Lett.} \textbf{92} (2004), 060402. \emph{Boundary test only.}
+\bibitem{PrincipiaII} PRINCIPIA PHYSICA Pilot --- Topic 2, \emph{Hamiltonian Reconstruction as a Physical Theory Object}, pilot topic series, Paper~II of 3, 2026.
+\bibitem{PrincipiaIII} PRINCIPIA PHYSICA Pilot --- Topic 3, \emph{Empirical Realization, Observational Equivalence, and the Limits of Finite-Dimensional Classical Models}, pilot topic series, Paper~III of 3, 2026.
 \end{thebibliography}
+
 \end{document}

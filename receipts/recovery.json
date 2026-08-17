@@ -1,16 +1,27 @@
 {
   "schema": "principia-publication-recovery-receipt.v1",
   "task_id": "complete_publication",
-  "review_fix_passes": 2,
-  "topic_review_applied": true,
-  "synthesis_review_applied": true,
-  "corrections": [
-    "Separated categorical compositional models from the linear observation-operator vocabulary.",
-    "Made compositional closure an explicit empirical premise for composite physical realization.",
-    "Retained gauge and Aharonov-Bohm counterexamples and did not infer realization from tensor admissibility.",
-    "Used the proved Hamiltonian existence criterion and labelled finite-data conclusions conditionally.",
-    "Kept unsupported scaling claims conjectural or conditional rather than empirical facts.",
-    "Removed partial-list operations rejected by the strict GHC warning policy."
-  ],
-  "acceptance": {"latex_clean":true,"page_range_6_to_10":true,"lean_accepted":true,"lean_placeholders":0,"haskell_strict_accepted":true,"unresolved_verifier_errors":0}
+  "run_date": "2026-08-16",
+  "native_agents": ["latex_repair", "lean_repair", "haskell_repair"],
+  "agent_count": 3,
+  "non_overlapping_ownership": true,
+  "parent_integration": {
+    "all_agents_completed": true,
+    "paper_acceptance_exit_status": 0,
+    "formal_acceptance_exit_status": 0,
+    "unresolved_compiler_or_verifier_errors": 0,
+    "bounded_review_fix_limit_respected": true
+  },
+  "review_inputs": {
+    "topic_series_verdict": "ACCEPT",
+    "synthesis_review_original_verdict": "REJECT",
+    "recovered_blockers": ["synthesis paper", "Lean companion", "Haskell companion"]
+  },
+  "acceptance": {
+    "clean_latex_diagnostics": true,
+    "all_papers_6_to_10_pages": true,
+    "lean_accepted_without_placeholders": true,
+    "haskell_accepted_under_strict_warnings": true
+  },
+  "accepted": true
 }

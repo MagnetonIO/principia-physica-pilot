@@ -1,7 +1,0 @@
-build/
-*.hi
-*.o
-*.aux
-*.log
-*.out
-.DS_Store

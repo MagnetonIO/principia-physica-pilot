@@ -1,196 +1,395 @@
-\documentclass[12pt]{article}
-\usepackage[a4paper,margin=1.5in]{geometry}
-\setlength{\parskip}{0.35em}
-\setlength{\emergencystretch}{3em}
-\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,hyperref,microtype}
+% !TEX program = pdflatex
+% PRINCIPIA PHYSICA pilot --- topic series, paper III of 3.
+% Self-contained arXiv-style preprint; no external .bib, no non-standard packages.
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathrsfs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+%---------------------------------------------------------------
+% Twelve epistemic classes of the pilot contract, plus example,
+% counterexample and remark, all on one shared counter so that the
+% type of every numbered claim is visible at the point of use.
+%---------------------------------------------------------------
+\theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 \newtheorem{axiom}[definition]{Axiom}
 \newtheorem{assumption}[definition]{Assumption}
+\newtheorem{conjecture}[definition]{Conjecture}
+\theoremstyle{plain}
 \newtheorem{lemma}[definition]{Lemma}
 \newtheorem{proposition}[definition]{Proposition}
 \newtheorem{theorem}[definition]{Theorem}
 \newtheorem{corollary}[definition]{Corollary}
-\newtheorem{conjecture}[definition]{Conjecture}
-\theoremstyle{definition}
-\newtheorem{example}[definition]{Example}
-\newtheorem{counterexample}[definition]{Counterexample}
+\newtheoremstyle{commentary}{3pt}{3pt}{\small}{}{\bfseries}{.}{.5em}{}
+\theoremstyle{commentary}
 \newtheorem{interpretation}[definition]{Interpretation}
 \newtheorem{empirical}[definition]{Empirical statement}
-\title{Empirical Limits of Structural Physics: Underdetermination, Scope, and Realization}
-\author{PRINCIPIA PHYSICA}
-\date{}
+\newtheorem{established}[definition]{Established physical result}
+\newtheorem{newresult}[definition]{New result claimed by this work}
+\newtheorem{counterexample}[definition]{Counterexample}
+\newtheorem{example}[definition]{Example}
+\newtheorem{remark}[definition]{Remark}
+
+% preprint density
+\makeatletter
+\def\thm@space@setup{\thm@preskip=3pt plus 1pt minus 1pt
+                     \thm@postskip=3pt plus 1pt minus 1pt}
+\makeatother
+\setlength{\abovedisplayskip}{4pt plus 1pt minus 1pt}
+\setlength{\belowdisplayskip}{4pt plus 1pt minus 1pt}
+\setlength{\abovedisplayshortskip}{2pt}
+\setlength{\belowdisplayshortskip}{2pt}
+\allowdisplaybreaks
+
+%--------------- shared series notation (identical in all three) --
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Cinf}{C^{\infty}}
+\newcommand{\FinSymp}{\mathsf{FinSymp}}
+\newcommand{\SympRel}{\mathsf{SympRel}}
+\newcommand{\CompSys}{\mathsf{CompSys}}
+\newcommand{\HamSys}{\mathsf{HamSys}}
+\newcommand{\Oc}{\mathcal{O}}
+\newcommand{\Mc}{\mathcal{M}}
+\newcommand{\Dsf}{\mathsf{D}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\pt}{\mathbf{1}}
+\newcommand{\graph}{\operatorname{graph}}
+\newcommand{\dive}{\operatorname{div}}
+
+\newcommand{\Mod}{\mathbf{Mod}}
+\newcommand{\Data}{\mathbf{Data}}
+\newcommand{\Rc}{\mathcal{R}}
+\newcommand{\Ac}{\mathcal{A}}
+\newcommand{\Reach}{\operatorname{Reach}}
+
+\title{\bf Empirical Realization, Observational Equivalence,\\ and the Limits of Finite-Dimensional Classical Models}
+\author{PRINCIPIA PHYSICA Pilot --- Topic 3\\[2pt]
+\small Compositional Foundations of Finite-Dimensional Classical Mechanics}
+\date{16 August 2026}
+
 \begin{document}
 \maketitle
 \begin{abstract}
-Mathematical consistency constrains physical models but does not establish their realization. We formalize finite observational records, empirical equivalence, identifiability, and scope. We prove a general finite-data underdetermination theorem, derive monotonicity and quotient results for observational equivalence, and give counterexamples to extrapolation and unrestricted causal inference. The analysis identifies which conclusions are mathematical, which depend on methodological assumptions, and which remain empirical.
+\noindent
+We separate two routinely conflated predicates: \emph{mathematical admissibility}, a unary predicate on symplectic model tuples, and \emph{empirical realization}, a binary relation between models and finite-precision data records; they come apart both ways. Finite-precision observational equivalence is a \emph{tolerance relation} --- reflexive and symmetric but non-transitive, with transitive closure the total relation, so model space cannot be quotiented by it. The equivalence horizon decays exponentially and the Gr\"onwall bound is \emph{attained}, so $T_\eps\sim L^{-1}\log(1/\delta)$ is not improvable in general. Exact, complete data still leave an infinite-dimensional consistent family, and for single-shell preparations the ambiguity sits on the data itself. Observational equivalence is \emph{not a congruence} for interconnection. We classify four failure modes, argue that a precision-only protocol is blind to two, and show the founding thesis as stated is not falsifiable, isolating the falsifiable sub-claim it contains.
 \end{abstract}
 
-\section{Data and models}
-\begin{definition}[Experimental design]
-An experimental design is a tuple $D=(X,Y,T,\delta)$, where $X$ is a set of admissible interventions or inputs, $Y$ an outcome space, $T\subseteq X$ the tested inputs, and $\delta$ records the measurement resolution or uncertainty specification.
+\section{Introduction}
+\label{s1}
+
+The founding thesis under investigation in this pilot is that \emph{physics is the study of empirically realized compositional mathematical structures}. This paper tests the conjunct ``empirically realized'' inside the charter scope of finite-dimensional smooth classical mechanics.
+
+The organizing claim is negative: once finite duration, sampling rate, readout precision, preparation resolution and instrument range enter the model-to-data relation, ``these two models say the same thing'' loses almost every property usually assumed of it. It is not transitive (Theorem~\ref{tol}), not implied by isomorphism (Counterexample~\ref{sym}), does not imply it (Counterexample~\ref{hid}), and does not survive composition (Proposition~\ref{cong}).
+
+This is Paper~III of a three-paper series whose companions are ``Compositional Systems in Finite-Dimensional Classical Mechanics: A Typed Reconstruction and Its Failure Modes'' \cite{PaperI} and ``Hamiltonian Reconstruction as a Physical Theory Object'' \cite{PaperII}; the notation $(M,\omega,H)$, $X_H$, $\Phi^t_H$ and the categories $\FinSymp$ (symplectic manifolds, symplectomorphisms), $\SympRel$ (canonical relations, partial composition) and $\CompSys$ (Paper~I's compositional systems) is shared across all three. Frequencies are written $\nu$, $\omega$ being reserved for the symplectic form.
+
+Every claim carrying epistemic status is typed by one of the twelve required labels, which share a counter with the Counterexample and Remark environments; assumptions are never promoted to theorems, and attributions our two research lines could not verify are withheld.
+
+\section{Admissibility versus realization}
+\label{s2}
+
+\begin{axiom}[Empirical bridge]
+\label{axb}
+A mathematical structure carries empirical content in this framework only through a realization map (Definition~\ref{rea}). No predicate defined on the mathematical data alone is an empirical predicate.
+\end{axiom}
+
+\begin{definition}[Theory object]
+\label{mod}
+A \emph{finite-dimensional classical mechanical model} is a tuple $\Mc=(M,\omega,H,\Ac,S,\Oc,I)$: $(M,\omega)$ symplectic with $\dim M=2n<\infty$; $H\in\Cinf(M,\R)$ with $\iota_{X_H}\omega=dH$; $\Ac\subseteq\Cinf(M)$ a Poisson subalgebra, $\{f,g\}=\omega(X_f,X_g)$; $S\subseteq M$ the preparations; $\Oc\subseteq\Ac$ the measured observables; $I$ a realization map. Write $\Phi^t_H$ for the flow of $X_H$.
 \end{definition}
 
-\begin{definition}[Model and prediction]
-A deterministic model is a function $m:X\to Y$. More generally, a statistical model assigns a probability measure $P_m(\cdot\mid x)$ on $Y$ to each $x\in X$.
-\end{definition}
-
-\begin{definition}[Empirical equivalence]
-Two deterministic models satisfy $m\sim_T n$ when $m(x)=n(x)$ for all $x\in T$. At finite resolution, write $m\sim_{T,\delta}n$ when their predictions differ by no more than the specified tolerance at every tested input. For statistical models, equality may be replaced by a declared distance between probability measures.
-\end{definition}
-
-\begin{definition}[Identifiability]
-A model class $\mathcal M$ is identifiable under an observation operator $O$ when $O(m)=O(n)$ implies $m=n$ for $m,n\in\mathcal M$. It is identifiable up to an equivalence relation $\approx$ when the same premise implies $m\approx n$.
-\end{definition}
-
-\begin{assumption}[Record reliability]
-Recorded inputs, outcomes, timestamps, and uncertainty estimates refer to the intended operations and have passed the stated calibration and data-integrity checks.
+\begin{assumption}[Completeness or a fixed horizon]
+\label{cpl}
+Either $X_H$ is forward-complete, or a horizon $T<\infty$ is fixed and every trajectory considered is defined on $[0,T]$.
 \end{assumption}
 
-\begin{empirical}[Status of the record]
-Record reliability is an empirical input. Mathematics can propagate a stated uncertainty model but cannot certify that instruments, labels, or sampling procedures satisfy it.
-\end{empirical}
+\begin{assumption}[Regularity]
+\label{reg}
+Vector fields are locally Lipschitz, so that integral curves are unique.
+\end{assumption}
 
-\section{Logical structure of finite tests}
-\begin{lemma}
-For fixed $T$, empirical equivalence $\sim_T$ is an equivalence relation on the set of deterministic models $X\to Y$.
+Both are genuine restrictions. The Newtonian $n$-body problem admits non-collision singularities \cite{Xia1992}, and Norton's dome has a non-Lipschitz force with multiple solutions from identical data \cite{Norton2008}.
+
+\begin{definition}[Instrument specification and realization map]
+\label{rea}
+An \emph{instrument specification} is $\Rc=(T,\Delta t,\Oc,S,\sigma,\eps_{\mathrm{read}},\mathcal{D})$: duration $T$; sampling interval $\Delta t$, $t_i=i\Delta t$, $i\le N=\lfloor T/\Delta t\rfloor$; observables $\Oc=\{f_1,\dots,f_m\}$; preparation resolution $\sigma>0$, so preparing $s$ yields some point of $B_\sigma(s)$; readout precision $\eps_{\mathrm{read}}>0$; and a \emph{bounded} range $\mathcal{D}\subseteq\R^m$, boundedness being what separates F2 from F1 in Definition~\ref{fail}. The realization map is set-valued, $I_{\Mc,\Rc}(s)=\{(f_k(\Phi^{t_i}_H(x)))_{i\le N,k\le m}:x\in B_\sigma(s)\}$; for a record $\Dsf=\{(s_j,y^{(j)})\}$, $\Mc$ is \emph{$\Rc$-consistent at $\eps$} iff each $j$ admits $z\in I_{\Mc,\Rc}(s_j)$ with $\|y^{(j)}-z\|_\infty\le\eps$, all entries in $\mathcal{D}$.
+\end{definition}
+
+\begin{definition}[Admissibility versus realization]
+\label{adm}
+Let $\Mod$ be the class of tuples meeting Definition~\ref{mod}. Then $\Mc$ is \emph{mathematically admissible} iff $\Mc\in\Mod$, a unary predicate on the mathematical data alone referring to no data record; and \emph{empirically realized on $(\Rc,\Dsf)$ at $\eps$} iff it is $\Rc$-consistent with $\Dsf$ at $\eps$, a binary relation on $\Mod\times\Data$.
+\end{definition}
+
+\section{Observational equivalence is a tolerance relation}
+\label{s3}
+
+\begin{definition}[$\eps$-$T$-$\Oc$-$S$ observational equivalence]
+\label{eqv}
+Let $\Mc_1,\Mc_2$ carry \emph{labelling bijections} $\beta_\Oc:\Oc_1\to\Oc_2$, $f\mapsto f'$, and $\beta_S:S_1\to S_2$, $s\mapsto s'$, and define
+\[
+d_{T,\Oc,S}(\Mc_1,\Mc_2):=\sup_{s\in S_1}\sup_{t\in[0,T]}\max_{f\in\Oc_1}\big|f(\Phi^t_{H_1}(s))-f'(\Phi^t_{H_2}(s'))\big|,
+\]
+and set $\Mc_1\approx_{\eps,T,\Oc,S}\Mc_2$ iff $d_{T,\Oc,S}(\Mc_1,\Mc_2)\le\eps$.
+\end{definition}
+
+\begin{assumption}[All four parameters are constitutive]
+\label{par}
+An unqualified assertion that two models are ``observationally equivalent'' is not well-formed: the relation depends on $\eps$ (Theorem~\ref{tol}), $T$ (Corollary~\ref{hor}), $\Oc$ (Theorem~\ref{res}) and $S$ (Proposition~\ref{lev}).
+\end{assumption}
+
+\begin{lemma}[Naturality of Hamiltonian vector fields]
+\label{nat}
+If $\varphi:M\to N$ is a diffeomorphism with $\varphi^*\eta=\omega$ and $H=K\circ\varphi$, then $T\varphi\circ X_H=X_K\circ\varphi$, hence $\varphi\circ\Phi^t_H=\Phi^t_K\circ\varphi$. Standard \cite[Ch.~3]{AbrahamMarsden1978}; labelled a Lemma because it is used, not claimed.
 \end{lemma}
-\begin{proof}
-Reflexivity holds because $m(x)=m(x)$. Symmetry follows from symmetry of equality. If $m\sim_T n$ and $n\sim_T r$, then $m(x)=n(x)=r(x)$ for every $x\in T$, so $m\sim_T r$.
-\end{proof}
 
-\begin{proposition}[Restriction monotonicity]
-If $T'\subseteq T$ and $m\sim_T n$, then $m\sim_{T'}n$.
-\end{proposition}
-\begin{proof}
-Every $x\in T'$ belongs to $T$, where the assumed equality holds.
-\end{proof}
+\begin{counterexample}[Symplectomorphism does not imply observational equivalence]
+\label{sym}
+Refutes: \emph{``models related by a symplectomorphism intertwining the Hamiltonians are empirically equivalent.''}
+Take $M=N=\R^2$, $\omega=\eta=dq\wedge dp$, $\varphi(q,p)=(2q,p/2)$, so $D\varphi=\mathrm{diag}(2,\tfrac12)$ has unit determinant and $\varphi^*\eta=\omega$. Let $H=\tfrac12(p^2+q^2)$ and $K=H\circ\varphi^{-1}$, i.e.\ $K(Q,P)=2P^2+Q^2/8$; both have angular frequency $1$. Let \emph{both} laboratories measure the same pointer coordinate $\chi(\cdot)=$ first argument, so the measurement map is \emph{not} transported: $\chi\circ\varphi^{-1}(Q,P)=Q/2\neq\chi(Q,P)$. With $s=(1,0)$, $s'=\varphi(s)=(2,0)$: $q_1(t)=\cos t$, $Q_2(t)=2\cos t$, hence
+\[
+d_{T,\{\chi\},\{s\}}(\Mc_1,\Mc_2)=\sup_{t\le T}|\cos t-2\cos t|=1
+\]
+for every $T\ge0$: for any $\eps<1$ the models are not $\eps$-$T$-equivalent although $\varphi$ is an isomorphism of Hamiltonian systems. The slogan ``canonical transformations do not change the physics'' conceals the premise that observables and preparations are transported with the transformation, and when the laboratory pointer is fixed independently of the coordinate change --- the normal case --- that premise is false.
+\end{counterexample}
 
-\begin{proposition}[Quotient of testable content]
-Let $R_T:\mathcal M\to Y^T$ be restriction, $R_T(m)=m|_T$. The quotient set $\mathcal M/{\sim_T}$ is in bijection with the image $R_T(\mathcal M)$.
-\end{proposition}
-\begin{proof}
-Define $\Phi([m])=R_T(m)$. If $[m]=[n]$, then $m\sim_Tn$, hence their restrictions agree, so $\Phi$ is well defined. Equal images imply $m\sim_Tn$, proving injectivity. Every element of $R_T(\mathcal M)$ is the restriction of some $m$, proving surjectivity.
-\end{proof}
-
-\begin{interpretation}
-A finite experiment directly distinguishes equivalence classes, not unrestricted global models. Selecting a representative requires additional structure such as smoothness, a parametric family, a simplicity preference, or prior information.
-\end{interpretation}
-
-\section{A general underdetermination theorem}
-\begin{assumption}[Perturbation closure]
-The deterministic model class $\mathcal M$ contains a model $m$ and, for infinitely many nonzero perturbations $h:X\to V$, also contains $m+h$, where $Y$ lies in a vector space $V$ and each $h$ vanishes on the tested set $T$.
-\end{assumption}
-
-\begin{theorem}[Finite-data underdetermination]
-Under perturbation closure, the observational record on $T$ does not identify $m$ uniquely in $\mathcal M$. If the admissible perturbations are pairwise distinct, the empirical-equivalence class of $m$ is infinite.
+\begin{theorem}[$\approx_{\eps,T,\Oc,S}$ is reflexive and symmetric but not transitive]
+\label{tol}
+\emph{(i)} $d_{T,\Oc,S}$ is a pseudometric on any class of models sharing the label sets, so $\approx_{\eps,T,\Oc,S}$ is reflexive and symmetric for every $\eps\ge0$.
+\emph{(ii)} It is not transitive. \emph{(iii)} In a pseudometric space, if $d$ takes no value in $(\eps,2\eps]$ then $\approx_\eps$ is transitive; conversely, if the space admits midpoints and has diameter exceeding $\eps$, then $\approx_\eps$ is not transitive.
 \end{theorem}
+
 \begin{proof}
-For every admissible $h$ and every $x\in T$, $(m+h)(x)=m(x)+h(x)=m(x)$. Hence $m+h\sim_Tm$. Nonzero perturbations give models distinct from $m$, and pairwise distinct perturbations give pairwise distinct models.
+(i) Nonnegativity, vanishing on the diagonal and symmetry are immediate; for the triangle inequality fix $s,t,f$, use $|a-c|\le|a-b|+|b-c|\le d(\Mc_1,\Mc_2)+d(\Mc_2,\Mc_3)$, then take $\sup_s\sup_t\max_f$ on the left.
+
+(ii) On $(\R^2,dq\wedge dp)$ take the uniform-gravity family $H_g=\tfrac12p^2+gq$ with $\Oc=\{q\}$, $S=\{(0,0)\}$, $T=2\,\mathrm{s}$. Hamilton's equations give $q_g(t)=-\tfrac12gt^2$ exactly, so
+\[d_{T,\Oc,S}(\Mc_g,\Mc_{g'})=\sup_{t\le T}\tfrac12|g-g'|t^2=|g-g'|T^2/2,\]
+equal to $2|g-g'|$ at $T=2$. With $g_1=9.8$, $g_2=9.9$, $g_3=10.0\,\mathrm{m\,s^{-2}}$ and $\eps=0.20\,\mathrm{m}$: $d(\Mc_1,\Mc_2)=d(\Mc_2,\Mc_3)=0.20=\eps$ while $d(\Mc_1,\Mc_3)=0.40=2\eps>\eps$. So $\Mc_1\approx_\eps\Mc_2\approx_\eps\Mc_3$ but $\Mc_1\not\approx_\eps\Mc_3$.
+
+(iii) $d(x,y)\le\eps$ and $d(y,z)\le\eps$ give $d(x,z)\le2\eps$, and $d(x,z)\notin(\eps,2\eps]$ forces $d(x,z)\le\eps$. Conversely take $d(x,z)>\eps$; if $d(x,z)>2\eps$, continuity of arclength along a geodesic yields $z'$ with $d(x,z')=2\eps$, so assume $\eps<d(x,z)\le2\eps$. A midpoint $y$ has $d(x,y)=d(y,z)=\tfrac12d(x,z)\le\eps$ while $d(x,z)>\eps$.
 \end{proof}
 
-\begin{corollary}[Smooth finite samples]
-Let $X$ be a positive-dimensional smooth manifold, $Y=\mathbb R$, and $T\subset X$ finite. The class $C^\infty(X,\mathbb R)$ is not identifiable by restriction to $T$.
+The family $\{\Mc_g\}$ is isometric to $(\R,\tfrac{T^2}{2}|\cdot|)$, of infinite diameter, so (iii) applies for \emph{every} $\eps>0$: non-transitivity is no artifact of the numbers, which describe free fall at $20\,\mathrm{cm}$ tolerance over a $2\,\mathrm{s}$ drop.
+
+\begin{corollary}[Chain collapse]
+\label{chain}
+For every $\eps>0$ the transitive closure of $\approx_{\eps,T,\Oc,S}$ on $\{\Mc_g:g\in\R\}$ is the total relation.
 \end{corollary}
+
 \begin{proof}
-Choose a coordinate ball disjoint from $T$ and a nonzero smooth bump function $h$ supported in that ball. Every scalar multiple $\lambda h$ vanishes on $T$. Apply the theorem to obtain infinitely many alternatives $m+\lambda h$.
+Given $g,g'$, put $c=T^2/2$, $N=\lceil c|g-g'|/\eps\rceil$ and $g_j=g+\tfrac{j}{N}(g'-g)$. Then $d(\Mc_{g_j},\Mc_{g_{j+1}})=c|g-g'|/N\le\eps$ for each $j$, so $\Mc_g$ and $\Mc_{g'}$ are joined by a chain.
 \end{proof}
 
-\begin{example}[Polynomial restriction restores identification]
-A real polynomial of degree at most $d$ is uniquely determined by its values at $d+1$ distinct points. If two such polynomials agree there, their difference has at least $d+1$ roots but degree at most $d$; therefore the difference is the zero polynomial. Identification here results from the degree bound, not from finiteness of data alone.
-\end{example}
+Non-transitivity cannot be repaired by taking the transitive closure, since by Corollary~\ref{chain} that identifies everything: the correct object is a tolerance space, not a quotient.
 
-\begin{counterexample}[Interpolation is not unrestricted confirmation]
-Given any finite scalar dataset with distinct inputs, a polynomial interpolant exists. Infinitely many smooth functions share those values and differ elsewhere. Exact fit therefore does not establish that the polynomial, rather than another interpolant, is physically realized outside the tested inputs.
-\end{counterexample}
+Our two lines disagreed here; we resolve in favour of the literature line \cite{LaudanLeplin1991}: the theorem and corollary stand on their proofs, but the tolerance-space framing is not claimed as new. Our narrower novelty claim is Result~\ref{ncg}.
 
-\section{Noise, falsification, and scope}
-\begin{definition}[Compatibility region]
-For observations $\widehat y_x$ and tolerances $\delta_x\geq0$, define
-\[
-C(D)=\{m\in\mathcal M: d_Y(m(x),\widehat y_x)\leq\delta_x
-\text{ for every }x\in T\}.
-\]
-A model outside $C(D)$ is incompatible with the record relative to the adopted error specification.
-\end{definition}
+\section{Equivalence horizons and their exponential cost}
+\label{s4}
 
-\begin{proposition}[Tolerance monotonicity]
-If $\delta'_x\geq\delta_x$ for every tested $x$, then $C(T,\delta)\subseteq C(T,\delta')$.
+\begin{established}[Gr\"onwall estimate]
+\label{gron}
+Let $U\subseteq\R^{2n}$ be open, $X$ Lipschitz on $U$ with constant $L>0$, $\sup_U|X-Y|\le\delta$, and let $x,y$ solve $\dot x=X(x)$, $\dot y=Y(y)$ with $x(0)=y(0)$, both remaining in $U$ on $[0,T]$. Then $|x(t)-y(t)|\le\frac{\delta}{L}(e^{Lt}-1)$ on $[0,T]$.
+\end{established}
+
+\begin{proof}
+With $e(t)=|x(t)-y(t)|$, splitting $x(t)-y(t)=\int_0^t[X(x)-X(y)]+\int_0^t[X(y)-Y(y)]$ gives $e(t)\le\int_0^tLe(s)\,ds+\delta t$; Gr\"onwall's inequality \cite{Gronwall1919} with forcing $\delta t$ yields $e(t)\le\delta t+\int_0^tL\delta s\,e^{L(t-s)}ds=\frac{\delta}{L}(e^{Lt}-1)$.
+\end{proof}
+
+That \emph{both} trajectories remain in $U$ is assumed, not derived; and the converse --- what one usually wants --- is false (Theorem~\ref{off}).
+
+\begin{proposition}[The bound is attained by a Hamiltonian system]
+\label{shp}
+On $(\R^2,dq\wedge dp)$ let $H=Lqp$, $K=Lqp+\delta p$. Then $X_H=(Lq,-Lp)$, $X_K=(Lq+\delta,-Lp)$, so $|X_K-X_H|\equiv\delta$ exactly and the Lipschitz constant of $X_H$ is exactly $L$. From $x(0)=y(0)=(0,0)$: $x(t)\equiv(0,0)$, $q_y(t)=\frac{\delta}{L}(e^{Lt}-1)$, $p_y\equiv0$, so equality holds in Result~\ref{gron} for every $t$.
 \end{proposition}
+
 \begin{proof}
-Every inequality bounded by $\delta_x$ is also bounded by the larger number $\delta'_x$.
+Immediate from $\dot q=Lq+\delta$, $q(0)=0$ and $\dot p=-Lp$, $p(0)=0$; $H=Lqp$ is a hyperbolic saddle and $\delta p$ a constant force along the unstable direction.
 \end{proof}
 
-\begin{interpretation}
-Rejection is conditional on the observation model, calibration, and scope. Compatibility is weaker than truth: $C(D)$ can contain many mutually incompatible extrapolations.
-\end{interpretation}
+\begin{corollary}[The horizon grows only logarithmically in model fidelity]
+\label{hor}
+Under Result~\ref{gron}, with $\Oc$ the coordinate functions and $S=\{x(0)\}$, $\Mc_X\approx_{\eps,T}\Mc_Y$ for all $T\le T_\eps(\delta):=\frac1L\log(1+L\eps/\delta)$, and by Proposition~\ref{shp} this threshold is attained. Since $T_\eps(\delta)=\frac1L\log(1/\delta)+O(1)$, improving $\delta$ buys horizon only logarithmically.
+\end{corollary}
 
-\begin{definition}[Scope claim]
-A scope claim is an explicit subset $S\subseteq X$ on which a model is asserted to meet a declared predictive criterion. Evidence on $T$ directly addresses the claim only where $T$ probes $S$; extension beyond $T$ invokes further assumptions.
-\end{definition}
+At $L=1\,\mathrm{s^{-1}}$, $\eps=0.01$: $\delta=10^{-6}$ gives $T_\eps=9.21\,\mathrm{s}$, $\delta=10^{-12}$ gives $23.03\,\mathrm{s}$ --- a $10^{6}$-fold fidelity gain buys a factor $2.50$.
 
-\begin{assumption}[Regularity-based extension]
-Suppose $m$ and the target response $f$ are $L$-Lipschitz on a metric space $S$, and every point of $S$ lies within distance $r$ of some tested point.
-\end{assumption}
+\section{Underdetermination: three independent mechanisms}
+\label{s5}
 
-\begin{proposition}[A bounded extrapolation result]
-If $|m(t)-f(t)|\leq\epsilon$ for all tested $t$, then
-\[
-|m(x)-f(x)|\leq\epsilon+2Lr
-\qquad(x\in S).
-\]
+Three independent mechanisms, not repaired by the same intervention: \textbf{M1} off-support freedom, \textbf{M2} level-set gauge, \textbf{M3} structural degeneracy.
+
+\begin{theorem}[M1: off-support underdetermination under exact, complete data]
+\label{off}
+Let $(M,\omega)$ be symplectic with $\dim M=2n\ge2$, $H_0\in\Cinf(M)$, $S\subseteq M$ finite, $T<\infty$, with $\Phi^t_{H_0}(s)$ defined on $[0,T]$ for $s\in S$. Let $\Oc\subseteq\Cinf(M)$ be arbitrary, possibly all of $\Cinf(M)$, and let $\Dsf=\{(s,t,f,f(\Phi^t_{H_0}(s))):s\in S,\ t\in[0,T],\ f\in\Oc\}$ be the continuous-time, infinite-precision, all-observable record. Then the set of $H\in\Cinf(M)$ whose flow reproduces $\Dsf$ exactly contains an affine subspace $H_0+V$ with $V$ infinite-dimensional.
+\end{theorem}
+
+\begin{proof}
+Let $\Gamma=\bigcup_{s\in S}\{\Phi^t_{H_0}(s):t\in[0,T]\}$. \emph{(1)} $\Gamma$ is a finite union of $C^1$ curve images, hence compact; in a chart each is Lipschitz with constant $C$, so covered by $N$ cubes of side $CT/N$ of total volume $C^{2n}T^{2n}N^{1-2n}\to0$ using $2n\ge2$, so $\Gamma$ has measure zero and empty interior. \emph{(2)} Choose a chart ball $B\subseteq M\setminus\Gamma$ and put $V=C_c^\infty(B)$ extended by zero, infinite-dimensional since disjoint balls in $B$ carry independent bumps. \emph{(3)} For $\chi\in V$, $H=H_0+\chi$: $d\chi=0$ off $\operatorname{supp}\chi$, so $X_\chi=0$ there and $X_H=X_{H_0}$ on $\Gamma$. \emph{(4)} For $\gamma(t)=\Phi^t_{H_0}(s)\in\Gamma$, $\dot\gamma=X_{H_0}(\gamma)=X_H(\gamma)$, so $\gamma$ is an integral curve of $X_H$ from $s$; uniqueness (Assumption~\ref{reg}) gives $\Phi^t_H(s)=\gamma(t)$ on $[0,T]$, hence $f(\Phi^t_H(s))=f(\Phi^t_{H_0}(s))$ throughout.
+\end{proof}
+
+No genericity or smallness hypothesis is used and $\chi$ may have arbitrarily large $C^k$ norm, so this is an exact-data statement; that finitely many trajectories do not determine $H$ is folklore, and what the proof supplies is the explicit family as a failure certificate. It requires $T<\infty$ with $S$ finite --- for $T=\infty$ with a dense orbit $\overline{\Gamma}=M$ the construction can fail, and we do not claim the theorem there.
+
+\begin{proposition}[M2: level-set gauge, degeneracy sitting on the data]
+\label{lev}
+Let $h$ be a regular value of $H$, $\Sigma_h=H^{-1}(h)$, $F\in\Cinf(\R)$. Then
+\emph{(i)} $X_{F\circ H}=(F'\circ H)X_H$ everywhere;
+\emph{(ii)} $\Sigma_h$ is invariant under both flows and $\Phi^t_{F\circ H}|_{\Sigma_h}=\Phi^{F'(h)t}_{H}|_{\Sigma_h}$;
+\emph{(iii)} writing $G_h=\{F:F'(h)=1\}$, if $S\subseteq\Sigma_h$ then for every $F\in G_h$, every $\Oc$, every $T$ including $T=\infty$, and $\eps=0$, $\Mc_H\approx_{0,\infty,\Oc,S}\Mc_{F\circ H}$. The set $G_h$ is infinite-dimensional.
 \end{proposition}
+
 \begin{proof}
-Choose $t$ with $d(x,t)\leq r$. The triangle inequality gives
-\[
-|m(x)-f(x)|\leq |m(x)-m(t)|+|m(t)-f(t)|+|f(t)-f(x)|.
-\]
-The two Lipschitz bounds contribute at most $Lr$ each, and the tested error contributes at most $\epsilon$.
+(i) $d(F\circ H)=(F'\circ H)dH=\iota_{(F'\circ H)X_H}\omega$; nondegeneracy gives the claim. (ii) $dH(X_H)=0$, so $X_H$ is tangent to $\Sigma_h$; by (i) $X_{F\circ H}=F'(h)X_H$ there, so both flows preserve $\Sigma_h$, the identity being uniqueness under constant rescaling. (iii) With $F'(h)=1$ the flows agree pointwise on $\Sigma_h$, so all observables agree at all times; $G_h\supseteq\mathrm{id}+\{G:G'(h)=0\}$, e.g.\ $F(u)=u+c(u-h)^2\psi(u)$.
 \end{proof}
 
-\begin{interpretation}
-The proposition demonstrates the role of bridge assumptions: data plus regularity and coverage yield a quantitative scope bound. Whether the common Lipschitz bound is adequate is an empirical or independently justified modelling question.
-\end{interpretation}
+Here the ambiguity sits \emph{directly on} the sampled set, not off it as in Theorem~\ref{off}, and no improvement in $\eps$, $T$ or $\Oc$ removes it. Identifiability requires the preparation set to meet a \emph{family} of level sets: the remedy is enlargement of $S$ and $\Oc$, never refinement of $\eps$ or $T$.
 
-\section{Composition and hidden structure}
-\begin{definition}[Componentwise test]
-For components $A$ and $B$, a componentwise test records their responses under isolated interfaces. A composite test records the response of $A\otimes B$ after connection through a specified interface.
-\end{definition}
-
-\begin{counterexample}[Components do not determine every composite]
-Let isolated binary components output unbiased bits. Model I makes the composite outputs independent; Model II makes them perfectly correlated while preserving each isolated marginal. Both agree on every isolated single-component statistic but disagree on the joint event that the outputs coincide. Componentwise adequacy alone does not determine composite behaviour.
+\begin{counterexample}[M3: observational equivalence does not imply isomorphism]
+\label{hid}
+Refutes: \emph{``models producing identical data at all times and all precisions are isomorphic.''}
+Let $A=(\R^2,dq\wedge dp,\tfrac12(p^2+q^2))$ with $S=\{(1,0)\}$, $\Oc=\{q\}$, and for $\nu>0$ let
+$B_\nu=(\R^4,dq_1\wedge dp_1+dq_2\wedge dp_2,\ \tfrac12(p_1^2+q_1^2)+\tfrac12(p_2^2+\nu^2q_2^2))$
+with $S=\{(1,0,0,0)\}$, $\Oc=\{q_1\}$. Both give $q(t)=\cos t$ exactly, for every $T$ and at every precision. But $\dim M_A=2\neq4=\dim M_{B_\nu}$, so they are not even diffeomorphic; and the unordered pair $(1,\nu)$ is an invariant of the linearization at the origin, so for distinct $\nu$ no symplectomorphism intertwines the Hamiltonians. Thus $\{B_\nu\}$ is an uncountable family of pairwise non-isomorphic Hamiltonian systems with identical empirical content on this instrument.
 \end{counterexample}
 
-\begin{assumption}[Compositional closure]
-Predictions for a composite are determined by component models and the declared interface, with no unmodelled shared cause, memory channel, or context dependence across that interface.
-\end{assumption}
-
-\begin{empirical}[Interface completeness]
-Tests for cross-component correlations, memory, leakage, and contextual dependence provide empirical evidence for or against compositional closure. The categorical availability of a tensor product does not establish interface completeness.
-\end{empirical}
-
-\section{Causal and theoretical limits}
-\begin{counterexample}[Observation does not fix causal direction]
-For correlated Gaussian variables $X,Y$, the same joint distribution can be factorized as $P(X)P(Y\mid X)$ or $P(Y)P(X\mid Y)$. Without intervention, temporal information, or structural restrictions, the observational distribution alone does not choose between the corresponding causal directions.
-\end{counterexample}
-
-\begin{assumption}[Causal identification]
-A causal conclusion must state its intervention semantics and the assumptions used for identification, such as randomization, absence of specified confounding, an instrumental-variable condition, or a structural causal model.
-\end{assumption}
-
-\begin{conjecture}[Hierarchical empirical realization]
-A mature compositional physical theory can attach validated uncertainty and scope metadata to components and propagate them through compositions without uncontrolled loss. This is conjectural because dependence, model discrepancy, and interface misspecification can defeat naive propagation.
+\begin{conjecture}[Genericity of underdetermination]
+\label{gen}
+For every finite data record $\Dsf$ and every $\eps>0$, the set of Hamiltonians consistent with $\Dsf$ at $\eps$ has nonempty interior in $C^k(M)$ for every $k$, and its complement is meagre.
 \end{conjecture}
 
-\section{Dependency ledger and conclusion}
-The equivalence and quotient results depend only on set-theoretic definitions. The underdetermination theorem depends on perturbation closure; its smooth corollary uses bump functions. The extrapolation bound depends on explicit Lipschitz and coverage assumptions. Causal and compositional conclusions require additional structural premises whose adequacy is empirical. Accordingly, mathematical admissibility, finite-record compatibility, identifiability within a class, and physical realization are four different statuses.
+We have no proof; it is recorded as a conjecture precisely so that it is not mistaken for a corollary of Theorem~\ref{off}.
 
-\paragraph{Bibliographic note.}
-The underdetermination of theories by evidence has a long methodological history \cite{Duhem,Glymour}. Statistical identifiability is treated systematically by Lehmann and Casella \cite{LC}, while causal identification and its assumptions are developed by Pearl \cite{Pearl}. The formal results in this paper are elementary and are included to make their dependencies explicit.
+\section{Limiting relations}
+\label{s6}
 
-\begin{thebibliography}{9}
-\bibitem{Duhem} P. Duhem, \emph{The Aim and Structure of Physical Theory}, Princeton University Press, 1954.
-\bibitem{Glymour} C. Glymour, \emph{Theory and Evidence}, Princeton University Press, 1980.
-\bibitem{LC} E. L. Lehmann and G. Casella, \emph{Theory of Point Estimation}, 2nd ed., Springer, 1998.
-\bibitem{Pearl} J. Pearl, \emph{Causality}, 2nd ed., Cambridge University Press, 2009.
+A model justified as a limit inherits empirical warrant only where that limit is \emph{regular}: $H_\mu\to H_0$ in $C^2_{\mathrm{loc}}$ \emph{and} flows converging uniformly on each compact set and finite horizon. Where the Hamiltonians converge but the data do not, the ``limit of the theories'' and the ``theory of the limit'' come apart; the slogan is folklore we attribute to no one.
+
+\begin{remark}[Stiff limits: mechanism stated, attribution withheld]
+\label{stf}
+On $\R^4$ take $H_k=\tfrac12(p_x^2+p_y^2)+\tfrac k2w(x)^2y^2$, $w>0$, $k\to\infty$. The naive ``theory of the limit'' imposes $y=p_y=0$, giving free drift $H=\tfrac12p_x^2$; the actual limit differs, since the fast oscillation has frequency $\sqrt k\,w(x)$, its action $J$ is an adiabatic invariant, and averaging gives $H_{\mathrm{eff}}=\tfrac12p_x^2+\sqrt k\,Jw(x)$. For $J\neq0$ that term \emph{diverges} rather than vanishing, so the naive limit holds only for $J=0$, a measure-zero condition never exactly met. We state mechanism and formulas, not a theorem: the averaging needs non-resonance and regularity hypotheses we have not verified, and neither research line could confirm attributions for the rigorous stiff-potential results, so no citation is given rather than an unverified one.
+\end{remark}
+
+\section{Composition breaks observational equivalence}
+\label{s7}
+
+Write $(M_A,\omega_A,H_A)\otimes_{H_{\mathrm{int}}}(M_B,\omega_B,H_B)=(M_A\times M_B,\ \omega_A\oplus\omega_B,\ H_A\oplus H_B+H_{\mathrm{int}})$.
+
+\begin{remark}[This is a monoidal, not a categorical, product]
+\label{mon}
+The projections are not symplectomorphisms, so this is a monoidal product \cite[Ch.~XI]{MacLane1998},\cite{BaezStay2011}, not a categorical one; worse, \emph{interacting} composition is not the monoidal product at all, $H_{\mathrm{int}}$ being extra data not determined by the parts. And $\SympRel$, with canonical relations as morphisms, is not a category, since composition can fail transversality \cite{Weinstein2010}. We flag this and do not resolve it.
+\end{remark}
+
+\begin{proposition}[Observational equivalence is not a congruence for interconnection]
+\label{cong}
+The following is false: \emph{if $A_1\approx_{\eps,T,\Oc_A,S_A}A_2$ and $B_1\approx_{\eps,T,\Oc_B,S_B}B_2$ then $A_1\otimes_{H_{\mathrm{int}}}B_1\approx_{\eps,T,\Oc_A\cup\Oc_B,S_A\times S_B}A_2\otimes_{H_{\mathrm{int}}}B_2$ for every coupling $H_{\mathrm{int}}$.} There exist parts that are \emph{exactly} equivalent, $\eps=0$ for all $T$, whose composites are not $\eps$-equivalent for any $\eps$ smaller than a positive constant fixed by the coupling.
+\end{proposition}
+
+\begin{proof}
+Take $A_1=(\R^2,dq_A\wedge dp_A,\tfrac12(p_A^2+q_A^2))$, $S_A=\{(1,0)\}$, $\Oc_A=\{q_A\}$, with orbit the unit circle $C$. By Theorem~\ref{off} choose $\chi\in C_c^\infty(B)$, $B$ the ball of radius $0.3$ about $(2,0)$, which lies inside the annulus $\{1.5<r<2.5\}$ and is therefore disjoint from $C$, and let $A_2$ have $H_A+\chi$; then $d_{T,\Oc_A,S_A}(A_1,A_2)=0$ for every $T$, since the $A_1$-orbit never meets $\operatorname{supp}\chi$.
+
+For the driver take $B_1=B_2=(\R^2,dq_B\wedge dp_B,\tfrac12(p_B^2+q_B^2))$ prepared at $(R,0)$ with $R=4$, and $H_{\mathrm{int}}=\kappa q_Aq_B$ with $\kappa=0.01$. Until a trajectory meets $\operatorname{supp}\chi$ the two composites are the \emph{same} linear system: two unit-frequency oscillators in bilinear resonant coupling, whose normal coordinates $q_\pm=(q_A\pm q_B)/\sqrt2$ have frequencies $\sqrt{1\pm\kappa}$. The frequency splitting $\sqrt{1+\kappa}-\sqrt{1-\kappa}=\kappa+O(\kappa^3)$ produces a complete beat of period $\pi/\kappa$, over which the amplitude initially carried by $B$ transfers to $A$: numerically $r_A=\sqrt{q_A^2+p_A^2}$ rises from $1$ to $4.005$ at $t=314.2=\pi/\kappa$, first crossing $r_A=1.5$ at $t=57.4$. Because the amplitude drifts on the slow timescale $\kappa^{-1}$ while the phase turns at unit rate, the trajectory makes $O(\kappa^{-1})$ revolutions at radii inside the annulus and therefore meets $B$; it first enters $B$ at $t=74.3$ and spends total time $1.54$ inside $B$ before $t=400$. So the composite reaches a region on which the two Hamiltonians differ, while the isolated parts never do. That is the reachability enlargement of the statement, and it is what defeats the part-level certificate.
+\end{proof}
+
+\begin{remark}[What this proof does and does not construct]
+\label{congres}
+The construction above establishes the displayed implication is false: the parts are exactly equivalent and the composites are driven onto $\operatorname{supp}\chi$, where their vector fields differ by $X_\chi\neq0$, so the composite discrepancy is bounded below by a positive constant depending on $\chi$ and on the dwell time recorded above. We do \emph{not} construct the stronger claim that the composite discrepancy can be made \emph{unbounded} uniformly by scaling $\chi$: scaling $\chi$ changes the dynamics inside $B$ and hence the dwell time, so a uniform lower bound would require an estimate we have not proved. The stronger claim is stated nowhere in this paper and nothing downstream uses it.
+\end{remark}
+
+Composition \emph{enlarges the reachable set}: equivalence certified on $S_A$ says nothing about the complement of $\Reach_{H_A}(S_A)$, while composite equivalence needs control on the strictly larger $\Reach_{H_A\oplus H_B+H_{\mathrm{int}}}(S_A\times S_B)$.
+
+\begin{newresult}
+\label{ncg}
+Observational equivalence in the sense of Definition~\ref{eqv} is not a congruence for Hamiltonian interconnection $\otimes_{H_{\mathrm{int}}}$, and the obstruction is exactly reachability enlargement.
+\end{newresult}
+
+We claim this as new with moderate confidence in the novelty, high in the correctness; if a direct symplectic antecedent exists this should be downgraded to Established.
+
+\begin{theorem}[Quantitative version: resonance]
+\label{res}
+Let $A_j$ have $H_A^{(j)}=\tfrac12(p_A^2+\nu_j^2q_A^2)$ with $\nu_1=1.00$, $\nu_2=1.02$; let $B_1=B_2$ have $H_B=\tfrac12(p_B^2+q_B^2)$; take the preparation $(1,0,0,0)$, the part observable $\Oc_A=\{E_A\}$ with $E_A=\tfrac12(p_A^2+\nu^2q_A^2)$, and $H_{\mathrm{int}}=\kappa q_Aq_B$ with $\kappa=0.01$. Then the isolated parts satisfy $E_A^{(1)}\equiv0.5000$ and $E_A^{(2)}\equiv0.5202$, so $d_{T,\Oc,S}(A_1,A_2)=0.0202$ for \emph{every} $T$, with no degradation whatever, while the composites satisfy $\sup_{t\le400}|E_A^{(1)}(t)-E_A^{(2)}(t)|=0.514$.
+\end{theorem}
+
+\begin{proof}[Proof sketch with the operative numbers]
+Here $E_A$ is exactly conserved in isolation. For the composites the potential matrix is $\left(\begin{smallmatrix}\nu_j^2&\kappa\\ \kappa&1\end{smallmatrix}\right)$. For $j=1$ the system is resonant: $\Omega_\pm=\sqrt{1\pm\kappa}$, so $\Omega_+-\Omega_-=0.0100$ and complete beating drains $A$ at $t=\pi/(\Omega_+-\Omega_-)=314.2\,\mathrm{s}$. For $j=2$ the mixing angle has $2\theta=\arctan(2\kappa/(\nu_2^2-1))=0.4597$, so the transferable fraction is $\sin^22\theta=0.1968$ and $E_A^{(2)}\ge(1-0.1968)(0.5202)=0.4178$; the supremum is near $t=297\,\mathrm{s}$.
+\end{proof}
+
+Parts differ by $0.0202$ for all $T$, composites by $0.514$: amplification $25.4$. Two honest restrictions: it requires $\Oc_A=\{E_A\}$, since with $\Oc_A=\{q_A\}$ the isolated parts are already maximally discrepant, so the counterexample does not work with position as the part observable and we do not claim it does; and the naive strengthening to \emph{unbounded} amplification at fixed $T$ is false, the beat and detuning timescales being coupled.
+
+\section{Failure modes and falsification}
+\label{s8}
+
+\begin{definition}[Failure modes of a realization]
+\label{fail}
+Given $\Mc,\Rc,\Dsf,\eps$:
+\textbf{F1, precision failure}: $\Mc$ is admissible and domain-compatible but not $\Rc$-consistent at $\eps$ --- \emph{false} at that precision.
+\textbf{F2, domain failure}: a predicted value leaves $\mathcal{D}$, or the trajectory leaves the region where the model's assumptions were certified --- \emph{uninformative}, not false.
+\textbf{F3, idealization failure}: $\Mc$ is the limit of a family whose limit is singular on the relevant compact set and horizon (Section~\ref{s6}).
+\textbf{F4, reconstruction degeneracy}: the consistent fibre is not a singleton --- F4a gauge (Proposition~\ref{lev}), F4b off-support (Theorem~\ref{off}), F4c structural (Counterexample~\ref{hid}).
+\end{definition}
+
+\begin{interpretation}[The reconciled disagreement]
+\label{brn}
+Our lines disagreed on what a protocol should target. The literature line held that F1 is the mechanism and the obstacle holistic: a failed prediction refutes the conjunction of Hamiltonian, preparation, measurement map, error model, isolation, integrator and calibration, and logic alone never says which conjunct to drop \cite{Duhem1954,Lakatos1970}. The mathematical line objected that F4 is an identifiability failure, \emph{immune} to improving precision --- Proposition~\ref{lev} is the certificate, with $\eps=0$, $T=\infty$, all of $\Oc$, and the degeneracy persisting. We resolve as follows: F1 and F4 are dual, F1 meaning \emph{too few} models fit and F4 \emph{too many}. A goodness-of-fit protocol is blind to two of the four modes --- to F4, because the fit is perfect for an infinite-dimensional family, and to F2, because a model outside its certified domain returns no verdict rather than a false one --- and no tightening of $\eps$ or extension of $T$ repairs either. The remedy for F4 is to \emph{enlarge $S$ and $\Oc$}, so any adequate protocol needs two branches with disjoint remedies.
+\end{interpretation}
+
+\begin{counterexample}[Hamiltonicity is a property of the pair, not of the system]
+\label{damp}
+Refutes: \emph{``whether a system is Hamiltonian is a property of the system.''}
+Consider $m\ddot q=-kq-\gamma m\dot q$ with $\gamma>0$.
+\emph{(i)} For any, possibly time-dependent, $H$ on a symplectic manifold, $\mathcal{L}_{X_H}\omega=d\,\iota_{X_H}\omega=d(dH)=0$, so the flow preserves $\omega$ and the Liouville volume; in canonical coordinates $\dive X_H=0$. This is Liouville's theorem, an established result \cite[Ch.~3]{AbrahamMarsden1978}.
+\emph{(ii)} With the \emph{physical} identification $p:=m\dot q$ the field is $X=(p/m,-kq-\gamma p)$, so $\dive X=-\gamma\neq0$ and phase volume contracts as $e^{-\gamma t}$. Hence $X\neq X_H$ for any $H$ whatsoever.
+\emph{(iii)} But with $P:=e^{\gamma t}m\dot q$, the time-dependent Hamiltonian $H_{\mathrm{CK}}=e^{-\gamma t}P^2/2m+e^{\gamma t}kq^2/2$ gives $\dot q=e^{-\gamma t}P/m$, $\dot P=-e^{\gamma t}kq$, hence $\ddot q=-\gamma\dot q-(k/m)q$: the damped equation. The map $(q,p)\mapsto(q,e^{\gamma t}p)$ is time-dependent and non-canonical --- it scales $\omega$ by $e^{\gamma t}$ --- which is exactly why (ii) and (iii) do not conflict.
+\end{counterexample}
+
+So the question has no answer until the measurement map is fixed: admissibility is silent, only the realization map decides. The construction in (iii) is usually associated with Caldirola and Kanai; we cite it by name only, since neither research line verified the primary-source pagination.
+
+\begin{empirical}
+\label{vol}
+At $\gamma=0.1\,\mathrm{s^{-1}}$ the phase-volume factor after $100\,\mathrm{s}$ is $e^{-10}=4.5\times10^{-5}$ against the $1$ required of any Hamiltonian flow --- five orders of magnitude, so the discrimination in (ii) is empirically decidable.
+\end{empirical}
+
+\begin{interpretation}[A negative result we do not soften]
+\label{fals}
+The thesis \emph{``physics is the study of empirically realized compositional mathematical structures''} has the form of a definition of a discipline, not of an empirical hypothesis. If ``empirically realized'' means ``matched to observations'', it reduces to the claim that physics studies mathematics that fits the data, which excludes nothing: no observation report contradicts it, so by Popper's own criterion \cite{Popper1959} it is not falsifiable. We state this plainly rather than defend the thesis, noting that ``naive falsificationism'' is Lakatos's label, not Popper's position \cite{Lakatos1970}. The substantive predicate is \emph{compositional}, and the falsifiable residue is that every empirically successful theory is compositional in a specified technical sense --- its systems and processes forming a symmetric monoidal category with joint systems the monoidal product \cite{BaezStay2011,MacLane1998} --- which has determinate counterexample conditions. Remark~\ref{mon} is a live obstruction \emph{inside} the classical scope, unresolved here; nor can we resolve a second problem, that the map from structure to observations is itself theory, chosen partly because it makes the fit work, so empirical realization relates mathematics to theory-laden observation reports \cite{Kuhn1962}, not to the world.
+\end{interpretation}
+
+Holism relocates rather than defeats: relative to a stated auxiliary bundle the claim \emph{is} testable, which converts holism into a requirement --- every empirical statement must carry its auxiliary bundle --- and is where the framework earns its keep. Instrument loading is itself a composition, so by Proposition~\ref{cong} it is where part-level certificates stop being valid.
+
+\section{Unresolved incompatibilities}
+\label{s9}
+
+\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=2pt]
+\item \textbf{The central object may not exist:} Remark~\ref{mon} is an obstruction, not a technicality \cite{Weinstein2010}, and we supply no alternative categorical target.
+\item \textbf{Completeness versus functoriality:} where Assumption~\ref{cpl} fails \cite{Xia1992}, dynamics is a local flow, so a functor from $(\R,+)$ is ill-typed.
+\item \textbf{Open claims:} we exhibit no novel empirical prediction from compositionality, Conjecture~\ref{gen} is unproved, and priority for the tolerance-space framing and Theorem~\ref{off} is unsettled; we downgraded both novelty claims rather than defend them.
+\end{enumerate}
+
+\paragraph{Bibliographic verification note.}
+Supplied citation candidates required correction: \cite{AbrahamMarsden1978} is the 2nd edition, prepared with T.~Ratiu and R.~Cushman, and \cite{BaezStay2011} is a book chapter, not a journal article. Unverifiable attributions --- pagination for Caldirola and Kanai, and the stiff-limit literature of Remark~\ref{stf} --- are deliberately absent.
+
+{\footnotesize
+\begin{thebibliography}{99}
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+\bibitem{AbrahamMarsden1978} R.~Abraham, J.~E. Marsden, \emph{Foundations of Mechanics}, 2nd ed., Benjamin/Cummings, 1978.
+\bibitem{BaezStay2011} J.~C. Baez, M.~Stay, ``Physics, topology, logic and computation: a Rosetta stone,'' Lect.\ Notes Phys.\ \textbf{813} (2011), 95--174.
+\bibitem{Duhem1954} P.~Duhem, \emph{The Aim and Structure of Physical Theory}, Princeton Univ.\ Press, 1954.
+\bibitem{Gronwall1919} T.~H. Gr\"onwall, ``Note on the derivatives with respect to a parameter of the solutions of a system of differential equations,'' Ann.\ of Math.\ \textbf{20} (1919), 292--296.
+\bibitem{Kuhn1962} T.~S. Kuhn, \emph{The Structure of Scientific Revolutions}, Univ.\ of Chicago Press, 1962.
+\bibitem{Lakatos1970} I.~Lakatos, ``Falsification and the methodology of scientific research programmes,'' in \emph{Criticism and the Growth of Knowledge}, Cambridge Univ.\ Press, 1970, 91--196.
+\bibitem{LaudanLeplin1991} L.~Laudan, J.~Leplin, ``Empirical equivalence and underdetermination,'' J.~Philos.\ \textbf{88} (1991), 449--472.
+\bibitem{MacLane1998} S.~Mac Lane, \emph{Categories for the Working Mathematician}, 2nd ed., Springer, 1998.
+\bibitem{Norton2008} J.~D. Norton, ``The dome: an unexpectedly simple failure of determinism,'' Philos.\ Sci.\ \textbf{75} (2008), 786--798.
+\bibitem{PaperI} PRINCIPIA PHYSICA Pilot --- Topic 1, ``Compositional Systems in Finite-Dimensional Classical Mechanics: A Typed Reconstruction and Its Failure Modes,'' pilot topic series, Paper~I of 3, 2026.
+\bibitem{PaperII} PRINCIPIA PHYSICA Pilot --- Topic 2, ``Hamiltonian Reconstruction as a Physical Theory Object,'' pilot topic series, Paper~II of 3, 2026.
+\bibitem{Popper1959} K.~R. Popper, \emph{The Logic of Scientific Discovery}, Hutchinson, 1959.
+\bibitem{Weinstein2010} A.~Weinstein, ``Symplectic categories,'' Port.\ Math.\ \textbf{67} (2010), 261--278.
+\bibitem{Xia1992} Z.~Xia, ``The existence of noncollision singularities in Newtonian systems,'' Ann.\ of Math.\ \textbf{135} (1992), 411--468.
 \end{thebibliography}
+}
+
 \end{document}

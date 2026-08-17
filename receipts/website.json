@@ -1,32 +1,268 @@
 {
   "schema": "principia-publication-website-receipt.v1",
-  "validated_at": "2026-08-16",
-  "result": "pass",
-  "tools": {
-    "html": "Node.js structural and content assertions",
-    "css": "Node.js delimiter-balance check",
-    "links": "Node.js filesystem target resolver",
-    "images": "ImageMagick identify",
-    "pdf": "Poppler pdfinfo",
-    "json": "jq",
-    "copies": "cmp",
-    "hashes": "shasum -a 256"
+  "task_id": "build_website",
+  "run_date": "2026-08-16",
+  "platform": "darwin 25.6.0, arm64",
+  "note": "AgentHero supplied no build or validation command recipe. Every tool below was selected by the builder from what is available locally, run, and its real output inspected. Exit statuses are the ones observed, not expected values. Re-run in the terminal release review after repair: the counts below are the values observed on the repaired bundle, not the first-build values.",
+  "site": {
+    "root": "website/",
+    "entry": "website/index.html",
+    "static": true,
+    "javascript": false,
+    "external_requests": 0,
+    "external_fonts": 0,
+    "build_step_required": false
   },
-  "checks": {
-    "html_required_structure_and_metadata": "pass",
-    "css_balanced_blocks": "pass",
-    "accessibility_landmarks_skip_link_language_heading_and_focus": "pass",
-    "responsive_breakpoints": "pass",
-    "twelve_epistemic_labels": "pass: 12/12",
-    "formal_companion_scope_disclosure": "pass",
-    "all_local_relative_targets": "pass: 19/19",
-    "open_graph_image": "pass: PNG, 1200x630",
-    "paper_page_ranges": "pass: 6, 7, 6, and 10 pages",
-    "json_parse": "pass",
-    "accepted_artifact_copy_identity": "pass"
+  "tools_selected": [
+    {
+      "purpose": "HTML5 conformance",
+      "tool": "html-validate",
+      "version": "11.7.0",
+      "invocation": "npx --yes html-validate@11.7.0 website/index.html"
+    },
+    {
+      "purpose": "CSS syntax and value-grammar validation",
+      "tool": "csstree-validator",
+      "version": "4.0.1",
+      "invocation": "npx --yes csstree-validator@latest website/styles.css"
+    },
+    {
+      "purpose": "automated WCAG audit in a real browser",
+      "tool": "axe-core",
+      "version": "4.11.0",
+      "invocation": "axe.run(document, {runOnly: {type: 'tag', values: ['wcag2a','wcag2aa','wcag21a','wcag21aa','best-practice']}}) injected into the page"
+    },
+    {
+      "purpose": "browser automation for the audit, the layout probe and screenshots",
+      "tool": "Playwright driving installed Google Chrome",
+      "version": "playwright 1.56.1, Google Chrome 151.0.7922.138",
+      "invocation": "chromium.launch({ channel: 'chrome' })"
+    },
+    {
+      "purpose": "image dimension check",
+      "tool": "sips",
+      "version": "316",
+      "invocation": "sips -g pixelWidth -g pixelHeight -g format website/og.png"
+    },
+    {
+      "purpose": "second, independent image check and blankness detection",
+      "tool": "ImageMagick identify",
+      "version": "7.1.2-29",
+      "invocation": "magick identify -format '%k %[fx:standard_deviation] %[fx:mean]' website/og.png"
+    },
+    {
+      "purpose": "Open Graph image authoring",
+      "tool": "Pillow",
+      "version": "12.3.0 on Python 3.14.7",
+      "invocation": "inline Python drawing program: vertical gradient, sheared-ellipse phase-portrait motif, accent bar, Georgia Bold title, Arial meta text"
+    },
+    {
+      "purpose": "PDF integrity and page count",
+      "tool": "pdfinfo",
+      "version": "26.08.0",
+      "invocation": "pdfinfo website/papers/pdf/<name>.pdf"
+    },
+    {
+      "purpose": "artifact integrity against the upstream receipts",
+      "tool": "shasum",
+      "version": "6.04",
+      "invocation": "shasum -a 256 <path>"
+    },
+    {
+      "purpose": "structure, links, accessibility and contrast checking",
+      "tool": "Python standard library (html.parser, re, json, subprocess)",
+      "version": "3.14.7",
+      "invocation": "inline checker program run from the workspace root; not shipped in the bundle"
+    }
+  ],
+  "tools_evaluated_and_rejected": [
+    {
+      "tool": "HTML Tidy (Apple build, 31 October 2006)",
+      "reason": "predates HTML5; reports header, nav, main, section, article and figure as unrecognised elements, so its output is not a valid signal for this document"
+    },
+    {
+      "tool": "csstree-validator 3.0.0",
+      "reason": "rejects clamp() in font-size as invalid, which is a false positive for baseline-supported CSS; replaced with 4.0.1, which accepts it"
+    },
+    {
+      "tool": "Playwright's bundled chromium_headless_shell",
+      "reason": "the cached build did not match the installed Playwright revision; the locally installed Google Chrome was used via channel: 'chrome' instead of downloading a browser"
+    }
+  ],
+  "checks_run": [
+    {
+      "check": "html5_conformance",
+      "tool": "html-validate 11.7.0",
+      "exit_status": 0,
+      "problems": 0,
+      "fixed_during_build": [
+        "title longer than 70 characters",
+        "7 inline style attributes",
+        "role=\"region\" on a div where a native <section> is preferred"
+      ]
+    },
+    {
+      "check": "css_grammar",
+      "tool": "csstree-validator 4.0.1",
+      "exit_status": 0,
+      "problems": 0
+    },
+    {
+      "check": "accessibility_audit",
+      "tool": "axe-core 4.11.0 in Chrome 151",
+      "violations": 0,
+      "passes": 38,
+      "incomplete": [
+        "color-contrast"
+      ],
+      "incomplete_note": "axe leaves contrast incomplete where a translucent sticky header can overlay content; all pairs were computed manually instead"
+    },
+    {
+      "check": "contrast_wcag21",
+      "tool": "inline Python, WCAG 2.1 relative luminance",
+      "pairs_checked": 14,
+      "minimum_text_ratio": 7.75,
+      "threshold": 4.5,
+      "passed": true,
+      "non_text_boundary_minimum": 3.07,
+      "non_text_threshold": 3.0
+    },
+    {
+      "check": "responsive_layout",
+      "tool": "Playwright layout probe",
+      "widths_px": [
+        320,
+        375,
+        414,
+        768,
+        1024,
+        1440
+      ],
+      "horizontal_overflow_px": 0,
+      "passed": true
+    },
+    {
+      "check": "pointer_target_size",
+      "tool": "Playwright bounding boxes at 375 px",
+      "anchors_below_44px": 0,
+      "passed": true
+    },
+    {
+      "check": "relative_links_resolve",
+      "tool": "inline Python link checker",
+      "links_on_page": 47,
+      "local_file_targets_resolved": 37,
+      "dead_links": 0,
+      "dead_fragments": 0,
+      "external_or_absolute_links": 0,
+      "empty_targets": 0
+    },
+    {
+      "check": "bundle_completeness",
+      "tool": "inline Python",
+      "required_files_present": 21,
+      "required_files_missing": 0,
+      "files_present_but_unlinked": 0
+    },
+    {
+      "check": "json_records_parse",
+      "tool": "inline Python json",
+      "records": 8,
+      "parse_failures": 0
+    },
+    {
+      "check": "og_image_dimensions",
+      "tool": "sips 316",
+      "width": 1200,
+      "height": 630,
+      "format": "png",
+      "passed": true
+    },
+    {
+      "check": "og_image_not_blank",
+      "tool": "magick identify 7.1.2-29",
+      "distinct_colours": 2686,
+      "standard_deviation": 0.2024,
+      "mean": 0.1488,
+      "passed": true,
+      "note": "designed card drawn with Pillow; explicitly not a stretched or letterboxed PDF thumbnail"
+    },
+    {
+      "check": "pdf_integrity",
+      "tool": "pdfinfo 26.08.0",
+      "pages": [
+        9,
+        9,
+        10,
+        7
+      ],
+      "total_pages": 35,
+      "unreadable": 0
+    },
+    {
+      "check": "artifact_integrity",
+      "tool": "shasum -a 256",
+      "compared_against": [
+        "receipts/latex.json",
+        "receipts/formal.json"
+      ],
+      "files_compared": 10,
+      "mismatches": 0,
+      "note": "every .tex, .pdf, Proofs.lean and Core.hs served by the site is byte-identical to the accepted artifact recorded upstream"
+    },
+    {
+      "check": "no_machine_paths_or_secrets",
+      "tool": "inline Python regex over website/index.html, website/styles.css and README.md",
+      "absolute_machine_paths": 0,
+      "secrets": 0,
+      "deployment_urls": 0,
+      "note": "the only URL-shaped strings found are the SVG XML namespace http://www.w3.org/2000/svg in the inline favicon and the http://localhost:8000/ example in the README local-inspection instructions; neither is a deployment origin, and no production URL is guessed anywhere in this bundle"
+    }
+  ],
+  "content_requirements": {
+    "papers_linked_pdf": 4,
+    "papers_linked_latex": 4,
+    "formal_artifacts_linked": 2,
+    "review_records_linked": 3,
+    "receipts_linked": 4,
+    "epistemic_labels_listed": 12,
+    "formal_artifacts_described_as_representative_not_proofs_of_the_thesis": true,
+    "limitations_section_present": true
   },
-  "notes": [
-    "The installed legacy HTML Tidy does not implement HTML5 and reports standard HTML5 elements, UTF-8 punctuation, ARIA attributes, and Open Graph metadata as unapproved; its diagnostics were inspected and it was not used as the acceptance validator.",
-    "No network services, publishing tools, or messaging tools were used."
-  ]
+  "review_cycle": {
+    "native_agents_used": true,
+    "agent_runtime": "Claude native Agent capability, two bounded subagents started in parallel",
+    "agents": [
+      {
+        "role": "accessibility-and-navigation reviewer",
+        "read_only": true,
+        "owned_declared_outputs": 0,
+        "milestones_reported": [
+          "a11y_review.start",
+          "a11y_review.done"
+        ],
+        "findings_returned": 4,
+        "verdict": "accept-with-fixes"
+      },
+      {
+        "role": "research-communication reviewer",
+        "read_only": true,
+        "owned_declared_outputs": 0,
+        "milestones_reported": [
+          "comms_review.start",
+          "comms_review.done"
+        ],
+        "findings_returned": 2,
+        "verdict": "accept-with-fixes"
+      }
+    ],
+    "parent_findings": 6,
+    "unique_findings_total": 10,
+    "first_pass_record": "reviews/website-self-review.json",
+    "accepted_record": "website/reviews/website-review.json",
+    "fix_passes_used": 1,
+    "fix_passes_permitted": 2,
+    "residual_findings": 0
+  },
+  "accepted": true
 }

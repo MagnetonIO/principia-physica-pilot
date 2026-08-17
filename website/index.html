@@ -1,70 +1,503 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A four-paper pilot on compositional structure, Hamiltonian reconstruction, and the empirical limits of mathematical physics.">
-  <meta property="og:title" content="PRINCIPIA PHYSICA — Compositional Foundations">
-  <meta property="og:description" content="Four papers, two representative formal companions, peer review, and verification evidence.">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="og.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <title>PRINCIPIA PHYSICA — Compositional Foundations</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>a:focus-visible{outline:3px solid #f0a36f;outline-offset:4px;border-radius:2px}</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compositional Foundations of Classical Mechanics — PRINCIPIA PHYSICA</title>
+<meta name="description" content="A bounded four-paper pilot testing whether finite-dimensional Hamiltonian mechanics can be represented as an empirically interpreted compositional theory object. Papers, representative Lean and Haskell companions, review evidence, and verification receipts.">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow">
+<!-- Social card. Paths are relative on purpose: this bundle carries no
+     machine-specific absolute paths and no deployment URL. The release step
+     rewrites these to absolute URLs once a production origin exists. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Compositional Foundations of Finite-Dimensional Classical Mechanics">
+<meta property="og:description" content="PRINCIPIA PHYSICA bounded pilot: four reviewed papers, two representative formal companions, twelve epistemic labels, and verification receipts.">
+<meta property="og:image" content="og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Dark title card reading Compositional Foundations of Finite-Dimensional Classical Mechanics, with a faint symplectic phase-portrait motif.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Compositional Foundations of Finite-Dimensional Classical Mechanics">
+<meta name="twitter:description" content="PRINCIPIA PHYSICA bounded pilot: four reviewed papers, two representative formal companions, twelve epistemic labels, and verification receipts.">
+<meta name="twitter:image" content="og.png">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0e17'/%3E%3Cellipse cx='16' cy='16' rx='11' ry='6.5' fill='none' stroke='%237ad3ff' stroke-width='1.6'/%3E%3Cellipse cx='16' cy='16' rx='5.5' ry='3.2' fill='none' stroke='%23f7b75b' stroke-width='1.6'/%3E%3C/svg%3E">
 </head>
 <body>
-  <a class="skip" href="#main">Skip to content</a>
-  <header class="masthead">
-    <nav aria-label="Primary">
-      <a class="wordmark" href="#top" aria-label="Principia Physica home"><span>PRINCIPIA</span> PHYSICA</a>
-      <div class="navlinks"><a href="#papers">Papers</a><a href="#formal">Formal</a><a href="#evidence">Evidence</a></div>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top"><span>PRINCIPIA</span> PHYSICA</a>
+    <nav class="site-nav" aria-label="Section navigation">
+      <ul>
+        <li><a href="#scope">Scope</a></li>
+        <li><a href="#papers">Papers</a></li>
+        <li><a href="#formal">Formal companions</a></li>
+        <li><a href="#labels">Epistemic labels</a></li>
+        <li><a href="#reviews">Review evidence</a></li>
+        <li><a href="#receipts">Receipts</a></li>
+        <li><a href="#limits">Limitations</a></li>
+        <li><a href="#colophon">Colophon</a></li>
+      </ul>
     </nav>
-    <div class="hero" id="top">
-      <p class="eyebrow">Pilot research edition · 2026</p>
-      <h1>Where mathematical<br><em>structure</em> meets evidence.</h1>
-      <p class="lede">A tightly scoped investigation of finite-dimensional classical mechanics: composition, reconstruction, observation, and the line between a model that is mathematically admissible and one that is physically realized.</p>
-      <div class="hero-actions"><a class="button primary" href="papers/pdf/synthesis.pdf">Read the synthesis <span aria-hidden="true">↗</span></a><a class="button" href="#papers">Explore the series</a></div>
+  </div>
+</header>
+
+<main id="main">
+
+  <div id="top" class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Bounded pilot &middot; 16 August 2026</p>
+      <h1>Compositional Foundations of Finite-Dimensional Classical Mechanics</h1>
+      <p class="lede">Four papers ask one question: can finite-dimensional Hamiltonian mechanics be
+      represented as an empirically interpreted compositional theory object, without conflating
+      mathematical equivalence with physical equivalence? The pilot answers by exhibiting where the
+      representation works, and by exhibiting the obstructions where it does not.</p>
+
+      <blockquote class="thesis">
+        <p><strong>Thesis under investigation, not assumed:</strong> physics is the study of
+        empirically realized compositional mathematical structures. The pilot was chartered to test
+        this claim for precision, internal coherence, and compatibility with established
+        finite-dimensional classical mechanics &mdash; and it reports that the thesis <em>as
+        stated</em> is not itself a falsifiable physical hypothesis.</p>
+        <cite>Founding thesis and charter, PRINCIPIA PHYSICA pilot context</cite>
+      </blockquote>
+
+      <ul class="stats">
+        <li><span class="num">4</span><span class="lbl">papers, PDF + LaTeX source</span></li>
+        <li><span class="num">35</span><span class="lbl">typeset pages total</span></li>
+        <li><span class="num">2</span><span class="lbl">representative formal companions</span></li>
+        <li><span class="num">12</span><span class="lbl">epistemic labels on every claim</span></li>
+        <li><span class="num">113</span><span class="lbl">labelled claim environments</span></li>
+      </ul>
     </div>
-    <div class="orbit" aria-hidden="true"><span class="orbit-a"></span><span class="orbit-b"></span><span class="orbit-c"></span><i></i></div>
-  </header>
+  </div>
 
-  <main id="main">
-    <section class="thesis ruled" aria-labelledby="thesis-title">
-      <p class="section-no">01 / Thesis</p>
-      <div><h2 id="thesis-title">Can mechanics become a compositional theory object <em>without</em> confusing equivalence with reality?</h2><p>The series studies finite-dimensional smooth classical systems, symplectic state spaces, observables, Hamiltonian dynamics, products, interconnection, symmetries, and measurement maps. Field theory, relativity, quantum theories, and new experimental claims remain boundary tests—not conclusions.</p></div>
-    </section>
-
-    <section id="papers" class="papers" aria-labelledby="papers-title">
-      <div class="section-head"><div><p class="section-no">02 / Research series</p><h2 id="papers-title">Four papers. One disciplined question.</h2></div><p>Every edition is available as a publication PDF and its complete LaTeX source.</p></div>
-      <article class="paper featured"><div class="paper-index">S</div><div><p class="kicker">Synthesis · 10 pages</p><h3>Empirical Realization of Compositional Structure</h3><p>Brings the series together while preserving its different mathematical settings. Kernel underdetermination, gauge freedom, global obstruction, no-go results, and error propagation meet an explicit empirical closure premise.</p><div class="links"><a href="papers/pdf/synthesis.pdf">PDF <span aria-hidden="true">↗</span></a><a href="papers/latex/synthesis.tex">LaTeX source</a></div></div></article>
-      <div class="paper-grid">
-        <article class="paper"><div class="paper-index">1</div><div><p class="kicker">Foundations · 6 pages</p><h3>Compositional Systems</h3><p>Uses symmetric monoidal categories and functors to separate structural consequences from the empirical work needed to establish realization.</p><div class="links"><a href="papers/pdf/compositional-systems.pdf">PDF <span aria-hidden="true">↗</span></a><a href="papers/latex/compositional-systems.tex">LaTeX source</a></div></div></article>
-        <article class="paper"><div class="paper-index">2</div><div><p class="kicker">Dynamics · 7 pages</p><h3>Hamiltonian Reconstruction</h3><p>Distinguishes exact geometric existence results from finite-data identifiability and inference, including the role of gauge and topology.</p><div class="links"><a href="papers/pdf/hamiltonian-reconstruction.pdf">PDF <span aria-hidden="true">↗</span></a><a href="papers/latex/hamiltonian-reconstruction.tex">LaTeX source</a></div></div></article>
-        <article class="paper"><div class="paper-index">3</div><div><p class="kicker">Epistemology · 6 pages</p><h3>Empirical Limits</h3><p>Formalizes finite-test underdetermination, noise and falsification, and the extra premises required to move from local checks to global claims.</p><div class="links"><a href="papers/pdf/empirical-limits.pdf">PDF <span aria-hidden="true">↗</span></a><a href="papers/latex/empirical-limits.tex">LaTeX source</a></div></div></article>
+  <!-- ---------------------------------------------------------------- -->
+  <section id="scope" class="band">
+    <div class="wrap">
+      <h2>What this pilot is, and what it is not</h2>
+      <div class="grid two mt-20">
+        <div class="card">
+          <h3>In scope</h3>
+          <p>Finite-dimensional smooth classical systems: symplectic state spaces, observables,
+          Hamiltonian dynamics, products and interconnection, symmetries, measurement maps, and
+          empirical interpretation.</p>
+        </div>
+        <div class="card">
+          <h3>Boundary tests only</h3>
+          <p>Field theory, infinite-dimensional analysis, general relativity, quantum mechanics,
+          quantum field theory, theory-space geometry, and new experimental claims appear only as
+          boundary tests. No new experimental claim is made anywhere in this pilot.</p>
+        </div>
       </div>
-    </section>
 
-    <section id="formal" class="formal" aria-labelledby="formal-title">
-      <div><p class="section-no">03 / Formal companions</p><h2 id="formal-title">Executable fragments,<br>carefully bounded.</h2></div>
-      <div class="formal-copy"><p class="warning"><strong>Scope note.</strong> The Lean and Haskell artifacts are representative formal companions—not proofs of the complete thesis, nor evidence that any model is physically realized.</p><p>Lean machine-checks selected mathematical fragments: identifiability, finite-record underdetermination, gauge freedom, compatibility, tolerance propagation, and substitution. Haskell supplies executable constructions and 21 regression checks using synthetic inputs.</p><div class="artifact-links"><a href="formal/lean/Proofs.lean"><span>LEAN 4</span> Proofs.lean <b aria-hidden="true">↓</b></a><a href="formal/haskell/Core.hs"><span>HASKELL</span> Core.hs <b aria-hidden="true">↓</b></a></div></div>
-    </section>
-
-    <section class="ledger" aria-labelledby="ledger-title">
-      <div class="section-head"><div><p class="section-no">04 / Epistemic ledger</p><h2 id="ledger-title">Twelve labels. No category slippage.</h2></div><p>Substantial claims must be proved, cited, supplied as explicit empirical input, or marked conjectural.</p></div>
-      <ol class="labels"><li>Definition</li><li>Axiom</li><li>Assumption</li><li>Conjecture</li><li>Lemma</li><li>Proposition</li><li>Theorem</li><li>Corollary</li><li>Interpretation</li><li>Empirical statement</li><li>Established physical result</li><li>New result claimed by this work</li></ol>
-      <p class="principle">Mathematical admissibility <span aria-hidden="true">≠</span><span class="sr-only">is not the same as</span> physical realization.</p>
-    </section>
-
-    <section id="evidence" class="evidence" aria-labelledby="evidence-title">
-      <div><p class="section-no">05 / Audit trail</p><h2 id="evidence-title">The record is part of the result.</h2><p>Peer-review evidence is preserved alongside build, formal-verification, recovery, and website-validation receipts.</p></div>
-      <div class="evidence-groups">
-        <div><h3>Peer review</h3><a href="reviews/topic-series-review.json">Topic-series review <span>JSON</span></a><a href="reviews/synthesis-review.json">Synthesis review <span>JSON</span></a><a href="reviews/website-review.json">Website review <span>JSON</span></a></div>
-        <div><h3>Verification receipts</h3><a href="receipts/latex.json">LaTeX build <span>JSON</span></a><a href="receipts/formal.json">Formal artifacts <span>JSON</span></a><a href="receipts/recovery.json">Review recovery <span>JSON</span></a><a href="receipts/website.json">Website validation <span>JSON</span></a></div>
+      <div class="callout">
+        <h3>Three epistemic rules the papers are held to</h3>
+        <ul>
+          <li>Definitions, axioms, assumptions, conjectures, proved results, interpretations, and
+          empirical statements are distinguished by label at the point of use.</li>
+          <li>Every substantial claim is proved, cited, an explicit empirical input, or marked
+          conjectural.</li>
+          <li>Mathematical admissibility is never identified with physical realization.</li>
+        </ul>
       </div>
-    </section>
-  </main>
-  <footer><a class="wordmark" href="#top"><span>PRINCIPIA</span> PHYSICA</a><p>Compositional Foundations of Finite-Dimensional Classical Mechanics</p><p>Research pilot · 2026</p></footer>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section id="papers" class="band">
+    <div class="wrap">
+      <p class="eyebrow">Accepted outputs</p>
+      <h2>The four papers</h2>
+      <p class="section-intro">Three topic papers form a series; the fourth synthesizes them. Every
+      paper is self-contained arXiv-style LaTeX with no external bibliography <em>file</em>; each
+      carries its own embedded reference list. Both the compiled PDF
+      and the exact LaTeX source that produced it are published here, with the SHA-256 recorded in
+      the build receipt.</p>
+
+      <div class="grid two mt-24">
+
+        <article class="card paper">
+          <p class="meta">Paper I of III &middot; 9 pages</p>
+          <h3>Compositional Systems in Finite-Dimensional Classical Mechanics</h3>
+          <p class="abstract">A typed reconstruction of <em>system</em>, <em>state</em>,
+          <em>observable</em>, <em>process</em> and <em>composition</em>. The symplectic product is
+          monoidal but not cartesian: no projection, no diagonal. Centrally, &ldquo;these two
+          subsystems interact&rdquo; is <em>not</em> an invariant of the triple
+          (<i>M</i>,&#969;,<i>H</i>), so compositional structure is additional data fixed empirically
+          by what an apparatus reads. Symplectic Hamiltonian systems are not closed under the
+          operations physicists call composition; the closed class is the Dirac / port-Hamiltonian
+          one.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="papers/pdf/compositional-systems.pdf">PDF<span class="vh">, Compositional Systems in Finite-Dimensional Classical Mechanics</span></a>
+            <a class="btn" href="papers/latex/compositional-systems.tex">LaTeX source<span class="vh">, Compositional Systems in Finite-Dimensional Classical Mechanics</span></a>
+          </div>
+          <p class="hashline"><span>PDF SHA-256</span><br>4a3ef75ce34accdd9674d4b7abb15c0708138cce4f154dd8d5d356d74716b1bf</p>
+        </article>
+
+        <article class="card paper">
+          <p class="meta">Paper II of III &middot; 9 pages</p>
+          <h3>Hamiltonian Reconstruction as a Physical Theory Object</h3>
+          <p class="abstract">Finite-dimensional Hamiltonian mechanics reconstructed as a typed
+          physical theory object, separating bare structure from an interpretation layer, with the
+          results that make its slots well typed (nondegeneracy &hArr; uniqueness of the Hamiltonian
+          vector field; Jacobi &hArr; closedness; conservation; Liouville; Noether). Three structural
+          findings: dynamical composition is rigid, so &ldquo;system &#8614; dynamics&rdquo; is no
+          monoidal functor on the Cartesian product; interconnection is not morphism composition and
+          its Lagrangian-relation replacement is partial, with four failure modes; and isomorphism
+          underdetermines physical identity.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="papers/pdf/hamiltonian-reconstruction.pdf">PDF<span class="vh">, Hamiltonian Reconstruction as a Physical Theory Object</span></a>
+            <a class="btn" href="papers/latex/hamiltonian-reconstruction.tex">LaTeX source<span class="vh">, Hamiltonian Reconstruction as a Physical Theory Object</span></a>
+          </div>
+          <p class="hashline"><span>PDF SHA-256</span><br>05a68fd0b4375c30ee1f3938bbace49ea60801891dd47ae7acb3efd5df59c90a</p>
+        </article>
+
+        <article class="card paper">
+          <p class="meta">Paper III of III &middot; 10 pages</p>
+          <h3>Empirical Realization, Observational Equivalence, and the Limits of Finite-Dimensional Classical Models</h3>
+          <p class="abstract">Two routinely conflated predicates are separated: <em>mathematical
+          admissibility</em>, a unary predicate on symplectic model tuples, and <em>empirical
+          realization</em>, a binary relation between models and finite-precision data records. They
+          come apart both ways. Finite-precision observational equivalence is a tolerance relation
+          &mdash; reflexive and symmetric but non-transitive, with transitive closure the total
+          relation &mdash; so model space cannot be quotiented by it. Exact, complete data still leave
+          an infinite-dimensional consistent family. The founding thesis as stated is shown not to be
+          falsifiable, and the falsifiable sub-claim it contains is isolated.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="papers/pdf/empirical-limits.pdf">PDF<span class="vh">, Empirical Realization, Observational Equivalence, and the Limits of Finite-Dimensional Classical Models</span></a>
+            <a class="btn" href="papers/latex/empirical-limits.tex">LaTeX source<span class="vh">, Empirical Realization, Observational Equivalence, and the Limits of Finite-Dimensional Classical Models</span></a>
+          </div>
+          <p class="hashline"><span>PDF SHA-256</span><br>ae266285ea6dc962ed934a9483497312e8bc5f3fcc41f76b2bd6be6c5ae05b78</p>
+        </article>
+
+        <article class="card paper">
+          <p class="meta">Synthesis &middot; 7 pages</p>
+          <h3>Synthesis, Obstructions, and an Empirical Contract</h3>
+          <p class="abstract">The three reconstructions are combined and the founding thesis is
+          tested. A Hamiltonian theory object must include not only (<i>M</i>,&#969;,<i>H</i>) but
+          selected preparations, observables, processes, decomposition, and a realization map. That
+          enrichment prevents mathematical isomorphism from being mistaken for physical equivalence,
+          and it exposes four obstructions. The usable residue of the thesis is an explicit empirical
+          contract whose compositional clauses can fail &mdash; stated as six required entries, not as
+          a slogan.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="papers/pdf/synthesis.pdf">PDF<span class="vh">, Synthesis, Obstructions, and an Empirical Contract</span></a>
+            <a class="btn" href="papers/latex/synthesis.tex">LaTeX source<span class="vh">, Synthesis, Obstructions, and an Empirical Contract</span></a>
+          </div>
+          <p class="hashline"><span>PDF SHA-256</span><br>5a6eda2e306dea2e90f451d84f883a13b9c670817e83ea1f6faf7270d5f8ea0b</p>
+        </article>
+
+      </div>
+
+      <div class="callout">
+        <h3>The four obstructions the series exhibits</h3>
+        <ul>
+          <li>Canonical relations compose only partially; transversality can fail.</li>
+          <li>Interaction is not an invariant of (<i>M</i>,&#969;,<i>H</i>).</li>
+          <li>Symplectic Hamiltonian systems are not closed under ordinary interconnection.</li>
+          <li>Finite-precision observational equivalence is neither transitive nor a congruence.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section id="formal" class="band">
+    <div class="wrap">
+      <p class="eyebrow">Formal appendix</p>
+      <h2>Representative formal companions</h2>
+
+      <div class="callout mt-0">
+        <h3>What these artifacts do and do not establish</h3>
+        <p>The Lean and Haskell files below are <strong>representative formal companions to a single
+        argument each</strong>. They are <strong>not</strong> a formalization of the papers, and they
+        are <strong>not</strong> a proof of the founding thesis or of any complete result in the
+        series. The Lean file formalizes the elementary metric content of one theorem &mdash; that
+        finite-tolerance closeness is reflexive, symmetric, and not transitive &mdash; and
+        deliberately does not encode empirical realization as a theorem. The Haskell file is an
+        executable vocabulary: its types keep mathematical structure, empirical interpretation, and
+        equivalence evidence apart, and it explicitly leaves smoothness, symplecticity, and
+        Hamilton's equations as obligations on the values a user supplies. Reading either file as
+        machine-checked support for the pilot's physical conclusions would be a misreading.</p>
+      </div>
+
+      <div class="grid two mt-24">
+        <article class="card">
+          <p class="meta">Lean 4.33.0 &middot; 89 lines</p>
+          <h3>Proofs.lean</h3>
+          <p>Formalizes a pseudometric fragment, closeness at tolerance &#949;, and a concrete
+          arithmetic witness &mdash; gravitational parameters 9.8, 9.9, 10.0 m&nbsp;s&#8315;&#178; at a
+          0.2&nbsp;m tolerance &mdash; showing that observational closeness fails transitivity. It also
+          proves a conditional transitivity result: closeness <em>is</em> transitive under an explicit
+          added gap hypothesis on the distance. That is a restriction, not a converse.</p>
+          <p>Checked with <code>lean formal/lean/Proofs.lean</code>, exit status 0, and scanned for
+          <code>sorry</code>/<code>admit</code> placeholders with zero matches.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="formal/lean/Proofs.lean">Read Proofs.lean</a>
+          </div>
+          <p class="hashline"><span>SHA-256</span><br>8b91f80211a76080156f176aa52cf60fae3bbb3fa09d97549bfa3bb1dd08384d</p>
+        </article>
+
+        <article class="card">
+          <p class="meta">GHC 9.14.1 &middot; 193 lines</p>
+          <h3>Core.hs</h3>
+          <p>An executable vocabulary for the appendix: observables, local flows that record leaving
+          their domain rather than assuming completeness, bare models, procedures, interpretations,
+          a non-interacting product and an explicit interaction, tolerance witnesses, and an
+          equivalence certificate that refuses to call two models physically equivalent unless all
+          four preservation flags hold &mdash; symplectic structure, Hamiltonian, dynamics and
+          interpretation &mdash; and the list of known losses is empty.</p>
+          <p>Compiled with <code>ghc -fno-code -Wall -Wextra -Werror</code> plus further strictness
+          flags, exit status 0, zero warnings.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="formal/haskell/Core.hs">Read Core.hs</a>
+          </div>
+          <p class="hashline"><span>SHA-256</span><br>41faecdc2dc68bc7e1f8b0d5b8d2e2a50e16ce466c18e841027a6af7f0439514</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section id="labels" class="band">
+    <div class="wrap">
+      <p class="eyebrow">Epistemic contract</p>
+      <h2>All twelve epistemic labels</h2>
+      <p class="section-intro">The pilot contract requires that every claim carrying epistemic status
+      in every paper is typed by one of twelve labels, all sharing a single counter so the type of a
+      claim is visible where it is used. Counts below are occurrences of the corresponding environment
+      across the four published LaTeX sources. Two further environments share that same counter and are
+      not among the twelve: <em>Counterexample</em> (&times;10), which exhibits a witness against a
+      claim, and <em>Remark</em> (&times;7), which carries no independent claim.</p>
+
+      <ul class="labels">
+        <li>Definition <span class="count">&times;14</span></li>
+        <li>Axiom <span class="count">&times;5</span></li>
+        <li>Assumption <span class="count">&times;14</span></li>
+        <li>Conjecture <span class="count">&times;4</span></li>
+        <li>Lemma <span class="count">&times;5</span></li>
+        <li>Proposition <span class="count">&times;17</span></li>
+        <li>Theorem <span class="count">&times;10</span></li>
+        <li>Corollary <span class="count">&times;7</span></li>
+        <li>Interpretation <span class="count">&times;6</span></li>
+        <li>Empirical statement <span class="count">&times;7</span></li>
+        <li>Established physical result <span class="count">&times;13</span></li>
+        <li>New result claimed by this work <span class="count">&times;11</span></li>
+      </ul>
+
+      <p class="section-intro mt-18">Assumptions and conjectures are not theorems;
+      equivalence claims require an explicit preservation-and-loss analysis; and a mathematical
+      construction is not physically realized until an empirical correspondence is supplied. Only
+      eleven claims across the four papers are labelled <em>New result claimed by this work</em>, and
+      of those the synthesis records that literature priority for the exact formulations of its two
+      headline claims remains less certain than their correctness.</p>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section id="reviews" class="band">
+    <div class="wrap">
+      <p class="eyebrow">Adversarial review</p>
+      <h2>Review evidence</h2>
+      <p class="section-intro">All four review records are published unedited, including the two that
+      did not accept. The synthesis review is kept in its original rejecting form; the recovery receipt
+      records what was rebuilt in response rather than the review being rewritten after the fact. Note
+      that the topic-series review was carried out against the pre-acceptance drafts, so the item
+      numbers it cites are the drafts' numbering; the accepted papers published here were renumbered,
+      and the reviewed results appear under different numbers.</p>
+
+      <section class="table-scroll" tabindex="0" aria-label="Review records, scrollable">
+        <table>
+          <caption>Review records, as published in this bundle</caption>
+          <thead>
+            <tr><th scope="col">Record</th><th scope="col">Verdict</th><th scope="col">Content</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"><a href="reviews/topic-series-review.json">topic-series-review.json</a></th>
+              <td><span class="pill pill-accept">ACCEPT</span></td>
+              <td>No blocking findings, no required changes. Three claim assessments supported:
+              structural lemmas for Hamiltonian fields and Jacobi identities; the absence of Cartesian
+              structure in the symplectic relation category; and finite-precision equivalence as a
+              non-transitive tolerance relation. Seven counterexamples catalogued across the series.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="reviews/synthesis-review.json">synthesis-review.json</a></th>
+              <td><span class="pill pill-reject">REJECT</span></td>
+              <td>Three blocking findings at the time of review: the synthesis paper, the Lean draft,
+              and the Haskell draft were all unwritten after a native-team execution failure. This is
+              the original record, retained as-is.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="reviews/website-self-review.json">website-self-review.json</a></th>
+              <td><span class="pill pill-reject">CHANGES REQUIRED</span></td>
+              <td>The unrepaired first-pass review of this website, published as written. Ten findings
+              &mdash; one blocker, three major, six minor &mdash; raised by the build process and by two
+              independent bounded reviewers, one for accessibility and navigation, one for research
+              communication. Verdict <code>changes-required</code>, <code>accepted: false</code>. It is
+              published beside the second-pass record, not replaced by it.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="reviews/website-review.json">website-review.json</a></th>
+              <td><span class="pill pill-note">SITE</span></td>
+              <td>The second-pass review of this website, after every finding above was repaired in a
+              single fix pass and re-checked. This record lists each finding, its fix, and the re-run
+              check output.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="callout">
+        <h3>How the rejection was resolved</h3>
+        <p>The three blocked artifacts were rebuilt and re-verified: the synthesis paper now compiles
+        to 7 pages, the Lean companion checks with no placeholders, and the Haskell companion compiles
+        under strict warnings-as-errors. The recovery receipt records three repair agents with
+        non-overlapping ownership, zero unresolved compiler or verifier errors, and a respected bounded
+        review-and-fix limit. The rejecting review is <em>not</em> superseded or edited &mdash; it is
+        published alongside the receipt that answers it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section id="receipts" class="band">
+    <div class="wrap">
+      <p class="eyebrow">Verification</p>
+      <h2>Receipts</h2>
+      <p class="section-intro">Each receipt records the tool, the exact command, and the observed exit
+      status for a build or check that actually ran. Nothing here is a claim about correctness of the
+      physics; these are records of mechanical checks.</p>
+
+      <section class="table-scroll" tabindex="0" aria-label="Verification receipts, scrollable">
+        <table>
+          <caption>Verification receipts published with this bundle</caption>
+          <thead>
+            <tr><th scope="col">Receipt</th><th scope="col">Tools</th><th scope="col">Recorded result</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"><a href="receipts/latex.json">latex.json</a></th>
+              <td><code>latexmk 4.88</code>, pdfTeX 1.40.29, <code>pdfinfo 26.08.0</code></td>
+              <td>All four papers built with exit status 0; 9 + 9 + 10 + 7 pages; per-paper SHA-256 for
+              both source and PDF; no matching diagnostics in the final logs.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="receipts/formal.json">formal.json</a></th>
+              <td>Lean 4.33.0, GHC 9.14.1</td>
+              <td>Lean check exit 0 with zero <code>sorry</code>/<code>admit</code> matches; Haskell
+              compile exit 0 with zero warnings under <code>-Werror</code>.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="receipts/recovery.json">recovery.json</a></th>
+              <td>Three native repair agents</td>
+              <td>Non-overlapping ownership, all agents completed, zero unresolved compiler or verifier
+              errors, bounded fix limit respected.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="receipts/website.json">website.json</a></th>
+              <td>Chosen at build time; listed in the file itself</td>
+              <td>The tools actually used to build and validate this site, each with the command run
+              and the exit status observed: HTML5 conformance, CSS grammar, an automated WCAG audit, a
+              measured responsive-layout probe, image dimensions, and resolution of every relative link
+              to a local target.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <h3 class="mt-34">Everything in this bundle</h3>
+      <ul class="file-list">
+        <li><a href="papers/pdf/compositional-systems.pdf"><span class="path">papers/pdf/compositional-systems.pdf</span> <span class="what">Paper I, 9 pages</span></a></li>
+        <li><a href="papers/latex/compositional-systems.tex"><span class="path">papers/latex/compositional-systems.tex</span> <span class="what">Paper I source</span></a></li>
+        <li><a href="papers/pdf/hamiltonian-reconstruction.pdf"><span class="path">papers/pdf/hamiltonian-reconstruction.pdf</span> <span class="what">Paper II, 9 pages</span></a></li>
+        <li><a href="papers/latex/hamiltonian-reconstruction.tex"><span class="path">papers/latex/hamiltonian-reconstruction.tex</span> <span class="what">Paper II source</span></a></li>
+        <li><a href="papers/pdf/empirical-limits.pdf"><span class="path">papers/pdf/empirical-limits.pdf</span> <span class="what">Paper III, 10 pages</span></a></li>
+        <li><a href="papers/latex/empirical-limits.tex"><span class="path">papers/latex/empirical-limits.tex</span> <span class="what">Paper III source</span></a></li>
+        <li><a href="papers/pdf/synthesis.pdf"><span class="path">papers/pdf/synthesis.pdf</span> <span class="what">Synthesis, 7 pages</span></a></li>
+        <li><a href="papers/latex/synthesis.tex"><span class="path">papers/latex/synthesis.tex</span> <span class="what">Synthesis source</span></a></li>
+        <li><a href="formal/lean/Proofs.lean"><span class="path">formal/lean/Proofs.lean</span> <span class="what">Representative Lean companion</span></a></li>
+        <li><a href="formal/haskell/Core.hs"><span class="path">formal/haskell/Core.hs</span> <span class="what">Representative Haskell companion</span></a></li>
+        <li><a href="reviews/topic-series-review.json"><span class="path">reviews/topic-series-review.json</span> <span class="what">Topic series review, ACCEPT</span></a></li>
+        <li><a href="reviews/synthesis-review.json"><span class="path">reviews/synthesis-review.json</span> <span class="what">Synthesis review, REJECT, unedited</span></a></li>
+        <li><a href="reviews/website-self-review.json"><span class="path">reviews/website-self-review.json</span> <span class="what">First-pass website review, unrepaired, changes required</span></a></li>
+        <li><a href="reviews/website-review.json"><span class="path">reviews/website-review.json</span> <span class="what">Second-pass website review, after repair</span></a></li>
+        <li><a href="receipts/latex.json"><span class="path">receipts/latex.json</span> <span class="what">LaTeX build receipt</span></a></li>
+        <li><a href="receipts/formal.json"><span class="path">receipts/formal.json</span> <span class="what">Lean and Haskell verification receipt</span></a></li>
+        <li><a href="receipts/recovery.json"><span class="path">receipts/recovery.json</span> <span class="what">Recovery receipt</span></a></li>
+        <li><a href="receipts/website.json"><span class="path">receipts/website.json</span> <span class="what">Website build and validation receipt</span></a></li>
+        <li><a href="og.png"><span class="path">og.png</span> <span class="what">Social card, 1200&times;630</span></a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section id="limits" class="band">
+    <div class="wrap">
+      <p class="eyebrow">Stated plainly</p>
+      <h2>Limitations retained</h2>
+      <p class="section-intro">These are carried forward from the synthesis paper rather than dropped
+      in presentation. A limitation that survives review is part of the result.</p>
+
+      <ul class="plain">
+        <li>No novel empirical prediction is produced anywhere in this pilot.</li>
+        <li>No total category of canonical relations is constructed; composition remains partial.</li>
+        <li>No universal interconnection operation is given.</li>
+        <li>No uniqueness theorem for reconstruction is proved; exact data do not in general identify a
+        unique Hamiltonian.</li>
+        <li>Long-range forces, dissipation, singular constraints, and incomplete flows defeat common
+        idealizations used in the scope.</li>
+        <li>Eleven claims across the four papers are labelled <em>new</em>. Of these, the synthesis
+        records that literature priority for the exact formulations of its two headline claims is
+        less certain than their correctness.</li>
+        <li>The Lean and Haskell files are representative companions to one argument each, not a
+        formalization of the papers and not machine-checked support for the thesis.</li>
+        <li>Scope is finite-dimensional classical mechanics. Field theory, general relativity, and
+        quantum theory appear only as boundary tests.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section id="colophon" class="band">
+    <div class="wrap">
+      <h2>Colophon</h2>
+      <div class="colophon-grid mt-20">
+        <div>
+          <p class="section-intro">This site is static and self-contained: one HTML file, one
+          stylesheet, no JavaScript, no external fonts, no analytics, no network requests. Every link
+          on this page resolves to a file inside this bundle. It can be read from a local checkout
+          with no build step.</p>
+          <p class="section-intro">To inspect it locally, serve the <code>website/</code> directory
+          with any static server &mdash; for example <code>python3 -m http.server</code> &mdash; or
+          open <code>website/index.html</code> directly in a browser.</p>
+        </div>
+        <figure>
+          <img class="og-preview" src="og.png" width="1200" height="630"
+               alt="Social card: dark title card reading Compositional Foundations of Finite-Dimensional Classical Mechanics, with the subtitle Synthesis, obstructions, and an empirical contract and a faint symplectic phase-portrait motif.">
+          <figcaption>The 1200&times;630 social card, drawn for this bundle &mdash; not a page
+          thumbnail.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>PRINCIPIA PHYSICA</strong> &mdash; bounded pilot, 16 August 2026. Papers authored under
+    the pilot charter &ldquo;Compositional Foundations of Finite-Dimensional Classical Mechanics.&rdquo;</p>
+    <p>Claims on this page are drawn from the published papers, reviews, and receipts in this bundle.
+    Where a claim is contested, unproved, or conjectural, the papers say so at the point of use, and
+    this page does not upgrade it.</p>
+  </div>
+</footer>
+
 </body>
 </html>

@@ -1,23 +1,166 @@
 {
-  "schema": "principia-website-self-review.v1",
+  "schema": "principia-publication-website-review.v1",
   "pass": 2,
-  "reviewed_at": "2026-08-16",
-  "verdict": "ACCEPT",
-  "findings": [],
-  "resolved_findings": [
+  "role": "re-run review after the single permitted fix pass",
+  "task_id": "build_website",
+  "run_date": "2026-08-16",
+  "first_pass_record": "reviews/website-self-review.json",
+  "fix_passes_used": 1,
+  "fix_passes_permitted": 2,
+  "target": {
+    "site_root": "website/",
+    "entry": "website/index.html",
+    "stylesheet": "website/styles.css",
+    "social_card": "website/og.png"
+  },
+  "reviewers": [
     {
-      "id": "A11Y-FOCUS-01",
-      "resolution": "Added a high-contrast three-pixel focus-visible outline and four-pixel offset to all links."
+      "id": "parent",
+      "kind": "parent process",
+      "role": "website builder, own instrumented checks and repairs"
+    },
+    {
+      "id": "accessibility-and-navigation",
+      "kind": "native Claude subagent, bounded, read-only",
+      "milestones_reported": ["a11y_review.start", "a11y_review.done"],
+      "milestone_transport": "mcp report_task_status",
+      "pass_1_verdict": "accept-with-fixes",
+      "pass_1_findings": 4
+    },
+    {
+      "id": "research-communication",
+      "kind": "native Claude subagent, bounded, read-only",
+      "milestones_reported": ["comms_review.start", "comms_review.done"],
+      "milestone_transport": "mcp report_task_status",
+      "pass_1_verdict": "accept-with-fixes",
+      "pass_1_findings": 2
     }
   ],
-  "checks": {
-    "content_completeness": "pass",
-    "formal_scope_disclosure": "pass",
-    "twelve_epistemic_labels": "pass",
-    "responsive_layout_review": "pass",
-    "semantic_structure_review": "pass",
-    "visual_design_review": "pass",
-    "local_asset_inventory": "pass",
-    "keyboard_focus_review": "pass"
-  }
+  "finding_disposition": [
+    {
+      "id": "w-1",
+      "severity": "major",
+      "summary": "20 px horizontal document overflow at a 320 px viewport, caused by minmax(320px, 1fr) auto-fit tracks",
+      "status": "fixed",
+      "fix": "every auto-fit and auto-fill grid minimum wrapped in min(..., 100%), and min-width: 0 set on grid children",
+      "reverified_by": "Playwright layout probe at 320, 375, 414, 768, 1024 and 1440 px",
+      "evidence_after_fix": "scrollWidth equals clientWidth at all six widths; overflow 0 px everywhere"
+    },
+    {
+      "id": "w-2",
+      "severity": "major",
+      "summary": "table links rendered 17 px tall, far below the 44 px pointer-target guidance",
+      "status": "fixed",
+      "fix": "td a, th a set to inline-block with min-height 44px and vertical padding",
+      "reverified_by": "Playwright bounding-box measurement of every anchor at 375 px",
+      "evidence_after_fix": "0 anchors below 44 px tall"
+    },
+    {
+      "id": "w-3",
+      "severity": "major",
+      "summary": "horizontally scrolling table containers were not keyboard focusable and had no accessible name",
+      "status": "fixed",
+      "fix": "each wrapper is now a native <section> with tabindex=\"0\" and a distinct aria-label, plus a visible focus ring",
+      "reverified_by": "html-validate 11.7.0 and axe-core 4.11.0",
+      "evidence_after_fix": "html-validate exit 0; axe-core 0 violations, 38 passes"
+    },
+    {
+      "id": "w-4",
+      "severity": "minor",
+      "summary": "secondary button boundary failed the WCAG 1.4.11 3:1 non-text contrast minimum",
+      "status": "fixed",
+      "fix": "--border-hi lightened from #3d4d6d to #5b6f95",
+      "reverified_by": "WCAG 2.1 relative-luminance computation on the CSS custom properties",
+      "evidence_after_fix": "#5b6f95 against --surface #141c2c = 3.37:1 and against --surface-2 #1a2438 = 3.07:1, both above 3:1"
+    },
+    {
+      "id": "w-5",
+      "severity": "minor",
+      "summary": "fixed 84 px scroll-margin-top did not match a sticky header that wraps to four rows on small screens",
+      "status": "fixed",
+      "fix": "below 760 px the header is no longer sticky and the reserved scroll margin drops to 16 px",
+      "reverified_by": "Playwright render at 320 and 375 px",
+      "evidence_after_fix": "no sticky header at narrow widths, so no anchored heading can be obscured and the header no longer consumes a quarter of the viewport"
+    },
+    {
+      "id": "w-6",
+      "severity": "minor",
+      "summary": "in-page nav reached six of the eight top-level sections",
+      "status": "fixed",
+      "fix": "Scope and Colophon entries added to the nav",
+      "reverified_by": "structural checker fragment-target check",
+      "evidence_after_fix": "8 nav entries, every href fragment resolves to an existing id, no dead fragments"
+    },
+    {
+      "id": "w-7",
+      "severity": "minor",
+      "summary": "masthead link 38 px tall and bundle file-list links 41 px tall at 375 px",
+      "status": "fixed",
+      "fix": ".brand made an inline-flex 44 px target; .file-list a padding raised and alignment centred",
+      "reverified_by": "Playwright bounding-box measurement of every anchor at 375 px",
+      "evidence_after_fix": "0 anchors below 44 px tall"
+    },
+    {
+      "id": "w-8",
+      "severity": "blocker",
+      "summary": "the page linked to and described as settled fact three review and receipt files that did not exist, asserting a completed acceptance while the review was still running",
+      "status": "fixed",
+      "fix": "the three records were written with their real content, and the page copy now describes what each record contains -- a second-pass review after one fix pass, and a receipt of commands actually run with observed exit statuses -- instead of asserting an acceptance the records do not themselves show",
+      "reverified_by": "structural checker local-link resolution over every href and src",
+      "evidence_after_fix": "all local link targets resolve to non-empty files, including reviews/website-review.json and receipts/website.json; all seven published JSON records parse"
+    },
+    {
+      "id": "w-9",
+      "severity": "minor",
+      "summary": "the Haskell equivalence gate was described with two of its five conditions",
+      "status": "fixed",
+      "fix": "copy now names all four preservation flags -- symplectic structure, Hamiltonian, dynamics, interpretation -- together with the empty known-losses requirement",
+      "reverified_by": "direct comparison against physicallyEquivalent in formal/haskell/Core.hs",
+      "evidence_after_fix": "site wording matches the conjunction in the source exactly"
+    },
+    {
+      "id": "w-10",
+      "severity": "minor",
+      "summary": "64-character SHA-256 strings did not contribute a breakable min-content width",
+      "status": "fixed",
+      "fix": "overflow-wrap: anywhere on .hashline",
+      "reverified_by": "Playwright layout probe at 320 px",
+      "evidence_after_fix": "no element right edge exceeds the viewport at any tested width"
+    }
+  ],
+  "checks_after_fix": {
+    "html_validate": {"tool": "html-validate 11.7.0", "exit_status": 0, "problems": 0},
+    "css_grammar": {"tool": "csstree-validator (npx, latest)", "exit_status": 0, "problems": 0},
+    "accessibility_audit": {
+      "tool": "axe-core 4.11.0 in Chrome via Playwright",
+      "rulesets": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"],
+      "violations": 0,
+      "passes": 38,
+      "incomplete": ["color-contrast"],
+      "incomplete_note": "axe cannot resolve contrast automatically where a translucent sticky header overlays content; every pair was computed manually instead and the lowest measured text ratio is 7.75:1"
+    },
+    "responsive_layout": {
+      "tool": "Playwright 1.56.1 driving installed Chrome",
+      "widths_px": [320, 375, 414, 768, 1024, 1440],
+      "horizontal_overflow_px": 0,
+      "pointer_targets_below_44px_at_375": 0
+    },
+    "contrast": {"method": "WCAG 2.1 relative luminance, computed over every foreground/background pair in use", "minimum_text_ratio": 7.75, "minimum_required": 4.5},
+    "social_card": {"tool": "sips 316 and magick identify 7.1.2-29", "width": 1200, "height": 630, "format": "png", "distinct_colours": 2686, "standard_deviation": 0.2024, "note": "drawn with Pillow 12.3.0, not a PDF thumbnail"},
+    "papers": {"tool": "pdfinfo 26.08.0", "pages": {"compositional-systems": 9, "hamiltonian-reconstruction": 9, "empirical-limits": 9, "synthesis": 7}, "total_pages": 34}
+  },
+  "content_verification": {
+    "epistemic_labels_listed_on_page": 12,
+    "label_counts_verified_against_sources": true,
+    "labelled_claim_environments_total": 113,
+    "formal_artifacts_bounded_as_representative": true,
+    "founding_thesis_presented_as_under_investigation": true,
+    "rejecting_review_published_unedited": true,
+    "receipt_figures_match_receipt_json": true,
+    "independent_check": "the research-communication reviewer independently recomputed every per-label count, the 34-page total, the 113-claim total, both formal-artifact line counts and all published SHA-256 values from the sources and reported no mismatch"
+  },
+  "verdict": "accept",
+  "accepted": true,
+  "residual_findings": [],
+  "notes": "All ten first-pass findings were repaired in one fix pass and re-verified with the tool that raised them. One fix pass of the two permitted was used."
 }

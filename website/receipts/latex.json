@@ -1,42 +1,46 @@
 {
   "schema": "principia-publication-latex-receipt.v1",
-  "verification_passes": 2,
-  "tools": {
-    "latexmk": "4.88",
-    "pdftex": "3.141592653-2.6-1.40.29 (TeX Live 2026)",
-    "pdfinfo": "Poppler pdfinfo"
+  "run_date": "2026-08-16",
+  "review_fix_passes": 1,
+  "tool": {
+    "name": "latexmk",
+    "version": "4.88",
+    "engine": "pdfTeX 1.40.29"
   },
-  "command": "latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error -outdir=build/latex/<paper> papers/latex/<paper>.tex",
-  "exit_status": 0,
-  "diagnostic_policy": "No LaTeX Warning, package warning, overfull/underfull box, TeX error, or unresolved reference in final logs",
+  "build_command": "latexmk -pdf -gg -halt-on-error -interaction=nonstopmode -file-line-error -outdir=papers/pdf papers/latex/<name>.tex",
+  "diagnostic_check": "rg -n 'LaTeX Warning|Package .* Warning|Overfull|Underfull|Undefined control sequence|Emergency stop|Fatal error' papers/pdf/*.log",
+  "diagnostic_check_exit_status": 1,
+  "diagnostic_interpretation": "No matching diagnostics in final logs; the enclosing acceptance check exited 0.",
+  "page_tool": "pdfinfo 26.08.0",
   "papers": [
     {
-      "source": "papers/latex/compositional-systems.tex",
-      "pdf": "papers/pdf/compositional-systems.pdf",
-      "pages": 6,
-      "source_sha256": "1db18d5b33005c421668df3bbd981ebf41aed0c89484f2643c8d492811d8d7ac",
-      "pdf_sha256": "59225230c74fa4ecc598115de03dfe589b71ea954f3103ae6e0811835a50897d"
+      "name": "compositional-systems",
+      "build_exit_status": 0,
+      "pages": 9,
+      "tex_sha256": "aab157ad0a1ba87b621a57c17050c317b2828ac4a87dbf29ecba7ab4f65c9fd1",
+      "pdf_sha256": "4a3ef75ce34accdd9674d4b7abb15c0708138cce4f154dd8d5d356d74716b1bf"
     },
     {
-      "source": "papers/latex/hamiltonian-reconstruction.tex",
-      "pdf": "papers/pdf/hamiltonian-reconstruction.pdf",
-      "pages": 7,
-      "source_sha256": "48d5792ded3976fa4d45f50dcca440b6fec564edea6e7d4426cec47a2890e3be",
-      "pdf_sha256": "c5813b8839c1026922b04c81bca6bf061a19cff6a74057c63bd8b3710ddd14c4"
+      "name": "hamiltonian-reconstruction",
+      "build_exit_status": 0,
+      "pages": 9,
+      "tex_sha256": "25b3e7a3855242686995ebc15fa51c685dfd8b8f47c9b198eeb1ac45e195f71e",
+      "pdf_sha256": "05a68fd0b4375c30ee1f3938bbace49ea60801891dd47ae7acb3efd5df59c90a"
     },
     {
-      "source": "papers/latex/empirical-limits.tex",
-      "pdf": "papers/pdf/empirical-limits.pdf",
-      "pages": 6,
-      "source_sha256": "d67d7b16349e4f4679b91f5425966963043b9ff2860893d74ec9e582ed80d12d",
-      "pdf_sha256": "d8942fed90f622fd1898001d6ae5a76eee642ae244c5339704af91c9c57a175c"
-    },
-    {
-      "source": "papers/latex/synthesis.tex",
-      "pdf": "papers/pdf/synthesis.pdf",
+      "name": "empirical-limits",
+      "build_exit_status": 0,
       "pages": 10,
-      "source_sha256": "b34f8b25601e8aace381018e4cd57bba54ac691257456fc34c2c68e02695c518",
-      "pdf_sha256": "9ed67895ebf8e9d5432c613cbd7abd24477fb8c9e3a7f1d7b6123e15b560e463"
+      "tex_sha256": "f117c6fc8fc2c1f85187d20d81532d839cb803d4a7ae7149ba8653eafb67a8d1",
+      "pdf_sha256": "ae266285ea6dc962ed934a9483497312e8bc5f3fcc41f76b2bd6be6c5ae05b78"
+    },
+    {
+      "name": "synthesis",
+      "build_exit_status": 0,
+      "pages": 7,
+      "tex_sha256": "f1819b41133b6e6ef940dad124215abcf709f6041d1efe5fa94a6603c22f308f",
+      "pdf_sha256": "5a6eda2e306dea2e90f451d84f883a13b9c670817e83ea1f6faf7270d5f8ea0b"
     }
-  ]
+  ],
+  "accepted": true
 }

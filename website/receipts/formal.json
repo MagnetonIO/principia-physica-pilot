@@ -1,5 +1,29 @@
 {
   "schema": "principia-publication-formal-receipt.v1",
-  "lean": {"tool":"Lean 4.33.0","command":"lean formal/lean/Proofs.lean","exit_status":0,"placeholder_scan":"rg -n '\\b(sorry|admit)\\b' formal/lean/Proofs.lean","placeholder_count":0,"sha256":"95ebe3da6883b57ec06f88473bd603f626f137e530e3afb7c2782d45c4618fce"},
-  "haskell": {"tool":"GHC 9.14.1","command":"ghc -Wall -Wextra -Werror -fforce-recomp -o build/core formal/haskell/Core.hs","compile_exit_status":0,"run_command":"build/core","run_exit_status":0,"regression_checks":"21/21 passed","sha256":"65c8034b61e7af02e27424194b3aa17ed7d886682e068053765d1ff38cc7ff9d"}
+  "run_date": "2026-08-16",
+  "lean": {
+    "tool": "Lean 4.33.0",
+    "placeholder_command": "grep -nE '\\b(sorry|admit|native_decide)\\b' formal/lean/Proofs.lean",
+    "placeholder_exit_status": 1,
+    "placeholder_matches": 0,
+    "axiom_declaration_command": "grep -nE '^[[:space:]]*axiom[[:space:]]' formal/lean/Proofs.lean",
+    "axiom_declaration_exit_status": 1,
+    "axiom_declaration_matches": 0,
+    "axiom_audit_command": "#print axioms on all eight theorems",
+    "axiom_audit_exit_status": 0,
+    "axiom_audit_result": "only propext and Quot.sound; closeAt_symm depends on no axiom; no sorryAx, no Classical.choice, no user-declared axiom",
+    "verify_command": "lean formal/lean/Proofs.lean",
+    "verify_exit_status": 0,
+    "review_fix_passes": 2,
+    "sha256": "8b91f80211a76080156f176aa52cf60fae3bbb3fa09d97549bfa3bb1dd08384d"
+  },
+  "haskell": {
+    "tool": "GHC 9.14.1",
+    "verify_command": "ghc -fno-code -fforce-recomp -Wall -Wextra -Werror -Wcompat -Widentities -Wincomplete-uni-patterns -Wincomplete-record-updates -Wpartial-fields formal/haskell/Core.hs",
+    "verify_exit_status": 0,
+    "warnings": 0,
+    "review_fix_passes": 2,
+    "sha256": "41faecdc2dc68bc7e1f8b0d5b8d2e2a50e16ce466c18e841027a6af7f0439514"
+  },
+  "accepted": true
 }

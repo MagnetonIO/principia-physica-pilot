@@ -1,25 +1,177 @@
 {
-  "schema": "principia-website-self-review.v1",
+  "schema": "principia-publication-website-review.v1",
   "pass": 1,
-  "reviewed_at": "2026-08-16",
-  "verdict": "CHANGES_REQUIRED",
-  "findings": [
+  "role": "first review, before any repair",
+  "task_id": "build_website",
+  "run_date": "2026-08-16",
+  "target": {
+    "site_root": "website/",
+    "entry": "website/index.html",
+    "stylesheet": "website/styles.css",
+    "social_card": "website/og.png"
+  },
+  "reviewers": [
     {
-      "id": "A11Y-FOCUS-01",
-      "severity": "major",
-      "category": "accessibility",
-      "location": "website/index.html",
-      "description": "Interactive links do not have a site-wide, deliberately visible keyboard focus treatment against every background.",
-      "required_fix": "Add a high-contrast :focus-visible outline with spacing for all links."
+      "id": "parent",
+      "role": "website builder, own instrumented checks",
+      "kind": "parent process",
+      "method": "html-validate 11.7.0, csstree-validator, axe-core 4.11.0 driven by Playwright/Chrome, a Playwright layout probe at 320/375/414/768/1024/1440 px, a stdlib Python structural + link + contrast checker, sips, magick identify, pdfinfo, shasum"
+    },
+    {
+      "id": "accessibility-and-navigation",
+      "role": "accessibility and navigation reviewer",
+      "kind": "native Claude subagent, bounded, read-only",
+      "milestones_reported": ["a11y_review.start", "a11y_review.done"],
+      "milestone_transport": "mcp report_task_status",
+      "verdict": "accept-with-fixes",
+      "findings_returned": 4
+    },
+    {
+      "id": "research-communication",
+      "role": "research communication reviewer",
+      "kind": "native Claude subagent, bounded, read-only",
+      "milestones_reported": ["comms_review.start", "comms_review.done"],
+      "milestone_transport": "mcp report_task_status",
+      "verdict": "accept-with-fixes",
+      "findings_returned": 2
     }
   ],
-  "checks": {
-    "content_completeness": "pass",
-    "formal_scope_disclosure": "pass",
-    "twelve_epistemic_labels": "pass",
-    "responsive_layout_review": "pass",
-    "semantic_structure_review": "pass",
-    "visual_design_review": "pass",
-    "local_asset_inventory": "pass"
-  }
+  "automated_results_at_pass_1": {
+    "html_validate_exit_status": 0,
+    "csstree_validator_exit_status": 0,
+    "axe_core_violations": 0,
+    "axe_core_passes": 37,
+    "axe_core_incomplete": ["color-contrast"],
+    "structural_checker_exit_status": 1,
+    "structural_checker_open_failures": [
+      "dead_local_link: reviews/website-review.json (not yet written at pass 1)",
+      "dead_local_link: receipts/website.json (not yet written at pass 1)"
+    ],
+    "min_text_contrast_ratio": 7.75,
+    "og_image": {"width": 1200, "height": 630, "format": "png", "distinct_colours": 2686, "stddev": 0.2024},
+    "pdf_pages": {"compositional-systems": 9, "hamiltonian-reconstruction": 9, "empirical-limits": 9, "synthesis": 7},
+    "document_scroll_overflow_px": {"320": 20, "375": 0, "414": 0, "768": 0, "1024": 0, "1440": 0}
+  },
+  "findings": [
+    {
+      "id": "w-1",
+      "severity": "major",
+      "area": "responsive",
+      "raised_by": ["parent", "accessibility-and-navigation"],
+      "file": "website/styles.css",
+      "locator": ".grid.two { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }",
+      "finding": "At a 320 px viewport the document overflows horizontally by 20 px. An auto-fit track cannot shrink below its px minimum, so a 320 px card is forced into a 280 px content box (.wrap has 20 px padding on each side).",
+      "evidence": "Playwright measurement: documentElement.scrollWidth = 340 at clientWidth = 320; eight offending .card elements each report right = 340. Overflow is 0 at 375 px and above.",
+      "fix_required": "Use a viewport-safe minimum, minmax(min(320px, 100%), 1fr), on every auto-fit grid, and set min-width: 0 on grid children."
+    },
+    {
+      "id": "w-2",
+      "severity": "major",
+      "area": "accessibility",
+      "raised_by": ["parent"],
+      "file": "website/styles.css",
+      "locator": "table links inside .table-scroll (review and receipt tables)",
+      "finding": "Links in the review and receipt tables render as 17 px tall inline targets at a 375 px viewport, far below the 44 x 44 CSS px pointer-target guidance.",
+      "evidence": "Playwright bounding boxes at 375 px: latex.json 70x17, formal.json 82x17, recovery.json 97x17, website.json 92x17.",
+      "fix_required": "Give table cell links display: inline-block with padding and min-height so every one is at least 44 px tall."
+    },
+    {
+      "id": "w-3",
+      "severity": "major",
+      "area": "accessibility",
+      "raised_by": ["parent"],
+      "file": "website/index.html",
+      "locator": "<div class=\"table-scroll\"> wrappers around both data tables",
+      "finding": "The tables scroll horizontally on small screens inside a container that is not keyboard focusable and has no accessible name, so a keyboard-only user cannot reach the clipped columns.",
+      "evidence": "table { min-width: 560px } (460px under 600px) inside .table-scroll { overflow-x: auto }; the wrapper has no tabindex and no role or label. Playwright reports table right edge at 480 px inside a 375 px viewport.",
+      "fix_required": "Add tabindex=\"0\", role=\"region\" and a distinct aria-label to each scroll wrapper, and make the focus ring visible on it."
+    },
+    {
+      "id": "w-4",
+      "severity": "minor",
+      "area": "accessibility",
+      "raised_by": ["accessibility-and-navigation"],
+      "file": "website/styles.css",
+      "locator": ".btn { border: 1px solid var(--border-hi); background: var(--surface-2); } inside .card { background: var(--surface); }",
+      "finding": "The secondary button boundary fails the WCAG 1.4.11 non-text contrast minimum of 3:1, so the control is not reliably distinguishable from the card it sits on.",
+      "evidence": "--border-hi #3d4d6d against --surface #141c2c = 2.01:1 and against --surface-2 #1a2438 = 1.83:1; the button fill against the card fill is 1.10:1.",
+      "fix_required": "Lighten --border-hi until both edges clear 3:1."
+    },
+    {
+      "id": "w-5",
+      "severity": "minor",
+      "area": "navigation",
+      "raised_by": ["accessibility-and-navigation", "parent"],
+      "file": "website/styles.css",
+      "locator": "section { scroll-margin-top: 84px; } with .site-header { position: sticky; top: 0; }",
+      "finding": "scroll-margin-top is a fixed 84 px, but the six-item nav wraps to three or four rows on narrow screens, so the sticky header grows past 84 px and covers the heading an in-page link jumps to. The same wrapped header consumes roughly a quarter of a small-screen viewport before any content is visible.",
+      "evidence": "Playwright screenshot at 375 px: the header occupies four rows, about 200 px tall, and the reserved scroll margin is 84 px.",
+      "fix_required": "Stop the header being sticky at narrow widths and reduce the reserved scroll margin there, so the anchor offset and the real header height agree."
+    },
+    {
+      "id": "w-6",
+      "severity": "minor",
+      "area": "navigation",
+      "raised_by": ["accessibility-and-navigation"],
+      "file": "website/index.html",
+      "locator": "<nav class=\"site-nav\"> list, versus <section id=\"scope\"> and <section id=\"colophon\">",
+      "finding": "The in-page nav lists six of the eight top-level sections; the scope section and the colophon each carry their own h2 but are unreachable from the nav.",
+      "evidence": "Six <li> entries (#papers, #formal, #labels, #reviews, #receipts, #limits) against eight <section> elements with h2 headings.",
+      "fix_required": "Add nav entries for the two missing sections."
+    },
+    {
+      "id": "w-7",
+      "severity": "minor",
+      "area": "accessibility",
+      "raised_by": ["parent"],
+      "file": "website/styles.css",
+      "locator": ".brand and .file-list a",
+      "finding": "Two more pointer targets fall under 44 px tall at a 375 px viewport: the masthead link and the bundle file-list links.",
+      "evidence": "Playwright bounding boxes at 375 px: .brand 172x38; .file-list a rows 82x41.",
+      "fix_required": "Raise the padding and min-height on both so every pointer target is at least 44 px tall."
+    },
+    {
+      "id": "w-8",
+      "severity": "blocker",
+      "area": "review-evidence",
+      "raised_by": ["research-communication"],
+      "file": "website/index.html",
+      "locator": "review table row for website-review.json, receipt table row for website.json, and the corresponding bundle file-list entries",
+      "finding": "The page links to and describes as settled fact three files that did not exist when the page was reviewed: website/reviews/website-review.json, website/receipts/website.json and reviews/website-self-review.json. It asserts a completed and accepted website review-and-repair cycle while that cycle was still running.",
+      "evidence": "Filesystem search across the workspace at pass 1 found only synthesis-review.json, topic-series-review.json, latex.json, formal.json and recovery.json. The parent's own link checker independently reported the two in-bundle paths as dead_local_link.",
+      "fix_required": "Write the three records with their real content, and restate the page copy so it describes exactly what those records contain, rather than asserting an acceptance the records do not themselves show."
+    },
+    {
+      "id": "w-9",
+      "severity": "minor",
+      "area": "formal-artifacts",
+      "raised_by": ["research-communication"],
+      "file": "website/index.html",
+      "locator": "\"an equivalence certificate that refuses to call two models physically equivalent unless interpretation is preserved and the loss list is empty\"",
+      "finding": "The description names two of the five conditions the Haskell gate actually requires, which understates how conservative the check is.",
+      "evidence": "formal/haskell/Core.hs: physicallyEquivalent requires preservesSymplecticStructure && preservesHamiltonian && preservesDynamics && preservesInterpretation && null (knownLosses certificate).",
+      "fix_required": "Name all four preservation flags together with the empty-loss-list requirement."
+    },
+    {
+      "id": "w-10",
+      "severity": "minor",
+      "area": "accessibility",
+      "raised_by": ["parent"],
+      "file": "website/index.html",
+      "locator": "long SHA-256 strings in .hashline inside grid cards",
+      "finding": "Sixty-four character hashes are unbreakable for intrinsic sizing purposes under overflow-wrap: break-word, which contributes to the narrow-viewport overflow in w-1 and can clip a hash inside a narrow card.",
+      "evidence": "overflow-wrap: break-word does not reduce a grid item's min-content contribution; only overflow-wrap: anywhere or word-break does.",
+      "fix_required": "Set overflow-wrap: anywhere on .hashline."
+    }
+  ],
+  "counts": {
+    "total": 10,
+    "blocker": 1,
+    "major": 3,
+    "minor": 6,
+    "by_reviewer": {"parent": 6, "accessibility-and-navigation": 4, "research-communication": 2, "raised_by_two_reviewers": 2}
+  },
+  "verdict": "changes-required",
+  "accepted": false,
+  "next_step": "apply every fix in one pass, then re-run the full check set once; the bounded limit of two fix passes must not be exceeded"
 }
